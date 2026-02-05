@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="de" data-bs-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nico's Links</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <link href="css/index.css" rel="stylesheet">
+</head>
+
+<body class="bg-body">
+
+    <div id="app" v-cloak>
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/icons/home.svg" alt="" class="sidebar-icon">
+                Nico's Links
+                <div id="discord-widget" style="display:none"></div>
+            </div>
+
+            <div v-for="section in navigation" :key="section.title">
+                <div v-if="section.title" class="sidebar-section">{{ section.title }}</div>
+                <ul class="nav flex-column">
+                    <li v-for="item in section.items" :key="item.id" class="nav-item">
+                        <a class="nav-link" :class="{ active: currentHash === item.id }" href="#"
+                            @click.prevent="navigate(item.id)">
+                            <img :src="'assets/icons/' + item.icon" alt="" class="sidebar-icon">
+                            {{ item.label }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <div id="content-container" class="page-content py-4" v-html="contentFragment"></div>
+
+            <footer class="footer mt-auto py-3 bg-body-tertiary border-top">
+                <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center">
+                    <div class="col-md-4 d-flex align-items-center">
+                        <span class="mb-3 mb-md-0 text-body-secondary">&copy; 2026 Nico Ruge</span>
+                    </div>
+
+                    <ul class="nav col-md-4 justify-content-end list-unstyled d-flex align-items-center">
+                        <li class="ms-3">
+                            <div class="dropdown">
+                                <button
+                                    class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center text-body-secondary"
+                                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                                    aria-label="Toggle theme">
+                                    <i :class="activeThemeIcon" class="me-2 theme-icon-active"></i>
+                                    <span class="d-lg-none ms-2">Toggle theme</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li v-for="t in themes" :key="t.value">
+                                        <button type="button" class="dropdown-item d-flex align-items-center"
+                                            :class="{ active: storedTheme === t.value }" @click="setTheme(t.value)">
+                                            <i :class="t.icon" class="me-2 opacity-50"></i>
+                                            {{ t.label }}
+                                            <i v-if="storedTheme === t.value" class="bi bi-check2 ms-auto"></i>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="assets/js/spotify_widget.js"></script>
+    <script src="assets/js/discord_widget.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    currentHash: 'home',
+                    contentFragment: '',
+                    storedTheme: localStorage.getItem('theme') || 'auto',
+                    pages: {
+                        home: `
+                            <div class="container-fluid px-4 py-5">
+                                <div class="row align-items-center g-3 py-5">
+                                    <div class="col-lg-2">
+                                        <img src="assets/images/profile.jpg" class="d-block ms-auto img-fluid rounded-4 shadow-lg"
+                                            alt="Hero Image" style="max-height: 300px; object-fit: cover;"
+                                            onerror="this.src='https://via.placeholder.com/600x400/dee2e6/6c757d?text=Your+Image+Here'">
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <h1 class="display-4 fw-bold lh-1 mb-3">Hi, I'm Nico</h1>
+                                        <p class="lead text-secondary">
+                                            Hobby Photographer & Data Analyst based in Germany.
+                                            Welcome to my personal links page where you can find my work,
+                                            projects, and other stuff I'm interested in.
+                                        </p>
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                                            <a href="https://pics.nico-ruge.de" class="btn btn-primary btn-lg px-4" target="_blank"
+                                                rel="noopener noreferrer" onclick="parent.location.hash='photography'">
+                                                My Photography Portfolio
+                                            </a>
+                                            <a href="https://unsplash.com/@nico_ruge" class="btn btn-outline-secondary btn-lg px-4"
+                                                target="_blank" rel="noopener noreferrer" onclick="parent.location.hash='github'">
+                                                My Images on Unsplash.com
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container-fluid px-4">
+                                <hr class="my-5 border-secondary-subtle">
+                                <div id="spotify-widget" class="mt-4"></div>
+                            </div>
+                        `,
+                        photography: `
+                            <div class="container-fluid">
+                                <h1 class="h3 mb-4">Photography</h1>
+                                <p class="text-secondary">Photography content goes here.</p>
+                            </div>
+                        `,
+                        'camera-equipment': `
+                            <div class="container-fluid px-4 py-5">
+                                <h1 class="display-5 fw-bold mb-5">Camera Equipment</h1>
+                                
+                                <div class="row g-4">
+                                    <style>
+                                        .equipment-card {
+                                            transition: transform 0.2s ease, box-shadow 0.2s ease;
+                                            border: 1px solid var(--bs-border-color);
+                                            background-color: var(--bs-body-tertiary-bg);
+                                        }
+                                        .equipment-card:hover {
+                                            transform: translateY(-5px);
+                                            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+                                        }
+                                        .card-header-icon {
+                                            width: 40px;
+                                            height: 40px;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                        }
+                                    </style>
+                                    <!-- Cameras -->
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="card h-100 shadow equipment-card">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div class="card-header-icon bg-primary rounded-3 text-white shadow-sm me-3">
+                                                        <i class="bi bi-camera" style="font-size: 1.2rem;"></i>
+                                                    </div>
+                                                    <h3 class="h5 mb-0 fw-bold">Cameras</h3>
+                                                </div>
+                                                <ul class="list-group list-group-flush bg-transparent">
+                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
+                                                        <div class="fw-bold">Sony Alpha 7 III</div>
+                                                        <small class="text-secondary">ILCE-7M3</small>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
+                                                        <div class="fw-bold">Praktica Mat</div>
+                                                        <small class="text-secondary">35mm (ca. 1965)</small>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
+                                                        <div class="fw-bold">Polaroid Supercolor 635CL</div>
+                                                        <small class="text-secondary">(ca. 1981)</small>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
+                                                        <div class="fw-bold">Google Pixel 9 Pro</div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Lenses -->
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="card h-100 shadow equipment-card">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div class="card-header-icon bg-success rounded-3 text-white shadow-sm me-3">
+                                                        <i class="bi bi-vinyl" style="font-size: 1.2rem;"></i>
+                                                    </div>
+                                                    <h3 class="h5 mb-0 fw-bold">Lenses</h3>
+                                                </div>
+                                                <ul class="list-group list-group-flush bg-transparent">
+                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
+                                                        <div class="fw-bold">Sony FE 70-200mm f/4 G OSS</div>
+                                                        <small class="text-secondary">(SEL70200G)</small>
+                                                        <span class="badge rounded-pill bg-danger-subtle text-danger ms-1">Broken</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
+                                                        <div class="fw-bold">Sigma Makro 105mm f/2.8 DG OS HSM</div>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
+                                                        <div class="fw-bold">Sony FE 28-70 f/3.5-5.6</div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Storage -->
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="card h-100 shadow equipment-card">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div class="card-header-icon bg-info rounded-3 text-white shadow-sm me-3">
+                                                        <i class="bi bi-hdd-fill" style="font-size: 1.2rem;"></i>
+                                                    </div>
+                                                    <h3 class="h5 mb-0 fw-bold">Storage</h3>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <h6 class="text-secondary text-uppercase small fw-bold mb-2">In-Camera</h6>
+                                                    <ul class="list-group list-group-flush bg-transparent">
+                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
+                                                            <div class="fw-bold small">RAW - SanDisk Extreme Pro 256 GB</div>
+                                                        </li>
+                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
+                                                            <div class="fw-bold small">JPEG - SanDisk Ultra 32 GB</div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <hr class="my-3 opacity-10">
+                                                <div>
+                                                    <h6 class="text-secondary text-uppercase small fw-bold mb-2">External</h6>
+                                                    <ul class="list-group list-group-flush bg-transparent">
+                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
+                                                            <div class="fw-bold small">Samsung T7 500 GB</div>
+                                                        </li>
+                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
+                                                            <div class="fw-bold small">WD MyBook 4 TB</div>
+                                                        </li>
+                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
+                                                            <div class="fw-bold small">Google Photos</div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Flash & Software -->
+                                    <div class="col-md-12 col-lg-4">
+                                        <div class="row g-4">
+                                            <div class="col-md-6 col-lg-12">
+                                                <div class="card shadow equipment-card">
+                                                    <div class="card-body">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="card-header-icon bg-warning rounded-3 text-dark shadow-sm me-3">
+                                                                <i class="bi bi-lightning-fill" style="font-size: 1.2rem;"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h3 class="h5 mb-0 fw-bold">Flash</h3>
+                                                                <div class="small fw-bold">Yongnou Speedlite YN560 IV</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-lg-12">
+                                                <div class="card shadow equipment-card">
+                                                    <div class="card-body">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="card-header-icon bg-dark rounded-3 text-white shadow-sm me-3">
+                                                                <i class="bi bi-display" style="font-size: 1.2rem;"></i>
+                                                            </div>
+                                                            <h3 class="h5 mb-0 fw-bold">Software</h3>
+                                                        </div>
+                                                        <ul class="list-group list-group-flush bg-transparent">
+                                                            <li class="list-group-item bg-transparent border-0 px-0 py-1 small">Affinity</li>
+                                                            <li class="list-group-item bg-transparent border-0 px-0 py-1 small">Adobe Lightroom Classic</li>
+                                                            <li class="list-group-item bg-transparent border-0 px-0 py-1 small">Adobe Photoshop</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        travelling: `
+                            <style>
+                                #map { position: absolute; top: 0; bottom: 0; width: 100%; height: 100%; border-radius: 12px; }
+                                .panel { 
+                                    position: absolute; top: 10px; right: 10px; 
+                                    background: var(--bs-body-bg); color: var(--bs-body-color);
+                                    padding: 1rem; border-radius: 12px; width: 280px; 
+                                    box-shadow: 0 8px 32px rgba(0,0,0,0.15); 
+                                    max-height: calc(100vh - 160px); overflow-y: auto; 
+                                    z-index: 10; border: 1px solid var(--bs-border-color);
+                                    backdrop-filter: blur(10px);
+                                }
+                                .panel .section { margin-bottom: 1.5rem; }
+                                .panel .section:last-child { margin-bottom: 0; }
+                                .panel h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; color: var(--bs-secondary-color); }
+                                .panel .menu-item { display: flex; align-items: center; margin-bottom: 0.5rem; font-size: 0.9rem; padding-left: 0.5rem; }
+                                .legend-color { width: 14px; height: 14px; border-radius: 3px; margin-right: 10px; flex-shrink: 0; }
+                                .legend-icon { margin-right: 10px; width: 14px; text-align: center; font-size: 1rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+                                .menu-item label { display: flex; align-items: center; cursor: pointer; width: 100%; margin: 0; }
+                                .menu-item input[type="checkbox"] { margin-right: 8px; cursor: pointer; }
+                                .collapsible-content { display: block; border-left: 2px solid var(--bs-border-color-translucent); margin-left: 5px; }
+                                .collapsible-content.collapsed { display: none; }
+                                .toggle-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.5; transition: transform 0.2s; }
+                                .collapsed .toggle-icon { transform: rotate(-90deg); }
+                                .group-checkbox-label { margin-right: 10px; display: flex; align-items: center; }
+                                .group-checkbox-label input { margin: 0; }
+                                .map-tooltip {
+                                    position: fixed; pointer-events: none; background: rgba(0,0,0,0.85);
+                                    color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px;
+                                    transform: translate(-50%, -130%); opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 2000;
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-weight: 500;
+                                }
+                                .map-tooltip.visible { opacity: 1; transform: translate(-50%, -140%); }
+                                .sight-marker { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.25); cursor: pointer; background: #fff; transition: transform 0.2s; }
+                                [data-bs-theme="dark"] .sight-marker { border-color: #333; background: #333; }
+                                .sight-marker:hover { transform: scale(1.1); z-index: 5; }
+                                .sight-icon { font-size: 16px; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+                            </style>
+                            <div style="position: relative; height: calc(100vh - 160px); width: 100%; overflow: hidden; border-radius: 12px;">
+                                <div id="map"></div>
+                                <div class="panel" id="ui">
+                                    <div class="section">
+                                        <h3>
+                                            <label class="group-checkbox-label"><input type="checkbox" class="group-toggle" data-group="trains" checked></label>
+                                            <span class="section-title">Train Rides</span>
+                                            <span class="toggle-icon">▼</span>
+                                        </h3>
+                                        <div class="collapsible-content" id="group-trains">
+                                            <div class="menu-item"><span class="legend-color" style="background:#ff0000"></span> <label><input type="checkbox" class="filter-cb" value="nationalExpress" checked> National Express</label> </div>
+                                            <div class="menu-item"><span class="legend-color" style="background:#ff8c00"></span> <label><input type="checkbox" class="filter-cb" value="regional" checked> Regional Express</label> </div>
+                                            <div class="menu-item"><span class="legend-color" style="background:#ffff00"></span> <label><input type="checkbox" class="filter-cb" value="suburban" checked> Suburban</label> </div>
+                                            <div class="menu-item"><span class="legend-color" style="background:#1eff00"></span> <label><input type="checkbox" class="filter-cb" value="subway"> Subway</label> </div>
+                                            <div class="menu-item"><span class="legend-color" style="background:#1100ff"></span> <label><input type="checkbox" class="filter-cb" value="tram"> Tram</label> </div>
+                                        </div>
+                                    </div>
+                                    <div class="section">
+                                        <h3>
+                                            <label class="group-checkbox-label"><input type="checkbox" class="group-toggle" data-group="other" checked></label>
+                                            <span class="section-title">Other Transport</span>
+                                            <span class="toggle-icon">▼</span>
+                                        </h3>
+                                        <div class="collapsible-content" id="group-other">
+                                            <div class="menu-item"><span class="legend-color" style="background:#ff00fb"></span> <label><input type="checkbox" class="filter-cb" value="bus" checked> Bus</label> </div>
+                                            <div class="menu-item"><span class="legend-color" style="background:#9500ff"></span> <label><input type="checkbox" class="filter-cb" value="ferry"> Ferry</label> </div>
+                                        </div>
+                                    </div>
+                                    <div class="section">
+                                        <h3>
+                                            <label class="group-checkbox-label"><input type="checkbox" class="group-toggle" data-group="sights" checked></label>
+                                            <span class="section-title">Sights</span>
+                                            <span class="toggle-icon">▼</span>
+                                        </h3>
+                                        <div class="collapsible-content" id="group-sights">
+                                            <div class="menu-item"><span class="legend-icon">⭐</span> <label><input type="checkbox" class="sight-filter-cb" value="Monument" checked> Monument</label></div>
+                                            <div class="menu-item"><span class="legend-icon">✈️</span> <label><input type="checkbox" class="sight-filter-cb" value="Airport" checked> Airport</label></div>
+                                            <div class="menu-item"><span class="legend-icon">🚆</span> <label><input type="checkbox" class="sight-filter-cb" value="Station" checked> Station</label></div>
+                                            <div class="menu-item"><span class="legend-icon">📍</span> <label><input type="checkbox" class="sight-filter-cb" value="Other" checked> Others</label></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        departures: `
+                            <div class="container-fluid">
+                                <h1 class="h3 mb-4">Departures</h1>
+                                <p class="text-secondary">Departures content goes here.</p>
+                            </div>
+                        `,
+                        blog: `
+                            <div class="container-fluid">
+                                <h1 class="h3 mb-4">Blog</h1>
+                                <p class="text-secondary">Blog content goes here.</p>
+                            </div>
+                        `,
+                        music: `
+                            <div class="container-fluid">
+                                <h1 class="h3 mb-4">Music</h1>
+                                <p class="text-secondary">Music content goes here.</p>
+                            </div>
+                        `,
+                        github: `
+                            <div class="container-fluid">
+                                <h1 class="h3 mb-4">GitHub</h1>
+                                <p class="text-secondary">GitHub content goes here.</p>
+                            </div>
+                        `,
+                        chess: `
+                            <div class="container-fluid">
+                                <h1 class="h3 mb-4">Chess</h1>
+                                <p class="text-secondary">Chess content goes here.</p>
+                            </div>
+                        `
+                    },
+                    navigation: [
+                        { items: [{ id: 'home', label: 'Home', icon: 'home.svg' }] },
+                        {
+                            title: 'Work', items: [
+                                { id: 'photography', label: 'Photography', icon: 'images.svg' },
+                                { id: 'camera-equipment', label: 'Camera Equipment', icon: 'camera.svg' }
+                            ]
+                        },
+                        {
+                            title: 'Projects', items: [
+                                { id: 'travelling', label: 'Travelling', icon: 'globe.svg' },
+                                { id: 'departures', label: 'Departures', icon: 'train-front.svg' }
+                            ]
+                        },
+                        {
+                            title: 'Other Stuff', items: [
+                                { id: 'blog', label: 'Blog', icon: 'book-open-text.svg' },
+                                { id: 'music', label: 'Music', icon: 'music.svg' },
+                                { id: 'github', label: 'GitHub', icon: 'git-branch.svg' },
+                                { id: 'chess', label: 'Chess', icon: 'chess.svg' }
+                            ]
+                        }
+                    ],
+                    themes: [
+                        { value: 'light', label: 'Light', icon: 'bi-sun-fill text-warning' },
+                        { value: 'dark', label: 'Dark', icon: 'bi-moon-stars-fill text-primary' },
+                        { value: 'auto', label: 'Auto', icon: 'bi-circle-half' }
+                    ]
+                }
+            },
+            computed: {
+                activeThemeIcon() {
+                    const found = this.themes.find(t => t.value === this.storedTheme)
+                    const icon = found ? found.icon : 'bi-circle-half'
+                    return icon.replace('text-warning', '').replace('text-primary', '')
+                }
+            },
+            methods: {
+                loadPageContent(page) {
+                    this.contentFragment = this.pages[page] || '<div class="container py-5 text-center"><h1>404</h1><p>Page Not Found</p></div>'
+                    if (page === 'travelling') {
+                        this.$nextTick(() => {
+                            this.initTravellingMap();
+                        });
+                    }
+                },
+                navigate(page) {
+                    window.location.hash = page
+                },
+                updateFromHash() {
+                    this.currentHash = window.location.hash.substring(1) || 'home'
+                    this.loadPageContent(this.currentHash)
+                },
+                setTheme(theme) {
+                    this.storedTheme = theme
+                    localStorage.setItem('theme', theme)
+                    this.applyTheme()
+                },
+                applyTheme() {
+                    const actualTheme = this.storedTheme === 'auto'
+                        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                        : this.storedTheme
+                    document.documentElement.setAttribute('data-bs-theme', actualTheme)
+                    if (this.map && this.mapStyles) {
+                        this.map.setStyle(this.mapStyles[actualTheme === 'dark' ? 'dark' : 'light']);
+                    }
+                },
+                initTravellingMap() {
+                    if (typeof mapboxgl === 'undefined') {
+                        setTimeout(() => this.initTravellingMap(), 200);
+                        return;
+                    }
+                    mapboxgl.accessToken = "pk.eyJ1Ijoibmljb3J1Z2UiLCJhIjoiY21nODVoZ2R2MDNqOTJqczg3c3F4cmZ3MiJ9.1fgkuGwAxjLf26gtzgOm0w";
+                    const actualTheme = document.documentElement.getAttribute('data-bs-theme');
+                    this.mapStyles = {
+                        dark: 'mapbox://styles/mapbox/dark-v11',
+                        light: 'mapbox://styles/mapbox/streets-v12'
+                    };
+                    const map = new mapboxgl.Map({
+                        container: "map",
+                        style: this.mapStyles[actualTheme === 'dark' ? 'dark' : 'light'],
+                        center: [5.0, 50.0],
+                        zoom: 4
+                    });
+                    this.map = map;
+                    map.addControl(new mapboxgl.NavigationControl(), "top-left");
+
+                    let tripsData = null, sightsData = null, sightMarkers = [], spiderfyTimeout;
+                    const mapTooltip = document.createElement('div');
+                    mapTooltip.className = 'map-tooltip';
+                    document.body.appendChild(mapTooltip);
+
+                    const updateTripFilter = () => {
+                        if (!map.getLayer("trips-lines")) return;
+                        const selected = Array.from(document.querySelectorAll('.filter-cb:checked')).map(cb => cb.value);
+                        map.setFilter("trips-lines", selected.length ? ["in", "category", ...selected] : ["in", "category", ""]);
+                    };
+
+                    const updateSightsFilter = () => {
+                        const selected = Array.from(document.querySelectorAll('.sight-filter-cb:checked')).map(cb => cb.value);
+                        const mainTypes = ["Monument", "Airport", "Station"];
+                        sightMarkers.forEach(m => {
+                            const isVisible = selected.includes(m.type) || (selected.includes('Other') && !mainTypes.includes(m.type));
+                            m.element.style.display = isVisible ? 'flex' : 'none';
+                        });
+                    };
+
+                    map.on("style.load", () => {
+                        if (tripsData) {
+                            if (!map.getSource("trips")) map.addSource("trips", { type: "geojson", data: tripsData });
+                            if (!map.getLayer("trips-lines")) {
+                                map.addLayer({
+                                    id: "trips-lines", type: "line", source: "trips",
+                                    paint: {
+                                        "line-color": ["match", ["get", "category"], "nationalExpress", "#ff0000", "regional", "#ff8c00", "suburban", "#ffff00", "subway", "#1eff00", "tram", "#00ff11", "bus", "#ff00fb", "ferry", "#9500ff", "#333333"],
+                                        "line-width": ["interpolate", ["linear"], ["zoom"], 6, 2.5, 14, 8],
+                                        "line-opacity": 0.95
+                                    }
+                                });
+                                updateTripFilter();
+                            }
+                        }
+                    });
+
+                    const sources = [
+                        ["nationalExpress", "assets/geojson/nationalExpress_Simplified.geojson"],
+                        ["regional", "assets/geojson/regional.geojson"],
+                        ["suburban", "assets/geojson/suburban.geojson"],
+                        ["subway", "assets/geojson/subway.geojson"],
+                        ["tram", "assets/geojson/tram.geojson"],
+                        ["bus", "assets/geojson/bus-stripped.geojson"],
+                        ["ferry", "assets/geojson/ferry.geojson"]
+                    ];
+
+                    Promise.all(sources.map(async ([cat, url]) => {
+                        const r = await fetch(url);
+                        const j = await r.json();
+                        j.features.forEach((f, i) => f.properties = { category: cat, ...f.properties, id: `${cat}-${i}` });
+                        return j.features;
+                    })).then(all => {
+                        tripsData = { type: "FeatureCollection", features: all.flat() };
+                        if (map.getStyle() && !map.getSource("trips")) {
+                            map.addSource("trips", { type: "geojson", data: tripsData });
+                            map.addLayer({ id: "trips-lines", type: "line", source: "trips", paint: { "line-color": ["match", ["get", "category"], "nationalExpress", "#ff0000", "regional", "#ff8c00", "suburban", "#ffff00", "subway", "#1eff00", "tram", "#00ff11", "bus", "#ff00fb", "ferry", "#9500ff", "#333333"], "line-width": ["interpolate", ["linear"], ["zoom"], 6, 2.5, 14, 8], "line-opacity": 0.95 } });
+                            updateTripFilter();
+                        }
+                    });
+
+                    fetch("assets/geojson/sights.geojson").then(r => r.json()).then(data => {
+                        data.features.forEach(f => {
+                            const wrapper = document.createElement('div'); wrapper.className = 'sight-marker';
+                            const icon = document.createElement('div'); icon.className = 'sight-icon';
+                            icon.innerText = { "Monument": "⭐", "Airport": "✈️", "Station": "🚆" }[f.properties.type] || "📍";
+                            wrapper.appendChild(icon);
+                            const marker = new mapboxgl.Marker({ element: wrapper }).setLngLat(f.geometry.coordinates).addTo(map);
+                            const mObj = { marker, element: wrapper, iconElement: icon, type: f.properties.type };
+                            sightMarkers.push(mObj);
+                            icon.addEventListener('mouseenter', (e) => {
+                                mapTooltip.innerText = f.properties.name || "Unknown";
+                                mapTooltip.classList.add('visible');
+                                const rect = icon.getBoundingClientRect();
+                                mapTooltip.style.left = `${rect.left + rect.width / 2}px`;
+                                mapTooltip.style.top = `${rect.top}px`;
+                            });
+                            icon.addEventListener('mouseleave', () => mapTooltip.classList.remove('visible'));
+                            icon.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                new mapboxgl.Popup({ offset: 25, className: 'translucent-popup' }).setLngLat(marker.getLngLat()).setHTML(`<strong>${f.properties.name}</strong><br>${f.properties.when || ""}`).addTo(map);
+                            });
+                        });
+                        updateSightsFilter();
+                    });
+
+                    document.addEventListener('change', (e) => {
+                        if (e.target.classList.contains('filter-cb')) updateTripFilter();
+                        if (e.target.classList.contains('sight-filter-cb')) updateSightsFilter();
+                        if (e.target.classList.contains('group-toggle')) {
+                            const groupName = e.target.dataset.group;
+                            const isChecked = e.target.checked;
+                            const groupContent = document.getElementById('group-' + groupName);
+                            if (groupContent) {
+                                groupContent.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = isChecked);
+                                updateTripFilter(); updateSightsFilter();
+                            }
+                        }
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        const header = e.target.closest('.panel h3');
+                        if (header) {
+                            const content = header.nextElementSibling;
+                            content.classList.toggle('collapsed');
+                            header.classList.toggle('collapsed');
+                        }
+                    });
+                }
+            },
+            mounted() {
+                this.updateFromHash()
+                this.applyTheme()
+                window.addEventListener('hashchange', this.updateFromHash)
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                    if (this.storedTheme === 'auto') this.applyTheme()
+                })
+            }
+        }).mount('#app')
+    </script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        .page-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+    </style>
+</body>
+
+</html>

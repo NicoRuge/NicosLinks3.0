@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Travelling</title>
+
+  <!-- Mapbox GL JS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="css/travelling.css">
+  <link rel="icon" type="image/jpeg" href="assets/images/profile.jpg">
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <a class="home-btn" href="index.html" role="button">Home</a>
+
+  <div class="panel" id="ui">
+    <div class="section">
+      <h3>
+        <label class="group-checkbox-label"><input type="checkbox" class="group-toggle" data-group="trains"
+            checked></label>
+        <span class="section-title">Train Rides</span>
+        <span class="toggle-icon">▼</span>
+      </h3>
+      <div class="collapsible-content" id="group-trains">
+        <div class="row"><span class="legend-color" style="background:#ff0000"></span> <label><input type="checkbox"
+              class="filter-cb" value="nationalExpress" checked>National
+            Express</label> </div>
+        <div class="row"><span class="legend-color" style="background:#ff8c00"></span> <label><input type="checkbox"
+              class="filter-cb" value="regional" checked>Regional
+            Express</label> </div>
+        <div class="row"><span class="legend-color" style="background:#ffff00"></span> <label><input type="checkbox"
+              class="filter-cb" value="suburban" checked> Suburban</label>
+        </div>
+        <div class="row"><span class="legend-color" style="background:#1eff00"></span> <label><input type="checkbox"
+              class="filter-cb" value="subway" unchecked> Subway</label> </div>
+        <div class="row"><span class="legend-color" style="background:#1100ff"></span> <label><input type="checkbox"
+              class="filter-cb" value="tram" unchecked> Tram</label> </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>
+        <label class="group-checkbox-label"><input type="checkbox" class="group-toggle" data-group="other"
+            checked></label>
+        <span class="section-title">Other Public Transport</span>
+        <span class="toggle-icon">▼</span>
+      </h3>
+      <div class="collapsible-content" id="group-other">
+        <div class="row"><span class="legend-color" style="background:#ff00fb"></span> <label><input type="checkbox"
+              class="filter-cb" value="bus" checked> Bus</label> </div>
+        <div class="row"><span class="legend-color" style="background:#9500ff"></span> <label><input type="checkbox"
+              class="filter-cb" value="ferry" unchecked> Ferry</label> </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>
+        <label class="group-checkbox-label"><input type="checkbox" class="group-toggle" data-group="sights"
+            checked></label>
+        <span class="section-title">Sights</span>
+        <span class="toggle-icon">▼</span>
+      </h3>
+      <div class="collapsible-content" id="group-sights">
+        <div class="row"><span class="legend-icon">⭐</span> <label><input type="checkbox" class="sight-filter-cb"
+              value="Monument" checked> Monument</label></div>
+        <div class="row"><span class="legend-icon">✈️</span> <label><input type="checkbox" class="sight-filter-cb"
+              value="Airport" checked> Airport</label></div>
+        <div class="row"><span class="legend-icon">🚆</span> <label><input type="checkbox" class="sight-filter-cb"
+              value="Station" checked> Station</label></div>
+        <div class="row"><span class="legend-icon">📍</span> <label><input type="checkbox" class="sight-filter-cb"
+              value="Other" checked> Others</label></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Eigener Mapbox Token hier eintragen
+    mapboxgl.accessToken = "pk.eyJ1Ijoibmljb3J1Z2UiLCJhIjoiY21nODVoZ2R2MDNqOTJqczg3c3F4cmZ3MiJ9.1fgkuGwAxjLf26gtzgOm0w";
+
+    // Karte initialisieren (Style je nach gewähltem Theme aus index.html)
+    const savedTheme = (localStorage.getItem('theme') || 'dark');
+    try { document.documentElement.setAttribute('data-theme', savedTheme); } catch (_) { }
+
+    const styles = {
+      dark: 'mapbox://styles/mapbox/dark-v11',
+      light: 'mapbox://styles/mapbox/streets-v12',
+      satellite: 'mapbox://styles/mapbox/satellite-streets-v12'
+    };
+
+    // Set initial style based on saved theme or default to dark
+    const initialStyleKey = savedTheme === 'dark' ? 'dark' : 'light';
+
+    // Listen for theme changes from parent
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'theme-change') {
+        const newTheme = event.data.theme;
+        const newStyleKey = newTheme === 'dark' ? 'dark' : 'light';
+        map.setStyle(styles[newStyleKey]);
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+      }
+    });
+
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: styles[initialStyleKey],
+      center: [5.0, 50.0], // Europe Mainland
+      zoom: 4,
+      pitch: 0,
+      bearing: 0
+    });
+
+    // Standard-Controls
+    map.addControl(new mapboxgl.NavigationControl(), "top-left");
+    map.addControl(new mapboxgl.FullscreenControl(), "top-left");
+    map.addControl(new mapboxgl.ScaleControl({ unit: "metric" }), "bottom-left");
+
+    // Globaler Speicher
+    let tripsData = null;
+    let sightsData = null;
+    let sightMarkers = []; // Array of { marker, element, iconElement, feature, originalLngLat, type, lineElement }
+    let spiderfyTimeout; // Shared timeout for stability
+
+    // --- SPIDERFY LOGIC ---
+    // Constants
+    const SPIDER_R = 50; // Radius in pixels to spread out
+    const MARKER_SIZE = 20;
+
+    // Helper to get screen pixel distance between two LngLats
+    function getPixelDistance(p1, p2) {
+      if (!p1 || !p2) return Infinity;
+      const dx = p1.x - p2.x;
+      const dy = p1.y - p2.y;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    // Function to check and spread overlapping markers
+    function checkOverlapAndSpread(hoveredMarkerObj) {
+      if (!map.getLayer('trips-lines')) return; // Ensure map is ready basically
+
+      // Ensure we don't collapse immediately if we just entered
+      clearTimeout(spiderfyTimeout);
+
+      // Find close markers (in screen pixels)
+      const mousePoint = map.project(hoveredMarkerObj.marker.getLngLat());
+
+      // Filter visible markers
+      const visibleMarkers = sightMarkers.filter(m => {
+        const el = m.element;
+        // Mapbox hides markers by display:none on the wrapper if out of view, 
+        // but our manual filtering toggles display on the wrapper too.
+        return el.style.display !== 'none';
+      });
+
+      // Find neighbors close to the hovered one
+      const neighbors = visibleMarkers.filter(m => {
+        if (m === hoveredMarkerObj) return true; // Include itself
+        const p = map.project(m.marker.getLngLat());
+        return getPixelDistance(mousePoint, p) < 40; // Detection threshold (2x size roughly)
+      });
+
+      if (neighbors.length <= 1) return; // No overlap or just itself
+
+      // Calculate positions in a circle
+      const angleStep = (2 * Math.PI) / neighbors.length;
+
+      neighbors.forEach((m, index) => {
+        const angle = index * angleStep;
+        const offsetX = Math.cos(angle) * SPIDER_R;
+        const offsetY = Math.sin(angle) * SPIDER_R;
+
+        // Animate the CHILD element (iconElement) using transform
+        // Mapbox controls the wrapper (element) position.
+        m.iconElement.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+
+        // Draw line
+        if (!m.lineElement) {
+          const line = document.createElement('div');
+          line.className = 'sight-line';
+          map.getCanvasContainer().appendChild(line);
+          m.lineElement = line;
+
+          // Interactions for line (prevents collapse when moving along spokes)
+          line.addEventListener('mouseenter', () => {
+            clearTimeout(spiderfyTimeout);
+          });
+          line.addEventListener('mouseleave', () => {
+            spiderfyTimeout = setTimeout(() => {
+              collapseMarkers();
+            }, 300);
+          });
+        }
+
+        // Position line:
+        // Since the wrapper is at the anchor (center), and we want the line to go from center to the new icon pos.
+        // We can position the line at the screen position of the wrapper.
+        const anchorPix = map.project(m.originalLngLat);
+        m.lineElement.style.left = anchorPix.x + 'px';
+        m.lineElement.style.top = anchorPix.y + 'px';
+        m.lineElement.style.width = SPIDER_R + 'px';
+        m.lineElement.style.transform = `rotate(${angle * (180 / Math.PI)}deg)`;
+        m.lineElement.style.opacity = 1;
+      });
+    }
+
+    function collapseMarkers(markersToCollapse = sightMarkers) {
+      markersToCollapse.forEach(m => {
+        // Reset child transform
+        m.iconElement.style.transform = `translate(0px, 0px)`;
+
+        if (m.lineElement) {
+          m.lineElement.style.opacity = 0;
+        }
+      });
+    }
+
+    // --- LAYER & DATA HANDLING ---
+
+    // Funktion zum Hinzufügen der Custom Layers (wird beim Start und nach Style-Wechsel aufgerufen)
+    function addCustomLayers() {
+      if (!map.getStyle()) return;
+
+      // 2. Trips GeoJSON Source & Layer
+      if (tripsData) {
+        if (!map.getSource("trips")) {
+          map.addSource("trips", { type: "geojson", data: tripsData });
+        }
+        if (!map.getLayer("trips-lines")) {
+          map.addLayer({
+            id: "trips-lines",
+            type: "line",
+            source: "trips",
+            layout: { "line-cap": "round", "line-join": "round" },
+            paint: {
+              "line-color": [
+                "match", ["get", "category"],
+                "nationalExpress", "#ff0000",
+                "national", "#ff9900",
+                "regional", "#ff8c00",
+                "suburban", "#ffff00",
+                "subway", "#1eff00",
+                "tram", "#00ff11",
+                "bus", "#ff00fb",
+                "ferry", "#9500ff",
+                "#333333"
+              ],
+              "line-width": ["interpolate", ["linear"], ["zoom"], 6, 2.5, 14, 8],
+              "line-opacity": 0.95
+            }
+          });
+          updateTripFilter(); // Apply current filter
+        }
+      }
+
+      // 3. Sights (Markers) - logic runs once when data is loaded, but markers persist?
+      // Markers are DOM elements, independent of Style. 
+      // EXCEPT: If the map style changes, we don't lose markers, BUT we might want to re-check something?
+      // Actually, markers are independent of the webgl style. So we just add them once.
+    }
+
+    const configureMapLayers = () => {
+      const style = map.getStyle();
+      if (!style || !style.layers) return;
+
+      for (const layer of style.layers) {
+        const id = layer.id || "";
+        const srcLayer = layer["source-layer"] || "";
+        const filterText = JSON.stringify(layer.filter || "");
+        const isRoadishId = id.startsWith("road-") || id.startsWith("bridge-") || id.startsWith("tunnel-") || id === "road-label";
+        const isRailRelated = /\b(rail|tram|subway|light_rail)\b/i.test(id);
+        const isAdminSource = srcLayer === "admin";
+        const isBoundaryId = /boundary/i.test(id);
+        const adminLevelIdMatch = /(^|-)admin-(0|1)(-|$)/i.test(id);
+        const adminLevelFilter01 = /admin\s*[_-]?level\W*(0|1)/i.test(filterText);
+        const adminKeyword = /\b(country|state|province|admin-0|admin-1)\b/i.test(id);
+
+        const isAdmin01Boundary = (isBoundaryId && (adminLevelIdMatch || adminLevelFilter01 || adminKeyword)) ||
+          (isAdminSource && (adminLevelFilter01 || adminKeyword));
+
+        if ((isRoadishId && !isRailRelated) || (isAdmin01Boundary && layer.type !== "symbol")) {
+          try {
+            if (map.getLayer(id)) {
+              map.setLayoutProperty(id, "visibility", "none");
+            }
+          } catch (_) { /* ignore */ }
+        }
+        if (layer.type === "symbol") {
+          if (id.includes("country-label")) {
+            map.setLayoutProperty(id, "visibility", "visible");
+          }
+          else if (id.includes("settlement-") || id.includes("place-city") || id.includes("place-town") || id.includes("place-village")) {
+            try {
+              map.setFilter(id, ["==", ["get", "capital"], 2]);
+              map.setLayoutProperty(id, "visibility", "visible");
+            } catch (e) {
+              console.warn("Could not set filter on", id, e);
+            }
+          }
+          else {
+            const isCountry = id.includes("country-label");
+            if (!isCountry && (id.includes("state-label") || id.includes("poi-label") || id.includes("water-point-label") || id.includes("natural-point-label"))) {
+              map.setLayoutProperty(id, "visibility", "none");
+            }
+          }
+        }
+      }
+    };
+
+    map.on("style.load", () => {
+      configureMapLayers();
+      addCustomLayers();
+    });
+    // Removed duplicate load listener
+
+    // LOAD DATA
+    // 1. Trips
+    const sources = [
+      ["nationalExpress", "assets/geojson/nationalExpress_Simplified.geojson"],
+      ["national", "assets/geojson/national.geojson"],
+      ["regional", "assets/geojson/regional.geojson"],
+      ["suburban", "assets/geojson/suburban.geojson"],
+      ["subway", "assets/geojson/subway.geojson"],
+      ["tram", "assets/geojson/tram.geojson"],
+      ["bus", "assets/geojson/bus-stripped.geojson"],
+      ["ferry", "assets/geojson/ferry.geojson"]
+    ];
+
+    Promise.all(sources.map(async ([cat, url]) => {
+      const r = await fetch(url);
+      const j = await r.json();
+      j.features.forEach((f, i) => {
+        f.properties = { category: cat, ...(f.properties || {}) };
+        if (!f.properties.id) f.properties.id = `${cat}-${i}`;
+      });
+      return j.features;
+    }))
+      .then(all => {
+        tripsData = { type: "FeatureCollection", features: all.flat() };
+        addCustomLayers();
+      })
+      .catch(e => console.warn("Fehler beim Laden der Trips:", e));
+
+    // 2. Sights (Fetch manually for JS control)
+    fetch("assets/geojson/sights.geojson")
+      .then(r => r.json())
+      .then(data => {
+        sightsData = data;
+        initSightMarkers();
+      })
+      .catch(e => console.error("Could not load sights:", e));
+
+
+    // Tooltip Element (created once)
+    let mapTooltip = document.getElementById('map-tooltip');
+    if (!mapTooltip) {
+      mapTooltip = document.createElement('div');
+      mapTooltip.id = 'map-tooltip';
+      mapTooltip.className = 'map-tooltip';
+      document.body.appendChild(mapTooltip); // Append to body to sit above everything
+    }
+
+    function initSightMarkers() {
+      if (!sightsData) return;
+
+      // Icon mapping
+      const icons = {
+        "Monument": "⭐",
+        "Airport": "✈️",
+        "Station": "🚆",
+        "Other": "📍"
+      };
+      const defaultIcon = "📍";
+
+      sightsData.features.forEach(f => {
+        const type = f.properties.type;
+        let iconChar = icons[type];
+        if (!iconChar) iconChar = defaultIcon; // Fallback
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'sight-marker';
+
+        const icon = document.createElement('div');
+        icon.className = 'sight-icon';
+        icon.innerText = iconChar;
+        wrapper.appendChild(icon);
+
+        // Create Marker
+        // element is wrapper
+        const marker = new mapboxgl.Marker({
+          element: wrapper,
+          anchor: 'center'
+        })
+          .setLngLat(f.geometry.coordinates)
+          .addTo(map);
+
+        // Store ref
+        const mObj = {
+          marker: marker,
+          element: wrapper,
+          iconElement: icon,
+          feature: f,
+          originalLngLat: f.geometry.coordinates,
+          type: f.properties.type,
+          lineElement: null
+        };
+        sightMarkers.push(mObj);
+
+        // Interactions
+
+        // Mouse Enter on Wrapper
+        wrapper.addEventListener('mouseenter', () => {
+          checkOverlapAndSpread(mObj);
+        });
+
+        // Mouse Leave on Wrapper
+        wrapper.addEventListener('mouseleave', () => {
+          // Delay collapse globally
+          spiderfyTimeout = setTimeout(() => {
+            collapseMarkers();
+          }, 300);
+        });
+
+        // Tooltip (Name only) on Icon Hover
+        icon.addEventListener('mouseenter', (e) => {
+          const name = f.properties.name || "Unknown";
+          mapTooltip.innerText = name;
+          mapTooltip.classList.add('visible');
+
+          // Position Tooltip
+          // We use getBoundingClientRect because icon might be moved by spiderfy transform
+          // inside a absolute wrapper.
+          const rect = icon.getBoundingClientRect();
+          // Center horizontally above icon
+          const left = rect.left + rect.width / 2;
+          const top = rect.top; // Above top edge
+
+          mapTooltip.style.left = `${left}px`;
+          mapTooltip.style.top = `${top}px`;
+        });
+
+        icon.addEventListener('mouseleave', () => {
+          mapTooltip.classList.remove('visible');
+        });
+
+        // Click: Popup (Detailed info)
+        icon.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          const props = f.properties;
+          const name = props.name || "Unknown";
+          const when = props.when || "";
+
+          // Use custom translucent class
+          new mapboxgl.Popup({
+            offset: 25,
+            className: 'translucent-popup'
+          })
+            .setLngLat(marker.getLngLat())
+            .setHTML(`<strong>${name}</strong><br>${when}`)
+            .addTo(map);
+
+          // Hide tooltip on click to avoid double info
+          mapTooltip.classList.remove('visible');
+        });
+      });
+
+      // Initial filter application
+      updateSightsFilter();
+    }
+
+    // Filter Logic
+    function updateTripFilter() {
+      if (!map.getLayer("trips-lines")) return;
+
+      const selectedCategories = [];
+      document.querySelectorAll('.filter-cb:checked').forEach(cb => {
+        const vals = cb.value.split(',');
+        selectedCategories.push(...vals);
+      });
+
+      if (selectedCategories.length === 0) {
+        map.setFilter("trips-lines", ["in", "category", ""]);
+      } else {
+        map.setFilter("trips-lines", ["in", "category", ...selectedCategories]);
+      }
+    }
+
+    // UI Event Listeners
+    // 2. Category Filter
+    document.querySelectorAll('.filter-cb').forEach(cb => {
+      cb.addEventListener('change', updateTripFilter);
+    });
+
+    // 2.1 Layer Toggles replaced by direct filter updates
+
+    // 2.2 Sights Type Filter (Updated for Markers)
+    function updateSightsFilter() {
+      const selectedTypes = [];
+      document.querySelectorAll('.sight-filter-cb:checked').forEach(cb => {
+        selectedTypes.push(cb.value);
+      });
+
+      const mainTypes = ["Monument", "Airport", "Station"];
+
+      sightMarkers.forEach(m => {
+        const type = m.type;
+        let isVisible = false;
+
+        if (selectedTypes.includes(type)) {
+          isVisible = true;
+        } else if (selectedTypes.includes('Other')) {
+          if (!mainTypes.includes(type)) isVisible = true;
+        }
+
+        m.element.style.display = isVisible ? 'flex' : 'none';
+        // Also hide line if hidden
+        if (!isVisible && m.lineElement) m.lineElement.style.opacity = 0;
+      });
+    }
+
+    document.querySelectorAll('.sight-filter-cb').forEach(cb => {
+      cb.addEventListener('change', updateSightsFilter);
+    });
+
+    // Group Toggles
+    document.querySelectorAll('.group-toggle').forEach(toggle => {
+      toggle.addEventListener('change', (e) => {
+        const groupName = e.target.dataset.group;
+        const isChecked = e.target.checked;
+        const groupContent = document.getElementById('group-' + groupName);
+
+        if (groupContent) {
+          // Handle standard filter checkboxes
+          const filterCbs = groupContent.querySelectorAll('.filter-cb');
+          if (filterCbs.length > 0) {
+            filterCbs.forEach(cb => cb.checked = isChecked);
+            if (typeof updateTripFilter === 'function') updateTripFilter();
+          }
+
+          // Handle sight filter checkboxes
+          const sightCbs = groupContent.querySelectorAll('.sight-filter-cb');
+          if (sightCbs.length > 0) {
+            sightCbs.forEach(cb => cb.checked = isChecked);
+            updateSightsFilter();
+          }
+        }
+      });
+
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    });
+
+    // Map Move Listener to update lines?
+    // If we pan/zoom, map.project changes. If spiderfy is active, lines need update.
+    // Simplest: Collapse markers on map move (standard spiderfy behavior often does this)
+    map.on('move', () => {
+      collapseMarkers();
+    });
+    // Also if zooming, markers move relative to each other, so strict spider state might be invalid.
+
+    // 3. Collapsible Menus
+    document.querySelectorAll('.panel h3 .section-title, .panel h3 .toggle-icon').forEach(element => {
+      element.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const header = e.target.closest('h3');
+        const content = header.nextElementSibling;
+        content.classList.toggle('collapsed');
+        header.classList.toggle('collapsed');
+      });
+    });
+
+  </script>
+</body>
+
+</html>

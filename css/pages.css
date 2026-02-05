@@ -1,0 +1,6 @@
+/* Common styles for iframe content pages */
+body {
+    margin: 0;
+    padding: 1.5rem;
+    min-height: 100vh;
+}
