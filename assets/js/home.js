@@ -32,10 +32,39 @@ const HomeView = {
             <hr class="my-5 border-secondary-subtle">
             <div class="row row-cols-1 row-cols-lg-2 g-4 pb-5 justify-content-center justify-content-lg-start">
                 <div class="col" style="max-width: fit-content;">
-                    <div id="spotify-widget" class="h-100"></div>
+                    <div id="spotify-widget" class="h-100">
+                        <div class="sp-card">
+                            <div class="sp-header">
+                                <div class="skeleton-box" style="width: 18px; height: 18px; margin-right: 8px;"></div>
+                                <div class="skeleton-box" style="width: 150px; height: 14px;"></div>
+                                <div class="skeleton-box" style="width: 60px; height: 12px; margin-left: auto;"></div>
+                            </div>
+                            <div class="sp-content">
+                                <div class="skeleton-box sp-cover"></div>
+                                <div class="sp-info" style="flex: 1;">
+                                    <div class="skeleton-box" style="width: 70%; height: 1.2rem; margin-bottom: 8px;"></div>
+                                    <div class="skeleton-box" style="width: 40%; height: 0.9rem;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col" style="max-width: fit-content;">
-                    <div id="discord-widget" class="h-100"></div>
+                    <div id="discord-widget" class="h-100">
+                        <div class="dc-card">
+                            <div class="dc-header">
+                                <div class="skeleton-box" style="width: 10px; height: 10px; border-radius: 50%; margin-right: 12px;"></div>
+                                <div class="skeleton-box" style="width: 120px; height: 14px;"></div>
+                            </div>
+                            <div class="dc-content">
+                                <div class="skeleton-box dc-no-activity" style="width: 48px; height: 48px;"></div>
+                                <div class="dc-info" style="flex: 1;">
+                                    <div class="skeleton-box" style="width: 60%; height: 1.1rem; margin-bottom: 6px;"></div>
+                                    <div class="skeleton-box" style="width: 40%; height: 0.9rem;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

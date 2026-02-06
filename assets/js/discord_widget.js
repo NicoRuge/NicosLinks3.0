@@ -10,7 +10,11 @@
     function render(data) {
         if (data) lastData = data;
         const container = document.getElementById(CONFIG.targetId);
-        if (!container || !lastData) return;
+        if (!container) return;
+        if (!lastData && !data) {
+            renderLoading();
+            return;
+        }
 
         // If we have data and the container is empty, or if we just got a fresh update
         if (container.innerHTML === "" || data) {
@@ -95,6 +99,26 @@
 
             container.innerHTML = html;
         }
+    }
+
+    function renderLoading() {
+        const container = document.getElementById(CONFIG.targetId);
+        if (!container) return;
+        container.innerHTML = `
+            <div class="${CONFIG.classPrefix}card">
+              <div class="${CONFIG.classPrefix}header">
+                <div class="skeleton-box" style="width: 10px; height: 10px; border-radius: 50%; margin-right: 12px;"></div>
+                <div class="skeleton-box" style="width: 120px; height: 14px;"></div>
+              </div>
+              <div class="${CONFIG.classPrefix}content">
+                  <div class="skeleton-box ${CONFIG.classPrefix}no-activity" style="width: 48px; height: 48px;"></div>
+                  <div class="${CONFIG.classPrefix}info" style="flex: 1;">
+                      <div class="skeleton-box" style="width: 60%; height: 1.1rem; margin-bottom: 6px;"></div>
+                      <div class="skeleton-box" style="width: 40%; height: 0.9rem;"></div>
+                  </div>
+              </div>
+            </div>
+          `;
     }
 
     // WebSocket for Real-time Updates

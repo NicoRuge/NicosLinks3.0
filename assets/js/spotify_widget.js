@@ -44,14 +44,15 @@
     if (!container) return;
     container.innerHTML = `<div class="${CONFIG.classPrefix}card">
           <div class="${CONFIG.classPrefix}header">
-            <span class="${CONFIG.classPrefix}icon ${CONFIG.classPrefix}icon-loading"></span>
-            <span class="${CONFIG.classPrefix}status">Getting Spotify Data...</span>
+            <div class="skeleton-box" style="width: 18px; height: 18px; margin-right: 8px;"></div>
+            <div class="skeleton-box" style="width: 150px; height: 14px;"></div>
+            <div class="skeleton-box" style="width: 60px; height: 12px; margin-left: auto;"></div>
           </div>
-          <div class="${CONFIG.classPrefix}content" style="align-items: center; display: flex;">
-               <div style="width: 48px; height: 48px; background: var(--md-sys-color-surface-variant); border-radius: 8px; margin-right: 12px;"></div>
+          <div class="${CONFIG.classPrefix}content">
+               <div class="skeleton-box ${CONFIG.classPrefix}cover"></div>
                <div class="${CONFIG.classPrefix}info" style="flex: 1;">
-                   <div style="height: 1rem; width: 60%; background: var(--md-sys-color-surface-variant); border-radius: 4px; margin-bottom: 6px;"></div>
-                   <div style="height: 0.8rem; width: 40%; background: var(--md-sys-color-surface-variant); border-radius: 4px;"></div>
+                   <div class="skeleton-box" style="width: 70%; height: 1.2rem; margin-bottom: 8px;"></div>
+                   <div class="skeleton-box" style="width: 40%; height: 0.9rem;"></div>
                </div>
           </div>
         </div>`;
