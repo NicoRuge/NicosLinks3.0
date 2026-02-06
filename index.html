@@ -29,7 +29,6 @@
             <div class="sidebar-brand">
                 <img src="assets/icons/home.svg" alt="" class="sidebar-icon">
                 Nico's Links
-                <div id="discord-widget" style="display:none"></div>
             </div>
 
             <div v-for="section in navigation" :key="section.title">
@@ -49,8 +48,15 @@
         <!-- Main content -->
         <main class="main-content">
             <div id="content-container" class="page-content py-4">
-                <departures-view v-if="currentHash === 'departures'"></departures-view>
+                <home-view v-if="currentHash === 'home'"></home-view>
+                <photography-view v-else-if="currentHash === 'photography'"></photography-view>
+                <travelling-view v-else-if="currentHash === 'travelling'"></travelling-view>
+                <departures-view v-else-if="currentHash === 'departures'"></departures-view>
                 <camera-equipment-view v-else-if="currentHash === 'camera-equipment'"></camera-equipment-view>
+                <blog-view v-else-if="currentHash === 'blog'"></blog-view>
+                <music-view v-else-if="currentHash === 'music'"></music-view>
+                <github-view v-else-if="currentHash === 'github'"></github-view>
+                <chess-view v-else-if="currentHash === 'chess'"></chess-view>
                 <div v-else v-html="contentFragment"></div>
             </div>
 
@@ -92,6 +98,10 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="assets/js/spotify_widget.js"></script>
     <script src="assets/js/discord_widget.js"></script>
+    <script src="assets/js/home.js"></script>
+    <script src="assets/js/photography.js"></script>
+    <script src="assets/js/travelling.js"></script>
+    <script src="assets/js/other_pages.js"></script>
     <script src="assets/js/departures.js"></script>
     <script src="assets/js/camera_equipment.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
@@ -100,8 +110,15 @@
 
         createApp({
             components: {
+                'home-view': HomeView,
+                'photography-view': PhotographyView,
+                'travelling-view': TravellingView,
                 'departures-view': DeparturesView,
-                'camera-equipment-view': CameraEquipmentView
+                'camera-equipment-view': CameraEquipmentView,
+                'blog-view': BlogView,
+                'music-view': MusicView,
+                'github-view': GitHubView,
+                'chess-view': ChessView
             },
             data() {
                 return {
@@ -109,328 +126,6 @@
                     contentFragment: '',
                     storedTheme: localStorage.getItem('theme') || 'auto',
                     sidebarOpen: false,
-                    pages: {
-                        home: `
-                            <div class="container-fluid px-4 py-3 py-lg-5">
-                                <div class="row align-items-center g-4 py-3 py-lg-5">
-                                    <div class="col-lg-2 text-center text-lg-end">
-                                        <img src="assets/images/profile.jpg" class="d-block mx-auto ms-lg-auto img-fluid rounded-4 shadow-lg mb-4 mb-lg-0"
-                                            alt="Hero Image" style="max-height: 300px; object-fit: cover;"
-                                            onerror="this.src='https://via.placeholder.com/600x400/dee2e6/6c757d?text=Your+Image+Here'">
-                                    </div>
-                                    <div class="col-lg-8 text-center text-lg-start">
-                                        <h1 class="display-4 fw-bold lh-1 mb-3">Hi, I'm Nico</h1>
-                                        <p class="lead text-secondary">
-                                            Hobby Photographer & Data Analyst based in Germany.
-                                            Welcome to my personal links page where you can find my work,
-                                            projects, and other stuff I'm interested in.
-                                        </p>
-                                        <div class="d-grid gap-2 d-md-flex justify-content-md-center justify-content-lg-start mt-4">
-                                            <a href="https://pics.nico-ruge.de" class="btn btn-primary btn-lg px-4" target="_blank"
-                                                rel="noopener noreferrer" onclick="parent.location.hash='photography'">
-                                                My Photography Portfolio
-                                            </a>
-                                            <a href="https://unsplash.com/@nico_ruge" class="btn btn-outline-secondary btn-lg px-4"
-                                                target="_blank" rel="noopener noreferrer" onclick="parent.location.hash='github'">
-                                                My Images on Unsplash.com
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="container-fluid px-4">
-                                <hr class="my-5 border-secondary-subtle">
-                                <div id="spotify-widget" class="mt-4"></div>
-                            </div>
-                        `,
-                        photography: `
-                            <div class="container-fluid py-4">
-                                <h1 class="h3 mb-5">Photography</h1>
-                                
-                                <!-- Group 1 -->
-                                <div class="mb-5">
-                                    <h3 class="h5 mb-3 text-secondary">Nature & Landscapes</h3>
-                                    <div id="carouselPhoto1" class="carousel slide carousel-fade shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
-                                        <div class="carousel-indicators">
-                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="3" aria-label="Slide 4"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="4" aria-label="Slide 5"></button>
-                                        </div>
-                                        <div class="carousel-inner">
-                                            <div class="carousel-item active" data-bs-interval="4000">
-                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+1" class="d-block w-100" alt="Nature 1">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4000">
-                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+2" class="d-block w-100" alt="Nature 2">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4000">
-                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+3" class="d-block w-100" alt="Nature 3">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4000">
-                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+4" class="d-block w-100" alt="Nature 4">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4000">
-                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+5" class="d-block w-100" alt="Nature 5">
-                                            </div>
-                                        </div>
-                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPhoto1" data-bs-slide="prev">
-                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Previous</span>
-                                        </button>
-                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselPhoto1" data-bs-slide="next">
-                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Next</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Group 2 -->
-                                <div class="mb-5">
-                                    <h3 class="h5 mb-3 text-secondary">Urban & Architecture</h3>
-                                    <div id="carouselPhoto2" class="carousel slide carousel-fade shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
-                                        <div class="carousel-indicators">
-                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="3" aria-label="Slide 4"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="4" aria-label="Slide 5"></button>
-                                        </div>
-                                        <div class="carousel-inner">
-                                            <div class="carousel-item active" data-bs-interval="4200">
-                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+1" class="d-block w-100" alt="Urban 1">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4200">
-                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+2" class="d-block w-100" alt="Urban 2">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4200">
-                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+3" class="d-block w-100" alt="Urban 3">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4200">
-                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+4" class="d-block w-100" alt="Urban 4">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4200">
-                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+5" class="d-block w-100" alt="Urban 5">
-                                            </div>
-                                        </div>
-                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPhoto2" data-bs-slide="prev">
-                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Previous</span>
-                                        </button>
-                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselPhoto2" data-bs-slide="next">
-                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Next</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Group 3 -->
-                                <div class="mb-5">
-                                    <h3 class="h5 mb-3 text-secondary">Portraits</h3>
-                                    <div id="carouselPhoto3" class="carousel slide carousel-fade shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
-                                        <div class="carousel-indicators">
-                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="3" aria-label="Slide 4"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="4" aria-label="Slide 5"></button>
-                                        </div>
-                                        <div class="carousel-inner">
-                                            <div class="carousel-item active" data-bs-interval="4500">
-                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+1" class="d-block w-100" alt="Portrait 1">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4500">
-                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+2" class="d-block w-100" alt="Portrait 2">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4500">
-                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+3" class="d-block w-100" alt="Portrait 3">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4500">
-                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+4" class="d-block w-100" alt="Portrait 4">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4500">
-                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+5" class="d-block w-100" alt="Portrait 5">
-                                            </div>
-                                        </div>
-                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPhoto3" data-bs-slide="prev">
-                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Previous</span>
-                                        </button>
-                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselPhoto3" data-bs-slide="next">
-                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Next</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Group 4 -->
-                                <div class="mb-5">
-                                    <h3 class="h5 mb-3 text-secondary">Events</h3>
-                                    <div id="carouselPhoto4" class="carousel slide carousel-fade shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
-                                        <div class="carousel-indicators">
-                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="3" aria-label="Slide 4"></button>
-                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="4" aria-label="Slide 5"></button>
-                                        </div>
-                                        <div class="carousel-inner">
-                                            <div class="carousel-item active" data-bs-interval="4700">
-                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+1" class="d-block w-100" alt="Event 1">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4700">
-                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+2" class="d-block w-100" alt="Event 2">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4700">
-                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+3" class="d-block w-100" alt="Event 3">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4700">
-                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+4" class="d-block w-100" alt="Event 4">
-                                            </div>
-                                            <div class="carousel-item" data-bs-interval="4700">
-                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+5" class="d-block w-100" alt="Event 5">
-                                            </div>
-                                        </div>
-                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPhoto4" data-bs-slide="prev">
-                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Previous</span>
-                                        </button>
-                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselPhoto4" data-bs-slide="next">
-                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Next</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `,
-                        'camera-equipment': null, // Content loaded dynamically
-                        travelling: `
-                            <style>
-                                #map { position: absolute; top: 0; bottom: 0; width: 100%; height: 100%; border-radius: 12px; }
-                                .map-controls { position: absolute; top: 1rem; right: 1rem; z-index: 10; width: 280px; display: flex; flex-direction: column; gap: 0.5rem; }
-                                .dropdown-menu { max-height: 60vh; overflow-y: auto; width: 100%; padding: 0.5rem 0; font-size: 0.9rem; }
-                                .dropdown-item { padding: 0.25rem 1rem; display: flex; align-items: center; }
-                                .dropdown-item:active { background-color: var(--bs-dropdown-link-hover-bg); color: var(--bs-dropdown-link-color); }
-                                .legend-color { width: 14px; height: 14px; border-radius: 3px; margin-right: 10px; flex-shrink: 0; }
-                                .legend-icon { margin-right: 10px; width: 14px; text-align: center; font-size: 1rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-                                .form-check { display: flex; align-items: center; margin: 0; width: 100%; cursor: pointer; }
-                                .form-check-input { margin-right: 0.5em; margin-top: 0; cursor: pointer; }
-                                .form-check-label { cursor: pointer; width: 100%; }
-                                .map-tooltip {
-                                    position: fixed; pointer-events: none; background: rgba(0,0,0,0.85);
-                                    color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px;
-                                    transform: translate(-50%, -130%); opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 2000;
-                                    box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-weight: 500;
-                                }
-                                .map-tooltip.visible { opacity: 1; transform: translate(-50%, -140%); }
-                                .sight-marker { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.25); cursor: pointer; background: #fff; transition: transform 0.2s; }
-                                [data-bs-theme="dark"] .sight-marker { border-color: #333; background: #333; }
-                                .sight-marker:hover { transform: scale(1.1); z-index: 5; }
-                                .sight-icon { font-size: 16px; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-                            </style>
-                            <div style="position: relative; height: calc(100vh - 160px); width: 100%; overflow: hidden; border-radius: 12px;">
-                                <div id="map"></div>
-                                <div class="map-controls">
-                                    <!-- Train Rides -->
-                                    <div class="dropdown">
-                                        <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                            Train Rides
-                                        </button>
-                                        <ul class="dropdown-menu shadow" id="group-trains">
-                                            <li>
-                                                <div class="dropdown-item">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input group-toggle" type="checkbox" data-group="trains" checked id="toggle-trains">
-                                                        <label class="form-check-label fw-bold" for="toggle-trains">Select All</label>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="nationalExpress" checked id="cb-ne"><label class="form-check-label d-flex align-items-center" for="cb-ne"><span class="legend-color" style="background:#ff0000"></span> National Express</label></div></div></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="regional" checked id="cb-re"><label class="form-check-label d-flex align-items-center" for="cb-re"><span class="legend-color" style="background:#ff8c00"></span> Regional Express</label></div></div></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="suburban" checked id="cb-s"><label class="form-check-label d-flex align-items-center" for="cb-s"><span class="legend-color" style="background:#ffff00"></span> Suburban</label></div></div></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="subway" id="cb-u"><label class="form-check-label d-flex align-items-center" for="cb-u"><span class="legend-color" style="background:#1eff00"></span> Subway</label></div></div></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="tram" id="cb-t"><label class="form-check-label d-flex align-items-center" for="cb-t"><span class="legend-color" style="background:#1100ff"></span> Tram</label></div></div></li>
-                                        </ul>
-                                    </div>
-
-                                    <!-- Other Transport -->
-                                    <div class="dropdown">
-                                        <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                            Other Transport
-                                        </button>
-                                        <ul class="dropdown-menu shadow" id="group-other">
-                                            <li>
-                                                <div class="dropdown-item">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input group-toggle" type="checkbox" data-group="other" checked id="toggle-other">
-                                                        <label class="form-check-label fw-bold" for="toggle-other">Select All</label>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="bus" checked id="cb-bus"><label class="form-check-label d-flex align-items-center" for="cb-bus"><span class="legend-color" style="background:#ff00fb"></span> Bus</label></div></div></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="ferry" id="cb-ferry"><label class="form-check-label d-flex align-items-center" for="cb-ferry"><span class="legend-color" style="background:#9500ff"></span> Ferry</label></div></div></li>
-                                        </ul>
-                                    </div>
-
-                                    <!-- Sights -->
-                                    <div class="dropdown">
-                                        <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                            Sights
-                                        </button>
-                                        <ul class="dropdown-menu shadow" id="group-sights">
-                                            <li>
-                                                <div class="dropdown-item">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input group-toggle" type="checkbox" data-group="sights" checked id="toggle-sights">
-                                                        <label class="form-check-label fw-bold" for="toggle-sights">Select All</label>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Monument" checked id="cb-mon"><label class="form-check-label d-flex align-items-center" for="cb-mon"><span class="legend-icon">⭐</span> Monument</label></div></div></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Airport" checked id="cb-air"><label class="form-check-label d-flex align-items-center" for="cb-air"><span class="legend-icon">✈️</span> Airport</label></div></div></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Station" checked id="cb-stat"><label class="form-check-label d-flex align-items-center" for="cb-stat"><span class="legend-icon">🚆</span> Station</label></div></div></li>
-                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Other" checked id="cb-oth"><label class="form-check-label d-flex align-items-center" for="cb-oth"><span class="legend-icon">📍</span> Others</label></div></div></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-
-                        `,
-                        departures: `
-                            <div class="container-fluid">
-                                <h1 class="h3 mb-4">Departures</h1>
-                                <p class="text-secondary">Departures content goes here.</p>
-                            </div>
-                        `,
-                        blog: `
-                            <div class="container-fluid">
-                                <h1 class="h3 mb-4">Blog</h1>
-                                <p class="text-secondary">Blog content goes here.</p>
-                            </div>
-                        `,
-                        music: `
-                            <div class="container-fluid">
-                                <h1 class="h3 mb-4">Music</h1>
-                                <p class="text-secondary">Music content goes here.</p>
-                            </div>
-                        `,
-                        github: `
-                            <div class="container-fluid">
-                                <h1 class="h3 mb-4">GitHub</h1>
-                                <p class="text-secondary">GitHub content goes here.</p>
-                            </div>
-                        `,
-                        chess: `
-                            <div class="container-fluid">
-                                <h1 class="h3 mb-4">Chess</h1>
-                                <p class="text-secondary">Chess content goes here.</p>
-                            </div>
-                        `
-                    },
                     navigation: [
                         { items: [{ id: 'home', label: 'Home', icon: 'home.svg' }] },
                         {
@@ -470,15 +165,8 @@
             },
             methods: {
                 loadPageContent(page) {
-                    this.contentFragment = this.pages[page] || '<div class="container py-5 text-center"><h1>404</h1><p>Page Not Found</p></div>'
-
-                    if (page === 'travelling') {
-                        this.$nextTick(() => {
-                            this.initTravellingMap();
-                        });
-                    }
+                    this.contentFragment = '';
                 },
-
                 toggleSidebar() {
                     this.sidebarOpen = !this.sidebarOpen;
                 },
@@ -502,132 +190,6 @@
                         ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
                         : this.storedTheme
                     document.documentElement.setAttribute('data-bs-theme', actualTheme)
-                    if (this.map && this.mapStyles) {
-                        this.map.setStyle(this.mapStyles[actualTheme === 'dark' ? 'dark' : 'light']);
-                    }
-                },
-                initTravellingMap() {
-                    if (typeof mapboxgl === 'undefined') {
-                        setTimeout(() => this.initTravellingMap(), 200);
-                        return;
-                    }
-                    mapboxgl.accessToken = "pk.eyJ1Ijoibmljb3J1Z2UiLCJhIjoiY21nODVoZ2R2MDNqOTJqczg3c3F4cmZ3MiJ9.1fgkuGwAxjLf26gtzgOm0w";
-                    const actualTheme = document.documentElement.getAttribute('data-bs-theme');
-                    this.mapStyles = {
-                        dark: 'mapbox://styles/mapbox/dark-v11',
-                        light: 'mapbox://styles/mapbox/streets-v12'
-                    };
-                    const map = new mapboxgl.Map({
-                        container: "map",
-                        style: this.mapStyles[actualTheme === 'dark' ? 'dark' : 'light'],
-                        center: [5.0, 50.0],
-                        zoom: 4
-                    });
-                    this.map = map;
-                    map.addControl(new mapboxgl.NavigationControl(), "top-left");
-
-                    let tripsData = null, sightsData = null, sightMarkers = [], spiderfyTimeout;
-                    const mapTooltip = document.createElement('div');
-                    mapTooltip.className = 'map-tooltip';
-                    document.body.appendChild(mapTooltip);
-
-                    const updateTripFilter = () => {
-                        if (!map.getLayer("trips-lines")) return;
-                        const selected = Array.from(document.querySelectorAll('.filter-cb:checked')).map(cb => cb.value);
-                        map.setFilter("trips-lines", selected.length ? ["in", "category", ...selected] : ["in", "category", ""]);
-                    };
-
-                    const updateSightsFilter = () => {
-                        const selected = Array.from(document.querySelectorAll('.sight-filter-cb:checked')).map(cb => cb.value);
-                        const mainTypes = ["Monument", "Airport", "Station"];
-                        sightMarkers.forEach(m => {
-                            const isVisible = selected.includes(m.type) || (selected.includes('Other') && !mainTypes.includes(m.type));
-                            m.element.style.display = isVisible ? 'flex' : 'none';
-                        });
-                    };
-
-                    map.on("style.load", () => {
-                        if (tripsData) {
-                            if (!map.getSource("trips")) map.addSource("trips", { type: "geojson", data: tripsData });
-                            if (!map.getLayer("trips-lines")) {
-                                map.addLayer({
-                                    id: "trips-lines", type: "line", source: "trips",
-                                    paint: {
-                                        "line-color": ["match", ["get", "category"], "nationalExpress", "#ff0000", "regional", "#ff8c00", "suburban", "#ffff00", "subway", "#1eff00", "tram", "#00ff11", "bus", "#ff00fb", "ferry", "#9500ff", "#333333"],
-                                        "line-width": ["interpolate", ["linear"], ["zoom"], 6, 2.5, 14, 8],
-                                        "line-opacity": 0.95
-                                    }
-                                });
-                                updateTripFilter();
-                            }
-                        }
-                    });
-
-                    const sources = [
-                        ["nationalExpress", "assets/geojson/nationalExpress_Simplified.geojson"],
-                        ["regional", "assets/geojson/regional.geojson"],
-                        ["suburban", "assets/geojson/suburban.geojson"],
-                        ["subway", "assets/geojson/subway.geojson"],
-                        ["tram", "assets/geojson/tram.geojson"],
-                        ["bus", "assets/geojson/bus-stripped.geojson"],
-                        ["ferry", "assets/geojson/ferry.geojson"]
-                    ];
-
-                    Promise.all(sources.map(async ([cat, url]) => {
-                        const r = await fetch(url);
-                        const j = await r.json();
-                        j.features.forEach((f, i) => f.properties = { category: cat, ...f.properties, id: `${cat}-${i}` });
-                        return j.features;
-                    })).then(all => {
-                        tripsData = { type: "FeatureCollection", features: all.flat() };
-                        if (map.getStyle() && !map.getSource("trips")) {
-                            map.addSource("trips", { type: "geojson", data: tripsData });
-                            map.addLayer({ id: "trips-lines", type: "line", source: "trips", paint: { "line-color": ["match", ["get", "category"], "nationalExpress", "#ff0000", "regional", "#ff8c00", "suburban", "#ffff00", "subway", "#1eff00", "tram", "#00ff11", "bus", "#ff00fb", "ferry", "#9500ff", "#333333"], "line-width": ["interpolate", ["linear"], ["zoom"], 6, 2.5, 14, 8], "line-opacity": 0.95 } });
-                            updateTripFilter();
-                        }
-                    });
-
-                    fetch("assets/geojson/sights.geojson").then(r => r.json()).then(data => {
-                        data.features.forEach(f => {
-                            const wrapper = document.createElement('div'); wrapper.className = 'sight-marker';
-                            const icon = document.createElement('div'); icon.className = 'sight-icon';
-                            icon.innerText = { "Monument": "⭐", "Airport": "✈️", "Station": "🚆" }[f.properties.type] || "📍";
-                            wrapper.appendChild(icon);
-                            const marker = new mapboxgl.Marker({ element: wrapper }).setLngLat(f.geometry.coordinates).addTo(map);
-                            const mObj = { marker, element: wrapper, iconElement: icon, type: f.properties.type };
-                            sightMarkers.push(mObj);
-                            icon.addEventListener('mouseenter', (e) => {
-                                mapTooltip.innerText = f.properties.name || "Unknown";
-                                mapTooltip.classList.add('visible');
-                                const rect = icon.getBoundingClientRect();
-                                mapTooltip.style.left = `${rect.left + rect.width / 2}px`;
-                                mapTooltip.style.top = `${rect.top}px`;
-                            });
-                            icon.addEventListener('mouseleave', () => mapTooltip.classList.remove('visible'));
-                            icon.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                new mapboxgl.Popup({ offset: 25, className: 'translucent-popup' }).setLngLat(marker.getLngLat()).setHTML(`<strong>${f.properties.name}</strong><br>${f.properties.when || ""}`).addTo(map);
-                            });
-                        });
-                        updateSightsFilter();
-                    });
-
-                    document.addEventListener('change', (e) => {
-                        if (e.target.classList.contains('filter-cb')) updateTripFilter();
-                        if (e.target.classList.contains('sight-filter-cb')) updateSightsFilter();
-                        if (e.target.classList.contains('group-toggle')) {
-                            const groupName = e.target.dataset.group;
-                            const isChecked = e.target.checked;
-                            const groupContent = document.getElementById('group-' + groupName);
-                            if (groupContent) {
-                                groupContent.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = isChecked);
-                                updateTripFilter(); updateSightsFilter();
-                            }
-                        }
-                    });
-
-
-
                 }
             },
             mounted() {

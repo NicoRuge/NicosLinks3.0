@@ -62,14 +62,15 @@
     if (!container) return;
     const data = currentState.data;
     const isRealtime = currentState.isRealtime;
-    const dotClass = isRealtime ? "sp-connection-dot live" : "sp-connection-dot";
+    const sourceText = isRealtime ? "Webhook" : "Spotify API";
+    const sourceClass = isRealtime ? "sp-source-webhook" : "sp-source-api";
 
     if (!data || !data.item) {
       if (currentState.currentTrackSignature !== "no-track" || currentState.lastRealtimeState !== isRealtime) {
         container.innerHTML = `<div class="${CONFIG.classPrefix}card">
                   <div class="${CONFIG.classPrefix}header">
                       <div class="${CONFIG.classPrefix}title">Not Playing</div>
-                      <span class="${dotClass}" title="${isRealtime ? 'Real-time (WebSocket)' : 'Polling (20s)'}"></span>
+                      <span class="${CONFIG.classPrefix}source-text ${sourceClass}">${sourceText}</span>
                   </div>
                 </div>`;
         currentState.currentTrackSignature = "no-track";
@@ -126,7 +127,7 @@
               <div class="${CONFIG.classPrefix}header">
                 <span class="${CONFIG.classPrefix}icon ${iconClass}"></span>
                 <span class="${CONFIG.classPrefix}status ${statusClass}">${statusText}</span>
-                <span class="${dotClass}" title="${isRealtime ? 'Real-time (WebSocket)' : 'Polling (20s)'}"></span>
+                <span class="${CONFIG.classPrefix}source-text ${sourceClass}">${sourceText}</span>
               </div>
               
               <div class="${CONFIG.classPrefix}content">
@@ -140,8 +141,8 @@
               ${isPlaying ? `
               <div class="${CONFIG.classPrefix}progress-container" id="sp-progress-container">
                 <div class="${CONFIG.classPrefix}time" id="sp-current-time">${formatTime(progress)}</div>
-                <div class="${CONFIG.classPrefix}progress-bar">
-                   <div class="${CONFIG.classPrefix}progress-fill" id="sp-progress-fill" style="width:${pct}%"></div>
+                <div class="progress flex-grow-1" style="height: 6px; background-color: var(--bs-secondary-bg-subtle);">
+                   <div class="progress-bar bg-success" id="sp-progress-fill" role="progressbar" style="width:${pct}%" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="${CONFIG.classPrefix}time">${formatTime(duration)}</div>
               </div>` : ''}
@@ -156,7 +157,10 @@
       const fillEl = document.getElementById("sp-progress-fill");
 
       if (timeEl) timeEl.textContent = formatTime(progress);
-      if (fillEl) fillEl.style.width = `${pct}%`;
+      if (fillEl) {
+        fillEl.style.width = `${pct}%`;
+        fillEl.setAttribute('aria-valuenow', pct);
+      }
     }
   }
 

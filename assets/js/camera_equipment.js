@@ -14,22 +14,15 @@ const CameraEquipmentView = {
                         transform: translateY(-5px);
                         box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
                     }
-                    .card-header-icon {
-                        width: 40px;
-                        height: 40px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
                 </style>
                 <!-- Cameras -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow equipment-card">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-4">
-                                <div class="card-header-icon bg-primary rounded-3 text-white shadow-sm me-3">
-                                    <i class="bi bi-camera" style="font-size: 1.2rem;"></i>
-                                </div>
+                                <span class="badge bg-primary rounded-3 text-white shadow-sm me-3 p-2">
+                                    <i class="bi bi-camera fs-5"></i>
+                                </span>
                                 <h3 class="h5 mb-0 fw-bold">Cameras</h3>
                             </div>
                             <ul class="list-group list-group-flush bg-transparent">
@@ -58,9 +51,9 @@ const CameraEquipmentView = {
                     <div class="card h-100 shadow equipment-card">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-4">
-                                <div class="card-header-icon bg-success rounded-3 text-white shadow-sm me-3">
-                                    <i class="bi bi-vinyl" style="font-size: 1.2rem;"></i>
-                                </div>
+                                <span class="badge bg-success rounded-3 text-white shadow-sm me-3 p-2">
+                                    <i class="bi bi-vinyl fs-5"></i>
+                                </span>
                                 <h3 class="h5 mb-0 fw-bold">Lenses</h3>
                             </div>
                             <ul class="list-group list-group-flush bg-transparent">
@@ -85,9 +78,9 @@ const CameraEquipmentView = {
                     <div class="card h-100 shadow equipment-card">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-4">
-                                <div class="card-header-icon bg-info rounded-3 text-white shadow-sm me-3">
-                                    <i class="bi bi-hdd-fill" style="font-size: 1.2rem;"></i>
-                                </div>
+                                <span class="badge bg-info rounded-3 text-white shadow-sm me-3 p-2">
+                                    <i class="bi bi-hdd-fill fs-5"></i>
+                                </span>
                                 <h3 class="h5 mb-0 fw-bold">Storage</h3>
                             </div>
                             <div class="mb-3">
@@ -127,9 +120,9 @@ const CameraEquipmentView = {
                             <div class="card shadow equipment-card">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
-                                        <div class="card-header-icon bg-warning rounded-3 text-dark shadow-sm me-3">
-                                            <i class="bi bi-lightning-fill" style="font-size: 1.2rem;"></i>
-                                        </div>
+                                        <span class="badge bg-warning rounded-3 text-dark shadow-sm me-3 p-2">
+                                            <i class="bi bi-lightning-fill fs-5"></i>
+                                        </span>
                                         <div>
                                             <h3 class="h5 mb-0 fw-bold">Flash</h3>
                                             <div class="small fw-bold">Yongnou Speedlite YN560 IV</div>
@@ -142,9 +135,9 @@ const CameraEquipmentView = {
                             <div class="card shadow equipment-card">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
-                                        <div class="card-header-icon bg-dark rounded-3 text-white shadow-sm me-3">
-                                            <i class="bi bi-display" style="font-size: 1.2rem;"></i>
-                                        </div>
+                                        <span class="badge bg-dark rounded-3 text-white shadow-sm me-3 p-2">
+                                            <i class="bi bi-display fs-5"></i>
+                                        </span>
                                         <h3 class="h5 mb-0 fw-bold">Software</h3>
                                     </div>
                                     <ul class="list-group list-group-flush bg-transparent">
