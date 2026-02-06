@@ -15,8 +15,17 @@
 <body class="bg-body">
 
     <div id="app" v-cloak>
+        <!-- Mobile Menu Toggle -->
+        <button class="btn btn-secondary d-lg-none mobile-menu-toggle" @click="toggleSidebar"
+            aria-label="Toggle navigation">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" :class="{ show: sidebarOpen }" @click="closeSidebar"></div>
+
         <!-- Sidebar -->
-        <nav class="sidebar">
+        <nav class="sidebar" :class="{ 'mobile-open': sidebarOpen }">
             <div class="sidebar-brand">
                 <img src="assets/icons/home.svg" alt="" class="sidebar-icon">
                 Nico's Links
@@ -28,7 +37,7 @@
                 <ul class="nav flex-column">
                     <li v-for="item in section.items" :key="item.id" class="nav-item">
                         <a class="nav-link" :class="{ active: currentHash === item.id }" href="#"
-                            @click.prevent="navigate(item.id)">
+                            @click.prevent="navigate(item.id); closeSidebar()">
                             <img :src="'assets/icons/' + item.icon" alt="" class="sidebar-icon">
                             {{ item.label }}
                         </a>
@@ -39,12 +48,16 @@
 
         <!-- Main content -->
         <main class="main-content">
-            <div id="content-container" class="page-content py-4" v-html="contentFragment"></div>
+            <div id="content-container" class="page-content py-4">
+                <departures-view v-if="currentHash === 'departures'"></departures-view>
+                <camera-equipment-view v-else-if="currentHash === 'camera-equipment'"></camera-equipment-view>
+                <div v-else v-html="contentFragment"></div>
+            </div>
 
             <footer class="footer mt-auto py-3 bg-body-tertiary border-top">
                 <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center">
                     <div class="col-md-4 d-flex align-items-center">
-                        <span class="mb-3 mb-md-0 text-body-secondary">&copy; 2026 Nico Ruge</span>
+                        <span class="mb-3 mb-md-0 text-body-secondary">Made with ❤ on an ICE 3neo</span>
                     </div>
 
                     <ul class="nav col-md-4 justify-content-end list-unstyled d-flex align-items-center">
@@ -79,33 +92,40 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="assets/js/spotify_widget.js"></script>
     <script src="assets/js/discord_widget.js"></script>
+    <script src="assets/js/departures.js"></script>
+    <script src="assets/js/camera_equipment.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script>
         const { createApp } = Vue
 
         createApp({
+            components: {
+                'departures-view': DeparturesView,
+                'camera-equipment-view': CameraEquipmentView
+            },
             data() {
                 return {
                     currentHash: 'home',
                     contentFragment: '',
                     storedTheme: localStorage.getItem('theme') || 'auto',
+                    sidebarOpen: false,
                     pages: {
                         home: `
-                            <div class="container-fluid px-4 py-5">
-                                <div class="row align-items-center g-3 py-5">
-                                    <div class="col-lg-2">
-                                        <img src="assets/images/profile.jpg" class="d-block ms-auto img-fluid rounded-4 shadow-lg"
+                            <div class="container-fluid px-4 py-3 py-lg-5">
+                                <div class="row align-items-center g-4 py-3 py-lg-5">
+                                    <div class="col-lg-2 text-center text-lg-end">
+                                        <img src="assets/images/profile.jpg" class="d-block mx-auto ms-lg-auto img-fluid rounded-4 shadow-lg mb-4 mb-lg-0"
                                             alt="Hero Image" style="max-height: 300px; object-fit: cover;"
                                             onerror="this.src='https://via.placeholder.com/600x400/dee2e6/6c757d?text=Your+Image+Here'">
                                     </div>
-                                    <div class="col-lg-8">
+                                    <div class="col-lg-8 text-center text-lg-start">
                                         <h1 class="display-4 fw-bold lh-1 mb-3">Hi, I'm Nico</h1>
                                         <p class="lead text-secondary">
                                             Hobby Photographer & Data Analyst based in Germany.
                                             Welcome to my personal links page where you can find my work,
                                             projects, and other stuff I'm interested in.
                                         </p>
-                                        <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-center justify-content-lg-start mt-4">
                                             <a href="https://pics.nico-ruge.de" class="btn btn-primary btn-lg px-4" target="_blank"
                                                 rel="noopener noreferrer" onclick="parent.location.hash='photography'">
                                                 My Photography Portfolio
@@ -124,198 +144,179 @@
                             </div>
                         `,
                         photography: `
-                            <div class="container-fluid">
-                                <h1 class="h3 mb-4">Photography</h1>
-                                <p class="text-secondary">Photography content goes here.</p>
-                            </div>
-                        `,
-                        'camera-equipment': `
-                            <div class="container-fluid px-4 py-5">
-                                <h1 class="display-5 fw-bold mb-5">Camera Equipment</h1>
+                            <div class="container-fluid py-4">
+                                <h1 class="h3 mb-5">Photography</h1>
                                 
-                                <div class="row g-4">
-                                    <style>
-                                        .equipment-card {
-                                            transition: transform 0.2s ease, box-shadow 0.2s ease;
-                                            border: 1px solid var(--bs-border-color);
-                                            background-color: var(--bs-body-tertiary-bg);
-                                        }
-                                        .equipment-card:hover {
-                                            transform: translateY(-5px);
-                                            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-                                        }
-                                        .card-header-icon {
-                                            width: 40px;
-                                            height: 40px;
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                        }
-                                    </style>
-                                    <!-- Cameras -->
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="card h-100 shadow equipment-card">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center mb-4">
-                                                    <div class="card-header-icon bg-primary rounded-3 text-white shadow-sm me-3">
-                                                        <i class="bi bi-camera" style="font-size: 1.2rem;"></i>
-                                                    </div>
-                                                    <h3 class="h5 mb-0 fw-bold">Cameras</h3>
-                                                </div>
-                                                <ul class="list-group list-group-flush bg-transparent">
-                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
-                                                        <div class="fw-bold">Sony Alpha 7 III</div>
-                                                        <small class="text-secondary">ILCE-7M3</small>
-                                                    </li>
-                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
-                                                        <div class="fw-bold">Praktica Mat</div>
-                                                        <small class="text-secondary">35mm (ca. 1965)</small>
-                                                    </li>
-                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
-                                                        <div class="fw-bold">Polaroid Supercolor 635CL</div>
-                                                        <small class="text-secondary">(ca. 1981)</small>
-                                                    </li>
-                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
-                                                        <div class="fw-bold">Google Pixel 9 Pro</div>
-                                                    </li>
-                                                </ul>
+                                <!-- Group 1 -->
+                                <div class="mb-5">
+                                    <h3 class="h5 mb-3 text-secondary">Nature & Landscapes</h3>
+                                    <div id="carouselPhoto1" class="carousel slide carousel-fade shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
+                                        <div class="carousel-indicators">
+                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto1" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                                        </div>
+                                        <div class="carousel-inner">
+                                            <div class="carousel-item active" data-bs-interval="4000">
+                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+1" class="d-block w-100" alt="Nature 1">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4000">
+                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+2" class="d-block w-100" alt="Nature 2">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4000">
+                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+3" class="d-block w-100" alt="Nature 3">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4000">
+                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+4" class="d-block w-100" alt="Nature 4">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4000">
+                                                <img src="https://via.placeholder.com/1200x600/212529/ced4da?text=Nature+5" class="d-block w-100" alt="Nature 5">
                                             </div>
                                         </div>
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPhoto1" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselPhoto1" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
                                     </div>
+                                </div>
 
-                                    <!-- Lenses -->
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="card h-100 shadow equipment-card">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center mb-4">
-                                                    <div class="card-header-icon bg-success rounded-3 text-white shadow-sm me-3">
-                                                        <i class="bi bi-vinyl" style="font-size: 1.2rem;"></i>
-                                                    </div>
-                                                    <h3 class="h5 mb-0 fw-bold">Lenses</h3>
-                                                </div>
-                                                <ul class="list-group list-group-flush bg-transparent">
-                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
-                                                        <div class="fw-bold">Sony FE 70-200mm f/4 G OSS</div>
-                                                        <small class="text-secondary">(SEL70200G)</small>
-                                                        <span class="badge rounded-pill bg-danger-subtle text-danger ms-1">Broken</span>
-                                                    </li>
-                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
-                                                        <div class="fw-bold">Sigma Makro 105mm f/2.8 DG OS HSM</div>
-                                                    </li>
-                                                    <li class="list-group-item bg-transparent border-0 px-0 py-2">
-                                                        <div class="fw-bold">Sony FE 28-70 f/3.5-5.6</div>
-                                                    </li>
-                                                </ul>
+                                <!-- Group 2 -->
+                                <div class="mb-5">
+                                    <h3 class="h5 mb-3 text-secondary">Urban & Architecture</h3>
+                                    <div id="carouselPhoto2" class="carousel slide carousel-fade shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
+                                        <div class="carousel-indicators">
+                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto2" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                                        </div>
+                                        <div class="carousel-inner">
+                                            <div class="carousel-item active" data-bs-interval="4200">
+                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+1" class="d-block w-100" alt="Urban 1">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4200">
+                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+2" class="d-block w-100" alt="Urban 2">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4200">
+                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+3" class="d-block w-100" alt="Urban 3">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4200">
+                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+4" class="d-block w-100" alt="Urban 4">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4200">
+                                                <img src="https://via.placeholder.com/1200x600/343a40/adb5bd?text=Urban+5" class="d-block w-100" alt="Urban 5">
                                             </div>
                                         </div>
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPhoto2" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselPhoto2" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
                                     </div>
+                                </div>
 
-                                    <!-- Storage -->
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="card h-100 shadow equipment-card">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center mb-4">
-                                                    <div class="card-header-icon bg-info rounded-3 text-white shadow-sm me-3">
-                                                        <i class="bi bi-hdd-fill" style="font-size: 1.2rem;"></i>
-                                                    </div>
-                                                    <h3 class="h5 mb-0 fw-bold">Storage</h3>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <h6 class="text-secondary text-uppercase small fw-bold mb-2">In-Camera</h6>
-                                                    <ul class="list-group list-group-flush bg-transparent">
-                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
-                                                            <div class="fw-bold small">RAW - SanDisk Extreme Pro 256 GB</div>
-                                                        </li>
-                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
-                                                            <div class="fw-bold small">JPEG - SanDisk Ultra 32 GB</div>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <hr class="my-3 opacity-10">
-                                                <div>
-                                                    <h6 class="text-secondary text-uppercase small fw-bold mb-2">External</h6>
-                                                    <ul class="list-group list-group-flush bg-transparent">
-                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
-                                                            <div class="fw-bold small">Samsung T7 500 GB</div>
-                                                        </li>
-                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
-                                                            <div class="fw-bold small">WD MyBook 4 TB</div>
-                                                        </li>
-                                                        <li class="list-group-item bg-transparent border-0 px-0 py-1">
-                                                            <div class="fw-bold small">Google Photos</div>
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                <!-- Group 3 -->
+                                <div class="mb-5">
+                                    <h3 class="h5 mb-3 text-secondary">Portraits</h3>
+                                    <div id="carouselPhoto3" class="carousel slide carousel-fade shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
+                                        <div class="carousel-indicators">
+                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto3" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                                        </div>
+                                        <div class="carousel-inner">
+                                            <div class="carousel-item active" data-bs-interval="4500">
+                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+1" class="d-block w-100" alt="Portrait 1">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4500">
+                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+2" class="d-block w-100" alt="Portrait 2">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4500">
+                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+3" class="d-block w-100" alt="Portrait 3">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4500">
+                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+4" class="d-block w-100" alt="Portrait 4">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4500">
+                                                <img src="https://via.placeholder.com/1200x600/495057/dee2e6?text=Portrait+5" class="d-block w-100" alt="Portrait 5">
                                             </div>
                                         </div>
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPhoto3" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselPhoto3" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
                                     </div>
+                                </div>
 
-                                    <!-- Flash & Software -->
-                                    <div class="col-md-12 col-lg-4">
-                                        <div class="row g-4">
-                                            <div class="col-md-6 col-lg-12">
-                                                <div class="card shadow equipment-card">
-                                                    <div class="card-body">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="card-header-icon bg-warning rounded-3 text-dark shadow-sm me-3">
-                                                                <i class="bi bi-lightning-fill" style="font-size: 1.2rem;"></i>
-                                                            </div>
-                                                            <div>
-                                                                <h3 class="h5 mb-0 fw-bold">Flash</h3>
-                                                                <div class="small fw-bold">Yongnou Speedlite YN560 IV</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                <!-- Group 4 -->
+                                <div class="mb-5">
+                                    <h3 class="h5 mb-3 text-secondary">Events</h3>
+                                    <div id="carouselPhoto4" class="carousel slide carousel-fade shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
+                                        <div class="carousel-indicators">
+                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                                            <button type="button" data-bs-target="#carouselPhoto4" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                                        </div>
+                                        <div class="carousel-inner">
+                                            <div class="carousel-item active" data-bs-interval="4700">
+                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+1" class="d-block w-100" alt="Event 1">
                                             </div>
-                                            <div class="col-md-6 col-lg-12">
-                                                <div class="card shadow equipment-card">
-                                                    <div class="card-body">
-                                                        <div class="d-flex align-items-center mb-3">
-                                                            <div class="card-header-icon bg-dark rounded-3 text-white shadow-sm me-3">
-                                                                <i class="bi bi-display" style="font-size: 1.2rem;"></i>
-                                                            </div>
-                                                            <h3 class="h5 mb-0 fw-bold">Software</h3>
-                                                        </div>
-                                                        <ul class="list-group list-group-flush bg-transparent">
-                                                            <li class="list-group-item bg-transparent border-0 px-0 py-1 small">Affinity</li>
-                                                            <li class="list-group-item bg-transparent border-0 px-0 py-1 small">Adobe Lightroom Classic</li>
-                                                            <li class="list-group-item bg-transparent border-0 px-0 py-1 small">Adobe Photoshop</li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                            <div class="carousel-item" data-bs-interval="4700">
+                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+2" class="d-block w-100" alt="Event 2">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4700">
+                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+3" class="d-block w-100" alt="Event 3">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4700">
+                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+4" class="d-block w-100" alt="Event 4">
+                                            </div>
+                                            <div class="carousel-item" data-bs-interval="4700">
+                                                <img src="https://via.placeholder.com/1200x600/6c757d/e9ecef?text=Event+5" class="d-block w-100" alt="Event 5">
                                             </div>
                                         </div>
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPhoto4" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselPhoto4" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         `,
+                        'camera-equipment': null, // Content loaded dynamically
                         travelling: `
                             <style>
                                 #map { position: absolute; top: 0; bottom: 0; width: 100%; height: 100%; border-radius: 12px; }
-                                .panel { 
-                                    position: absolute; top: 10px; right: 10px; 
-                                    background: var(--bs-body-bg); color: var(--bs-body-color);
-                                    padding: 1rem; border-radius: 12px; width: 280px; 
-                                    box-shadow: 0 8px 32px rgba(0,0,0,0.15); 
-                                    max-height: calc(100vh - 160px); overflow-y: auto; 
-                                    z-index: 10; border: 1px solid var(--bs-border-color);
-                                    backdrop-filter: blur(10px);
-                                }
-                                .panel .section { margin-bottom: 1.5rem; }
-                                .panel .section:last-child { margin-bottom: 0; }
-                                .panel h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; color: var(--bs-secondary-color); }
-                                .panel .menu-item { display: flex; align-items: center; margin-bottom: 0.5rem; font-size: 0.9rem; padding-left: 0.5rem; }
+                                .map-controls { position: absolute; top: 1rem; right: 1rem; z-index: 10; width: 280px; display: flex; flex-direction: column; gap: 0.5rem; }
+                                .dropdown-menu { max-height: 60vh; overflow-y: auto; width: 100%; padding: 0.5rem 0; font-size: 0.9rem; }
+                                .dropdown-item { padding: 0.25rem 1rem; display: flex; align-items: center; }
+                                .dropdown-item:active { background-color: var(--bs-dropdown-link-hover-bg); color: var(--bs-dropdown-link-color); }
                                 .legend-color { width: 14px; height: 14px; border-radius: 3px; margin-right: 10px; flex-shrink: 0; }
                                 .legend-icon { margin-right: 10px; width: 14px; text-align: center; font-size: 1rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-                                .menu-item label { display: flex; align-items: center; cursor: pointer; width: 100%; margin: 0; }
-                                .menu-item input[type="checkbox"] { margin-right: 8px; cursor: pointer; }
-                                .collapsible-content { display: block; border-left: 2px solid var(--bs-border-color-translucent); margin-left: 5px; }
-                                .collapsible-content.collapsed { display: none; }
-                                .toggle-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.5; transition: transform 0.2s; }
-                                .collapsed .toggle-icon { transform: rotate(-90deg); }
-                                .group-checkbox-label { margin-right: 10px; display: flex; align-items: center; }
-                                .group-checkbox-label input { margin: 0; }
+                                .form-check { display: flex; align-items: center; margin: 0; width: 100%; cursor: pointer; }
+                                .form-check-input { margin-right: 0.5em; margin-top: 0; cursor: pointer; }
+                                .form-check-label { cursor: pointer; width: 100%; }
                                 .map-tooltip {
                                     position: fixed; pointer-events: none; background: rgba(0,0,0,0.85);
                                     color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px;
@@ -330,47 +331,74 @@
                             </style>
                             <div style="position: relative; height: calc(100vh - 160px); width: 100%; overflow: hidden; border-radius: 12px;">
                                 <div id="map"></div>
-                                <div class="panel" id="ui">
-                                    <div class="section">
-                                        <h3>
-                                            <label class="group-checkbox-label"><input type="checkbox" class="group-toggle" data-group="trains" checked></label>
-                                            <span class="section-title">Train Rides</span>
-                                            <span class="toggle-icon">▼</span>
-                                        </h3>
-                                        <div class="collapsible-content" id="group-trains">
-                                            <div class="menu-item"><span class="legend-color" style="background:#ff0000"></span> <label><input type="checkbox" class="filter-cb" value="nationalExpress" checked> National Express</label> </div>
-                                            <div class="menu-item"><span class="legend-color" style="background:#ff8c00"></span> <label><input type="checkbox" class="filter-cb" value="regional" checked> Regional Express</label> </div>
-                                            <div class="menu-item"><span class="legend-color" style="background:#ffff00"></span> <label><input type="checkbox" class="filter-cb" value="suburban" checked> Suburban</label> </div>
-                                            <div class="menu-item"><span class="legend-color" style="background:#1eff00"></span> <label><input type="checkbox" class="filter-cb" value="subway"> Subway</label> </div>
-                                            <div class="menu-item"><span class="legend-color" style="background:#1100ff"></span> <label><input type="checkbox" class="filter-cb" value="tram"> Tram</label> </div>
-                                        </div>
+                                <div class="map-controls">
+                                    <!-- Train Rides -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                            Train Rides
+                                        </button>
+                                        <ul class="dropdown-menu shadow" id="group-trains">
+                                            <li>
+                                                <div class="dropdown-item">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input group-toggle" type="checkbox" data-group="trains" checked id="toggle-trains">
+                                                        <label class="form-check-label fw-bold" for="toggle-trains">Select All</label>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="nationalExpress" checked id="cb-ne"><label class="form-check-label d-flex align-items-center" for="cb-ne"><span class="legend-color" style="background:#ff0000"></span> National Express</label></div></div></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="regional" checked id="cb-re"><label class="form-check-label d-flex align-items-center" for="cb-re"><span class="legend-color" style="background:#ff8c00"></span> Regional Express</label></div></div></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="suburban" checked id="cb-s"><label class="form-check-label d-flex align-items-center" for="cb-s"><span class="legend-color" style="background:#ffff00"></span> Suburban</label></div></div></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="subway" id="cb-u"><label class="form-check-label d-flex align-items-center" for="cb-u"><span class="legend-color" style="background:#1eff00"></span> Subway</label></div></div></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="tram" id="cb-t"><label class="form-check-label d-flex align-items-center" for="cb-t"><span class="legend-color" style="background:#1100ff"></span> Tram</label></div></div></li>
+                                        </ul>
                                     </div>
-                                    <div class="section">
-                                        <h3>
-                                            <label class="group-checkbox-label"><input type="checkbox" class="group-toggle" data-group="other" checked></label>
-                                            <span class="section-title">Other Transport</span>
-                                            <span class="toggle-icon">▼</span>
-                                        </h3>
-                                        <div class="collapsible-content" id="group-other">
-                                            <div class="menu-item"><span class="legend-color" style="background:#ff00fb"></span> <label><input type="checkbox" class="filter-cb" value="bus" checked> Bus</label> </div>
-                                            <div class="menu-item"><span class="legend-color" style="background:#9500ff"></span> <label><input type="checkbox" class="filter-cb" value="ferry"> Ferry</label> </div>
-                                        </div>
+
+                                    <!-- Other Transport -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                            Other Transport
+                                        </button>
+                                        <ul class="dropdown-menu shadow" id="group-other">
+                                            <li>
+                                                <div class="dropdown-item">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input group-toggle" type="checkbox" data-group="other" checked id="toggle-other">
+                                                        <label class="form-check-label fw-bold" for="toggle-other">Select All</label>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="bus" checked id="cb-bus"><label class="form-check-label d-flex align-items-center" for="cb-bus"><span class="legend-color" style="background:#ff00fb"></span> Bus</label></div></div></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="ferry" id="cb-ferry"><label class="form-check-label d-flex align-items-center" for="cb-ferry"><span class="legend-color" style="background:#9500ff"></span> Ferry</label></div></div></li>
+                                        </ul>
                                     </div>
-                                    <div class="section">
-                                        <h3>
-                                            <label class="group-checkbox-label"><input type="checkbox" class="group-toggle" data-group="sights" checked></label>
-                                            <span class="section-title">Sights</span>
-                                            <span class="toggle-icon">▼</span>
-                                        </h3>
-                                        <div class="collapsible-content" id="group-sights">
-                                            <div class="menu-item"><span class="legend-icon">⭐</span> <label><input type="checkbox" class="sight-filter-cb" value="Monument" checked> Monument</label></div>
-                                            <div class="menu-item"><span class="legend-icon">✈️</span> <label><input type="checkbox" class="sight-filter-cb" value="Airport" checked> Airport</label></div>
-                                            <div class="menu-item"><span class="legend-icon">🚆</span> <label><input type="checkbox" class="sight-filter-cb" value="Station" checked> Station</label></div>
-                                            <div class="menu-item"><span class="legend-icon">📍</span> <label><input type="checkbox" class="sight-filter-cb" value="Other" checked> Others</label></div>
-                                        </div>
+
+                                    <!-- Sights -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                            Sights
+                                        </button>
+                                        <ul class="dropdown-menu shadow" id="group-sights">
+                                            <li>
+                                                <div class="dropdown-item">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input group-toggle" type="checkbox" data-group="sights" checked id="toggle-sights">
+                                                        <label class="form-check-label fw-bold" for="toggle-sights">Select All</label>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Monument" checked id="cb-mon"><label class="form-check-label d-flex align-items-center" for="cb-mon"><span class="legend-icon">⭐</span> Monument</label></div></div></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Airport" checked id="cb-air"><label class="form-check-label d-flex align-items-center" for="cb-air"><span class="legend-icon">✈️</span> Airport</label></div></div></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Station" checked id="cb-stat"><label class="form-check-label d-flex align-items-center" for="cb-stat"><span class="legend-icon">🚆</span> Station</label></div></div></li>
+                                            <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Other" checked id="cb-oth"><label class="form-check-label d-flex align-items-center" for="cb-oth"><span class="legend-icon">📍</span> Others</label></div></div></li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
+
                         `,
                         departures: `
                             <div class="container-fluid">
@@ -443,11 +471,19 @@
             methods: {
                 loadPageContent(page) {
                     this.contentFragment = this.pages[page] || '<div class="container py-5 text-center"><h1>404</h1><p>Page Not Found</p></div>'
+
                     if (page === 'travelling') {
                         this.$nextTick(() => {
                             this.initTravellingMap();
                         });
                     }
+                },
+
+                toggleSidebar() {
+                    this.sidebarOpen = !this.sidebarOpen;
+                },
+                closeSidebar() {
+                    this.sidebarOpen = false;
                 },
                 navigate(page) {
                     window.location.hash = page
@@ -590,14 +626,8 @@
                         }
                     });
 
-                    document.addEventListener('click', (e) => {
-                        const header = e.target.closest('.panel h3');
-                        if (header) {
-                            const content = header.nextElementSibling;
-                            content.classList.toggle('collapsed');
-                            header.classList.toggle('collapsed');
-                        }
-                    });
+
+
                 }
             },
             mounted() {
