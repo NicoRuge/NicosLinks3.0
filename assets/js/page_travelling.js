@@ -86,6 +86,10 @@ const TravellingView = {
         if (this.mapTooltip && this.mapTooltip.parentNode) {
             this.mapTooltip.parentNode.removeChild(this.mapTooltip);
         }
+        if (this.map) {
+            this.map.remove();
+            this.map = null;
+        }
         window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleThemeChange);
     },
     methods: {
@@ -125,6 +129,29 @@ const TravellingView = {
             this.mapTooltip = document.createElement('div');
             this.mapTooltip.className = 'map-tooltip';
             document.body.appendChild(this.mapTooltip);
+
+            let hoveredSightIcon = null;
+            let tooltipRaf = null;
+            const positionTooltip = () => {
+                tooltipRaf = null;
+                if (!this.mapTooltip || !hoveredSightIcon) return;
+                if (!this.mapTooltip.classList.contains('visible')) return;
+                const rect = hoveredSightIcon.getBoundingClientRect();
+                this.mapTooltip.style.left = `${rect.left + rect.width / 2}px`;
+                this.mapTooltip.style.top = `${rect.top}px`;
+            };
+            const scheduleTooltipPosition = () => {
+                if (tooltipRaf) cancelAnimationFrame(tooltipRaf);
+                tooltipRaf = requestAnimationFrame(positionTooltip);
+            };
+
+            map.on('move', scheduleTooltipPosition);
+            map.on('zoom', scheduleTooltipPosition);
+            map.on('resize', scheduleTooltipPosition);
+            map.on('movestart', () => this.$el.classList.add('map-moving'));
+            map.on('moveend', () => this.$el.classList.remove('map-moving'));
+            map.on('zoomstart', () => this.$el.classList.add('map-moving'));
+            map.on('zoomend', () => this.$el.classList.remove('map-moving'));
 
             const updateTripFilter = () => {
                 if (!map.getLayer("trips-lines")) return;
@@ -185,20 +212,24 @@ const TravellingView = {
             fetch("assets/geojson/sights.geojson").then(r => r.json()).then(data => {
                 data.features.forEach(f => {
                     const wrapper = document.createElement('div'); wrapper.className = 'sight-marker';
+                    const inner = document.createElement('div'); inner.className = 'sight-marker-inner';
                     const icon = document.createElement('div'); icon.className = 'sight-icon';
                     icon.innerText = { "Monument": "⭐", "Airport": "✈️", "Station": "🚆" }[f.properties.type] || "📍";
-                    wrapper.appendChild(icon);
+                    inner.appendChild(icon);
+                    wrapper.appendChild(inner);
                     const marker = new mapboxgl.Marker({ element: wrapper }).setLngLat(f.geometry.coordinates).addTo(map);
                     const mObj = { marker, element: wrapper, iconElement: icon, type: f.properties.type };
                     this.sightMarkers.push(mObj);
                     icon.addEventListener('mouseenter', (e) => {
+                        hoveredSightIcon = icon;
                         this.mapTooltip.innerText = f.properties.name || "Unknown";
                         this.mapTooltip.classList.add('visible');
-                        const rect = icon.getBoundingClientRect();
-                        this.mapTooltip.style.left = `${rect.left + rect.width / 2}px`;
-                        this.mapTooltip.style.top = `${rect.top}px`;
+                        scheduleTooltipPosition();
                     });
-                    icon.addEventListener('mouseleave', () => this.mapTooltip.classList.remove('visible'));
+                    icon.addEventListener('mouseleave', () => {
+                        hoveredSightIcon = null;
+                        this.mapTooltip.classList.remove('visible');
+                    });
                     icon.addEventListener('click', (e) => {
                         e.stopPropagation();
                         new mapboxgl.Popup({ offset: 25, className: 'translucent-popup' }).setLngLat(marker.getLngLat()).setHTML(`<strong>${f.properties.name}</strong><br>${f.properties.when || ""}`).addTo(map);

@@ -486,22 +486,37 @@
     justify-content: center;
     width: 28px;
     height: 28px;
+    cursor: pointer;
+    /* Mapbox GL positions markers via `transform`; don't animate it or markers will lag behind the map. */
+    transition: none !important;
+    will-change: transform;
+}
+
+.sight-marker-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 3px solid #fff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
     background: #fff;
     transition: transform 0.2s;
+    will-change: transform;
 }
 
-[data-bs-theme="dark"] .sight-marker {
+[data-bs-theme="dark"] .sight-marker-inner {
     border-color: #333;
     background: #333;
 }
 
-.sight-marker:hover {
+.sight-marker:hover .sight-marker-inner {
     transform: scale(1.1);
-    z-index: 5;
+}
+
+.map-moving .sight-marker-inner {
+    transition: none;
 }
 
 .sight-icon {
