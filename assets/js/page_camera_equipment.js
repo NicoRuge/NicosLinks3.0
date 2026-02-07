@@ -59,14 +59,15 @@ const CameraEquipmentView = {
                             <ul class="list-group list-group-flush bg-transparent">
                                 <li class="list-group-item bg-transparent border-0 px-0 py-2">
                                     <div class="fw-bold">Sony FE 70-200mm f/4 G OSS</div>
-                                    <small class="text-secondary">(SEL70200G)</small>
-                                    <span class="badge rounded-pill bg-danger-subtle text-danger ms-1">Broken</span>
                                 </li>
                                 <li class="list-group-item bg-transparent border-0 px-0 py-2">
                                     <div class="fw-bold">Sigma Makro 105mm f/2.8 DG OS HSM</div>
                                 </li>
                                 <li class="list-group-item bg-transparent border-0 px-0 py-2">
                                     <div class="fw-bold">Sony FE 28-70 f/3.5-5.6</div>
+                                </li>
+                                <li class="list-group-item bg-transparent border-0 px-0 py-2">
+                                    <div class="fw-bold">Samyang T1.5 24mm ED AS IF UMC II</div>
                                 </li>
                             </ul>
                         </div>

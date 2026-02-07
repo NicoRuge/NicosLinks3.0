@@ -70,6 +70,7 @@
       if (currentState.currentTrackSignature !== "no-track" || currentState.lastRealtimeState !== isRealtime) {
         container.innerHTML = `<div class="${CONFIG.classPrefix}card">
                   <div class="${CONFIG.classPrefix}header">
+                      <span class="${CONFIG.classPrefix}icon sp-icon-stopped"></span>
                       <div class="${CONFIG.classPrefix}title">Not Playing</div>
                       <span class="${CONFIG.classPrefix}source-text ${sourceClass}">${sourceText}</span>
                   </div>
@@ -139,14 +140,13 @@
                 </div>
               </div>
       
-              ${isPlaying ? `
-              <div class="${CONFIG.classPrefix}progress-container" id="sp-progress-container">
+              <div class="${CONFIG.classPrefix}progress-container ${!isPlaying ? 'sp-progress-inactive' : ''}" id="sp-progress-container">
                 <div class="${CONFIG.classPrefix}time" id="sp-current-time">${formatTime(progress)}</div>
                 <div class="progress flex-grow-1" style="height: 6px; background-color: var(--bs-secondary-bg-subtle);">
-                   <div class="progress-bar bg-success" id="sp-progress-fill" role="progressbar" style="width:${pct}%" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
+                   <div class="progress-bar ${isPlaying ? 'bg-success' : ''}" id="sp-progress-fill" role="progressbar" style="width:${pct}%" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="${CONFIG.classPrefix}time">${formatTime(duration)}</div>
-              </div>` : ''}
+              </div>
             </div>
           `;
       container.innerHTML = html;

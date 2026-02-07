@@ -65,9 +65,11 @@
                 <div v-if="section.title" class="sidebar-section">{{ section.title }}</div>
                 <ul class="nav flex-column">
                     <li v-for="item in section.items" :key="item.id" class="nav-item">
-                        <a class="nav-link" :class="{ active: currentHash === item.id }" href="#"
+                        <a class="nav-link"
+                            :class="{ active: currentHash === item.id, 'text-secondary opacity-75': item.wip }" href="#"
                             @click.prevent="navigate(item.id); closeSidebar()">
-                            <img :src="'assets/icons/' + item.icon" alt="" class="sidebar-icon">
+                            <img :src="'assets/icons/' + item.icon" alt="" class="sidebar-icon"
+                                :style="item.wip ? 'opacity: 0.5' : ''">
                             {{ item.label }}
                         </a>
                     </li>
@@ -126,14 +128,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="assets/js/spotify_widget.js"></script>
-    <script src="assets/js/discord_widget.js"></script>
-    <script src="assets/js/home.js"></script>
-    <script src="assets/js/photography.js"></script>
-    <script src="assets/js/travelling.js"></script>
-    <script src="assets/js/other_pages.js"></script>
-    <script src="assets/js/departures.js"></script>
-    <script src="assets/js/camera_equipment.js"></script>
+    <script src="assets/js/widget_spotify.js"></script>
+    <script src="assets/js/widget_discord.js"></script>
+    <script src="assets/js/page_home.js"></script>
+    <script src="assets/js/page_photography.js"></script>
+    <script src="assets/js/page_travelling.js"></script>
+    <script src="assets/js/page_other.js"></script>
+    <script src="assets/js/page_departures.js"></script>
+    <script src="assets/js/page_camera_equipment.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script>
         const { createApp } = Vue
@@ -172,10 +174,10 @@
                         },
                         {
                             title: 'Other Stuff', items: [
-                                { id: 'blog', label: 'Blog', icon: 'book-open-text.svg' },
-                                { id: 'music', label: 'Music', icon: 'music.svg' },
-                                { id: 'github', label: 'GitHub', icon: 'git-branch.svg' },
-                                { id: 'chess', label: 'Chess', icon: 'chess.svg' }
+                                { id: 'blog', label: 'Blog (WIP)', icon: 'book-open-text.svg', wip: true },
+                                { id: 'music', label: 'Music (WIP)', icon: 'music.svg', wip: true },
+                                { id: 'github', label: 'GitHub (WIP)', icon: 'git-branch.svg', wip: true },
+                                { id: 'chess', label: 'Chess (WIP)', icon: 'chess.svg', wip: true }
                             ]
                         }
                     ],

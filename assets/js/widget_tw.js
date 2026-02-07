@@ -2,7 +2,7 @@
 /*! Träwelling Widget (vanilla JS) for @Lord_NicolasX
    Drop-in usage:
    <div id="twlngwidget"></div>
-   <script src="tw_widget.js"></script>
+   <script src="widget_tw.js"></script>
 */
 (function () {
   const CONFIG = {

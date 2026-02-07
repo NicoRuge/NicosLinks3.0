@@ -1,11 +1,11 @@
 const HomeView = {
     template: `
         <!-- Hero Section -->
-        <div class="container-fluid px-4 py-5">
-            <div class="row align-items-center g-3 py-5 text-center text-lg-start">
+        <div class="container-fluid px-4 py-2">
+            <div class="row align-items-center g-3 pt-2 pb-2 text-center text-lg-start">
                 <div class="col-lg-2">
-                    <img src="assets/images/profile.jpg" class="d-block mx-auto img-fluid rounded-4 shadow-lg"
-                        alt="Hero Image" style="max-height: 300px; object-fit: cover;"
+                    <img src="assets/images/profile.jpg" class="d-block mx-auto img-fluid rounded-4 shadow-lg profile-image"
+                        alt="Hero Image"
                         onerror="this.src='https://via.placeholder.com/600x400/dee2e6/6c757d?text=Your+Image+Here'">
                 </div>
                 <div class="col-lg-8">
@@ -25,11 +25,29 @@ const HomeView = {
                             My Images on Unsplash.com
                         </a>
                     </div>
+                    <!-- Social Icons -->
+                    <div class="social-icons-row justify-content-center justify-content-lg-start">
+                        <a href="https://bsky.app/profile/nico-ruge.de" class="social-icon-link" target="_blank" rel="noopener noreferrer" title="Bluesky">
+                            <div class="social-icon-box shadow">
+                                <img src="assets/icons/bluesky.svg" alt="Bluesky" class="social-icon-img">
+                            </div>
+                        </a>
+                        <a href="https://www.linkedin.com/in/nico-ruge/" class="social-icon-link" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                            <div class="social-icon-box shadow">
+                                <img src="assets/icons/linkedin.svg" alt="LinkedIn" class="social-icon-img">
+                            </div>
+                        </a>
+                        <a href="mailto:mail@nico-ruge.de" class="social-icon-link" title="Mail">
+                            <div class="social-icon-box shadow">
+                                <img src="assets/icons/mail.svg" alt="Mail" class="social-icon-img">
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="container-fluid px-4">
-            <hr class="my-5 border-secondary-subtle">
+            <hr class="mt-2 mb-5 border-secondary-subtle">
             <div class="row row-cols-1 row-cols-lg-2 g-4 pb-5 justify-content-center justify-content-lg-start">
                 <div class="col" style="max-width: fit-content;">
                     <div id="spotify-widget" class="h-100">
