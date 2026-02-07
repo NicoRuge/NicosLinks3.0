@@ -75,8 +75,7 @@ const TravellingView = {
             map: null,
             mapStyles: null,
             sightMarkers: [],
-            mapTooltip: null,
-            spider: null
+            mapTooltip: null
         };
     },
     mounted() {
@@ -86,10 +85,6 @@ const TravellingView = {
     beforeUnmount() {
         if (this.mapTooltip && this.mapTooltip.parentNode) {
             this.mapTooltip.parentNode.removeChild(this.mapTooltip);
-        }
-        if (this.spider) {
-            this.spider.cleanup();
-            this.spider = null;
         }
         if (this.map) {
             this.map.remove();
@@ -129,154 +124,11 @@ const TravellingView = {
             this.map = map;
             map.addControl(new mapboxgl.NavigationControl(), "top-left");
 
+
             let tripsData = null;
             this.mapTooltip = document.createElement('div');
             this.mapTooltip.className = 'map-tooltip';
             document.body.appendChild(this.mapTooltip);
-
-            const buildSpiderifier = () => {
-                const svgNS = 'http://www.w3.org/2000/svg';
-                const svg = document.createElementNS(svgNS, 'svg');
-                svg.classList.add('spider-lines');
-                this.$refs.mapContainer.appendChild(svg);
-
-                const state = {
-                    active: false,
-                    centerLngLat: null,
-                    markers: [],
-                    offsets: new Map(),
-                    lineEls: new Map(),
-                    raf: null
-                };
-
-                const contains = (markerObj) => state.active && state.markers.includes(markerObj);
-
-                const clearLines = () => {
-                    state.lineEls.forEach(el => el.remove());
-                    state.lineEls.clear();
-                };
-
-                const scheduleRedraw = () => {
-                    if (!state.active) return;
-                    if (state.raf) cancelAnimationFrame(state.raf);
-                    state.raf = requestAnimationFrame(redraw);
-                };
-
-                const redraw = () => {
-                    state.raf = null;
-                    if (!state.active) return;
-                    if (!state.centerLngLat) return;
-                    const svgRect = this.$refs.mapContainer.getBoundingClientRect();
-                    svg.setAttribute('viewBox', `0 0 ${svgRect.width} ${svgRect.height}`);
-                    svg.setAttribute('width', `${svgRect.width}`);
-                    svg.setAttribute('height', `${svgRect.height}`);
-
-                    state.markers.forEach(m => {
-                        const lngLat = m.marker.getLngLat();
-                        const origin = map.project(lngLat);
-                        const offset = state.offsets.get(m) || { x: 0, y: 0 };
-                        const x1 = origin.x;
-                        const y1 = origin.y;
-                        const x2 = origin.x + offset.x;
-                        const y2 = origin.y + offset.y;
-
-                        let line = state.lineEls.get(m);
-                        if (!line) {
-                            line = document.createElementNS(svgNS, 'line');
-                            svg.appendChild(line);
-                            state.lineEls.set(m, line);
-                        }
-                        line.setAttribute('x1', `${x1}`);
-                        line.setAttribute('y1', `${y1}`);
-                        line.setAttribute('x2', `${x2}`);
-                        line.setAttribute('y2', `${y2}`);
-                    });
-                };
-
-                const unspiderfy = () => {
-                    if (!state.active) return;
-                    state.markers.forEach(m => m.marker.setOffset([0, 0]));
-                    state.markers = [];
-                    state.offsets.clear();
-                    clearLines();
-                    state.active = false;
-                    state.centerLngLat = null;
-                };
-
-                const getNearbyGroup = (anchorMarkerObj, radiusPx = 42) => {
-                    const anchorPoint = map.project(anchorMarkerObj.marker.getLngLat());
-                    const candidates = this.sightMarkers.filter(m => m.element && m.element.style.display !== 'none');
-                    return candidates.filter(m => {
-                        const p = map.project(m.marker.getLngLat());
-                        const dx = p.x - anchorPoint.x;
-                        const dy = p.y - anchorPoint.y;
-                        return Math.hypot(dx, dy) <= radiusPx;
-                    });
-                };
-
-                const spiderfy = (anchorMarkerObj) => {
-                    const group = getNearbyGroup(anchorMarkerObj);
-                    if (group.length <= 1) {
-                        unspiderfy();
-                        return { didSpiderfy: false, group };
-                    }
-
-                    state.active = true;
-                    state.centerLngLat = anchorMarkerObj.marker.getLngLat();
-                    state.markers = group;
-                    state.offsets.clear();
-                    clearLines();
-
-                    const n = group.length;
-                    const offsets = [];
-                    if (n <= 8) {
-                        const radius = 34 + n * 3;
-                        for (let i = 0; i < n; i++) {
-                            const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
-                            offsets.push({ x: Math.round(Math.cos(angle) * radius), y: Math.round(Math.sin(angle) * radius) });
-                        }
-                    } else {
-                        // simple spiral for many markers
-                        for (let i = 0; i < n; i++) {
-                            const angle = i * 0.7;
-                            const radius = 28 + i * 6;
-                            offsets.push({ x: Math.round(Math.cos(angle) * radius), y: Math.round(Math.sin(angle) * radius) });
-                        }
-                    }
-
-                    group.forEach((m, idx) => {
-                        const off = offsets[idx];
-                        state.offsets.set(m, off);
-                        m.marker.setOffset([off.x, off.y]);
-                    });
-
-                    scheduleRedraw();
-                    return { didSpiderfy: true, group };
-                };
-
-                const onMapClick = () => unspiderfy();
-                map.on('click', onMapClick);
-                map.on('move', scheduleRedraw);
-                map.on('zoom', scheduleRedraw);
-                map.on('resize', scheduleRedraw);
-
-                return {
-                    spiderfy,
-                    unspiderfy,
-                    isActive: () => state.active,
-                    contains,
-                    cleanup: () => {
-                        unspiderfy();
-                        map.off('click', onMapClick);
-                        map.off('move', scheduleRedraw);
-                        map.off('zoom', scheduleRedraw);
-                        map.off('resize', scheduleRedraw);
-                        if (state.raf) cancelAnimationFrame(state.raf);
-                        svg.remove();
-                    }
-                };
-            };
-            this.spider = buildSpiderifier();
 
             let hoveredSightIcon = null;
             let tooltipRaf = null;
@@ -380,14 +232,6 @@ const TravellingView = {
                     });
                     icon.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        if (this.spider) {
-                            if (this.spider.isActive() && this.spider.contains(mObj)) {
-                                // Already spiderfied: allow opening the popup.
-                            } else {
-                            const { didSpiderfy } = this.spider.spiderfy(mObj);
-                            if (didSpiderfy) return;
-                            }
-                        }
                         new mapboxgl.Popup({ offset: 25, className: 'translucent-popup' }).setLngLat(marker.getLngLat()).setHTML(`<strong>${f.properties.name}</strong><br>${f.properties.when || ""}`).addTo(map);
                     });
                 });
