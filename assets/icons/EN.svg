@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="EuroNight Hungary.svg"
+   id="svg4"
+   version="1.1"
+   viewBox="0 0 339.81675 89.953448"
+   height="340"
+   width="1284.3514">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8" />
+  <sodipodi:namedview
+     inkscape:current-layer="svg4"
+     inkscape:window-maximized="1"
+     inkscape:window-y="-8"
+     inkscape:window-x="-8"
+     inkscape:cy="384.09103"
+     inkscape:cx="90.698709"
+     inkscape:zoom="0.49095671"
+     showgrid="false"
+     id="namedview6"
+     inkscape:window-height="1017"
+     inkscape:window-width="1920"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     bordercolor="#666666"
+     pagecolor="#ffffff" />
+  <path
+     style="stroke-width:2.93097"
+     id="path2"
+     fill="#000000"
+     d="M 205.75415,89.89861 206.63344,28.143055 142.85552,89.92792 H 100.79609 L 191.94928,0.03504522 h 42.46977 L 232.42599,64.985358 298.13835,0.03504522 h 41.67841 L 248.34116,89.92792 Z m -179.258174,0 L 0,61.966458 62.371059,0.06435493 c 0,0 74.563901,-0.14654854 111.523441,0 L 151.82429,22.134565 82.477519,21.988016 71.427759,33.155015 H 140.80384 L 124.24385,49.715 H 55.072942 l -12.016981,12.837652 68.408859,0.05862 -27.463196,27.345957 z" />
+</svg>

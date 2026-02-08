@@ -467,10 +467,21 @@
 /* Departures */
 .departures-panel {
     max-width: 980px;
+    --departures-col-line: 150px;
+    --departures-col-platform: 110px;
+    --departures-col-time: 130px;
 }
 
 .departures-table {
     table-layout: fixed;
+}
+
+@media (min-width: 992px) {
+    .departures-panel {
+        --departures-col-line: 140px;
+        --departures-col-platform: 100px;
+        --departures-col-time: 110px;
+    }
 }
 
 .departures-destination-text {

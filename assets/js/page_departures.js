@@ -89,10 +89,10 @@
 		                        <div class="table-responsive">
 		                            <table class="table table-hover mb-0 align-middle departures-table">
 		                                <colgroup>
-		                                    <col style="width: 150px;">
+		                                    <col style="width: var(--departures-col-line, 150px);">
 		                                    <col>
-		                                    <col style="width: 110px;">
-		                                    <col style="width: 130px;">
+		                                    <col style="width: var(--departures-col-platform, 110px);">
+		                                    <col style="width: var(--departures-col-time, 130px);">
 		                                </colgroup>
 		                                <thead class="table-light">
 		                                    <tr>
@@ -308,6 +308,8 @@
 
 	            if (name.startsWith('ICE')) return 'ice';
 	            if (name.startsWith('IC')) return 'ic';
+	            if (/^EN\b/.test(name)) return 'en';
+	            if (/^RJ\b/.test(name)) return 'rj';
 	            if (name.startsWith('FLX') || name.startsWith('FLIXTRAIN')) return 'flx';
 	            if (/^(RE|RB)\b/.test(name)) return 'rerb';
 	            if (product === 'suburban' || product === 's-bahn') return 'sbahn';
@@ -320,6 +322,8 @@
 	            const mode = this.getLineModeKey(line);
 	            if (mode === 'ice') return 'assets/icons/InterCityExpress.svg';
 	            if (mode === 'ic') return 'assets/icons/InterCity.svg';
+	            if (mode === 'en') return 'assets/icons/EN.svg';
+	            if (mode === 'rj') return 'assets/icons/Railjet.svg';
 	            if (mode === 'flx') return 'assets/icons/FLX.svg';
 	            if (mode === 'rerb') return 'assets/icons/RE_RB.svg';
 	            if (mode === 'sbahn') return 'assets/icons/SBahn.svg';
@@ -338,6 +342,8 @@
 
 	            if (mode === 'ice') return raw.replace(/^ICE\s*/i, '').trim() || raw;
 	            if (mode === 'ic') return raw.replace(/^IC\s*/i, '').trim() || raw;
+	            if (mode === 'en') return raw.replace(/^EN\s*/i, '').trim() || raw;
+	            if (mode === 'rj') return raw.replace(/^RJ\s*/i, '').trim() || raw;
 	            if (mode === 'flx') return raw.replace(/^(FLX|FLIXTRAIN)\s*/i, '').trim() || raw;
 	            if (mode === 'rerb') return raw.replace(/^(RE|RB)\s*/i, '').trim() || raw;
 	            return raw;
@@ -347,6 +353,8 @@
 	            const mode = this.getLineModeKey(line);
 	            if (mode === 'ice') return 'ICE';
 	            if (mode === 'ic') return 'IC';
+	            if (mode === 'en') return 'EN';
+	            if (mode === 'rj') return 'RJ';
 	            if (mode === 'flx') return 'FLX';
 	            if (mode === 'rerb') return name.startsWith('RB') ? 'RB' : 'RE';
 	            if (mode === 'sbahn') return 'S';
