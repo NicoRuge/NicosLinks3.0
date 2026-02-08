@@ -465,6 +465,53 @@
 }
 
 /* Departures */
+.departures-panel {
+    max-width: 980px;
+}
+
+.departures-table {
+    table-layout: fixed;
+}
+
+.departures-destination-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.departures-destination-inner {
+    display: inline;
+    will-change: transform;
+}
+
+.departures-destination-text.is-overflowing {
+    text-overflow: clip;
+}
+
+.departures-destination-text.is-overflowing .departures-destination-inner {
+    display: inline-block;
+    animation: departures-destination-marquee var(--marquee-duration, 7s) ease-in-out 1s infinite alternate;
+}
+
+@keyframes departures-destination-marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(calc(-1 * var(--marquee-distance, 0px)));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .departures-destination-text.is-overflowing {
+        text-overflow: ellipsis;
+    }
+    .departures-destination-text.is-overflowing .departures-destination-inner {
+        animation: none;
+        display: inline;
+    }
+}
+
 .departure-line-cell {
     display: inline-flex;
     align-items: center;

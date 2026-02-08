@@ -1,13 +1,13 @@
-const DeparturesView = {
-    template: `
-        <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <h1 class="h3 mb-4">Departures</h1>
-                    
-                    <div class="mb-4">
-                        <label for="station-search" class="form-label visually-hidden">Search Station</label>
-	                        <div class="position-relative">
+	const DeparturesView = {
+	    template: `
+	        <div class="container-fluid">
+	            <div class="row justify-content-center">
+	                <div class="col-12 col-md-10 col-lg-8 col-xl-6 departures-panel">
+	                    <h1 class="h3 mb-4">Departures</h1>
+	                    
+	                    <div class="mb-4">
+	                        <label for="station-search" class="form-label visually-hidden">Search Station</label>
+		                        <div class="position-relative">
 	                            <div class="input-group flex-nowrap">
 	                                <span class="input-group-text" id="addon-wrapping">
 	                                    <i class="bi bi-search"></i>
@@ -86,13 +86,19 @@ const DeparturesView = {
 	                                </button>
 	                            </div>
 	                        </div>
-	                        <div class="table-responsive">
-	                            <table class="table table-hover mb-0 align-middle">
-	                                <thead class="table-light">
-	                                    <tr>
-	                                        <th scope="col">Line</th>
-	                                        <th scope="col">Destination</th>
-	                                        <th scope="col">Platform</th>
+		                        <div class="table-responsive">
+		                            <table class="table table-hover mb-0 align-middle departures-table">
+		                                <colgroup>
+		                                    <col style="width: 150px;">
+		                                    <col>
+		                                    <col style="width: 110px;">
+		                                    <col style="width: 130px;">
+		                                </colgroup>
+		                                <thead class="table-light">
+		                                    <tr>
+		                                        <th scope="col">Line</th>
+		                                        <th scope="col">Destination</th>
+		                                        <th scope="col">Platform</th>
 	                                        <th scope="col" class="text-end">Time</th>
 	                                    </tr>
 	                                </thead>
@@ -107,14 +113,18 @@ const DeparturesView = {
 	                                            <div class="departure-line-cell">
 	                                                <img v-if="getLineIconSrc(dep.line)" :src="getLineIconSrc(dep.line)" alt="" class="departure-line-icon" loading="lazy" :title="dep.line.name || dep.line.product || 'Line'">
 	                                                <span v-else class="departure-line-icon-fallback" :title="dep.line.name || dep.line.product || 'Line'">{{ getLineFallbackLabel(dep.line) }}</span>
-	                                                <span class="departure-line-text fw-bold">{{ getLineNumberText(dep.line) }}</span>
-	                                            </div>
-	                                        </td>
-	                                        <td class="fw-medium">{{ dep.direction }}</td>
-	                                        <td>{{ dep.platform || dep.plannedPlatform || '-' }}</td>
-	                                        <td class="text-end">
-	                                            <div class="d-flex flex-column align-items-end">
-	                                                <span class="fw-bold">{{ getDisplayTime(dep) }}</span>
+		                                                <span class="departure-line-text fw-bold">{{ getLineNumberText(dep.line) }}</span>
+		                                            </div>
+		                                        </td>
+		                                        <td class="fw-medium departures-destination">
+		                                            <div class="departures-destination-text">
+		                                                <span class="departures-destination-inner">{{ dep.direction }}</span>
+		                                            </div>
+		                                        </td>
+		                                        <td>{{ dep.platform || dep.plannedPlatform || '-' }}</td>
+		                                        <td class="text-end">
+		                                            <div class="d-flex flex-column align-items-end">
+		                                                <span class="fw-bold">{{ getDisplayTime(dep) }}</span>
 	                                                <small v-if="getDelay(dep) > 0" class="text-danger fw-bold">
 	                                                    +{{ getDelay(dep) }} min
 	                                                </small>
@@ -138,14 +148,15 @@ const DeparturesView = {
 	            suggestions: [],
 	            station: null,
 	            departures: [],
-	            autocompleteLoading: false,
-	            stationSearchSeq: 0,
-	            stationSearchAbortController: null,
-	            stationSearchCache: new Map(),
-	            sampleDepartures: [
-	                {
-	                    tripId: 'sample-ice-100',
-	                    line: { name: 'ICE 100', product: 'nationalExpress' },
+		            autocompleteLoading: false,
+		            stationSearchSeq: 0,
+		            stationSearchAbortController: null,
+		            stationSearchCache: new Map(),
+		            destinationResizeObserver: null,
+		            sampleDepartures: [
+		                {
+		                    tripId: 'sample-ice-100',
+		                    line: { name: 'ICE 100', product: 'nationalExpress' },
 	                    direction: 'Rostock',
 	                    platform: '99',
 	                    delay: 99 * 60,
@@ -154,14 +165,54 @@ const DeparturesView = {
 	            ],
 	            loading: false,
 	            error: null,
-	            debounceTimeout: null
-	        };
-	    },
-	    methods: {
-	        onInput() {
-	            clearTimeout(this.debounceTimeout);
-	            this.debounceTimeout = setTimeout(() => {
-	                this.searchStations();
+		            debounceTimeout: null
+		        };
+		    },
+		    mounted() {
+		        this.initDestinationMarqueeObserver();
+		        this.$nextTick(() => this.updateDestinationMarquee());
+		    },
+		    beforeUnmount() {
+		        if (this.destinationResizeObserver) this.destinationResizeObserver.disconnect();
+		        this.destinationResizeObserver = null;
+		        if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
+		    },
+		    methods: {
+		        initDestinationMarqueeObserver() {
+		            if (typeof ResizeObserver === 'undefined') return;
+		            if (this.destinationResizeObserver) this.destinationResizeObserver.disconnect();
+		            this.destinationResizeObserver = new ResizeObserver(() => this.updateDestinationMarquee());
+		            this.destinationResizeObserver.observe(this.$el);
+		        },
+		        updateDestinationMarquee() {
+		            const wrappers = this.$el?.querySelectorAll?.('.departures-destination-text');
+		            if (!wrappers || !wrappers.length) return;
+
+		            wrappers.forEach((wrapper) => {
+		                const inner = wrapper.querySelector('.departures-destination-inner');
+		                if (!inner) return;
+
+		                wrapper.classList.remove('is-overflowing');
+		                wrapper.style.removeProperty('--marquee-distance');
+		                wrapper.style.removeProperty('--marquee-duration');
+
+		                const wrapperWidth = wrapper.clientWidth;
+		                if (!wrapperWidth) return;
+
+		                const overflow = Math.ceil(inner.scrollWidth - wrapperWidth);
+		                if (overflow <= 4) return;
+
+		                const distance = overflow + 16;
+		                const duration = Math.min(14, Math.max(6, distance / 35));
+		                wrapper.style.setProperty('--marquee-distance', `${distance}px`);
+		                wrapper.style.setProperty('--marquee-duration', `${duration}s`);
+		                wrapper.classList.add('is-overflowing');
+		            });
+		        },
+		        onInput() {
+		            clearTimeout(this.debounceTimeout);
+		            this.debounceTimeout = setTimeout(() => {
+		                this.searchStations();
 	            }, 300);
 	        },
 	        async searchStations() {
@@ -209,26 +260,28 @@ const DeparturesView = {
 	            this.suggestions = [];
             this.getDepartures(station.id);
         },
-	        clearSearch() {
-	            if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
-	            this.query = '';
-	            this.suggestions = [];
-	            this.station = null;
-	            this.departures = [];
+		        clearSearch() {
+		            if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
+		            this.query = '';
+		            this.suggestions = [];
+		            this.station = null;
+		            this.departures = [];
+		            this.error = null;
+		            this.$nextTick(() => this.updateDestinationMarquee());
+		        },
+	        async getDepartures(stationId) {
+	            this.loading = true;
 	            this.error = null;
-	        },
-        async getDepartures(stationId) {
-            this.loading = true;
-            this.error = null;
-            try {
+	            try {
                 const response = await fetch(`https://v6.db.transport.rest/stops/${stationId}/departures?results=10&duration=60`);
-                if (!response.ok) throw new Error('Failed to load departures');
-                const data = await response.json();
-                this.departures = data.departures || data;
-            } catch (err) {
-                this.error = 'Could not load departures. Please try again.';
-                console.error(err);
-            } finally {
+	                if (!response.ok) throw new Error('Failed to load departures');
+	                const data = await response.json();
+	                this.departures = data.departures || data;
+	                this.$nextTick(() => this.updateDestinationMarquee());
+	            } catch (err) {
+	                this.error = 'Could not load departures. Please try again.';
+	                console.error(err);
+	            } finally {
                 this.loading = false;
             }
         },
