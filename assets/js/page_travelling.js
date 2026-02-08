@@ -1,12 +1,12 @@
 const TravellingView = {
-    template: `
-	        <div class="map-container-wrapper">
-	            <div ref="mapContainer" id="map"></div>
-	            <div class="toast-container position-absolute bottom-0 end-0 p-3 map-toast-container pe-none">
-	                <div ref="sightToast" class="toast align-items-center shadow pe-auto" role="alert" aria-live="polite" aria-atomic="true">
-	                    <div class="toast-header">
-	                        <strong ref="sightToastTitle" class="me-auto"></strong>
-	                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+	    template: `
+		        <div class="map-container-wrapper">
+		            <div ref="mapContainer" id="map"></div>
+		            <div ref="sightToastContainer" class="toast-container position-absolute p-2 map-toast-container pe-none">
+		                <div ref="sightToast" class="toast align-items-center shadow pe-auto" role="alert" aria-live="polite" aria-atomic="true">
+		                    <div class="toast-header">
+		                        <strong ref="sightToastTitle" class="me-auto"></strong>
+		                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
 	                    </div>
 	                    <div ref="sightToastBody" class="toast-body"></div>
 	                </div>
@@ -108,7 +108,56 @@ const TravellingView = {
 	            if (!this.$refs.sightToast || typeof bootstrap === 'undefined' || !bootstrap.Toast) return;
 	            this.sightToastInstance = bootstrap.Toast.getOrCreateInstance(this.$refs.sightToast, { autohide: true, delay: 4500 });
 	        },
-	        showSightToast({ title, body }) {
+	        positionSightToast(anchorEl, { mode = 'above' } = {}) {
+	            if (!anchorEl || !this.$refs.sightToastContainer || !this.$refs.sightToast) return;
+
+	            const containerEl = this.$refs.sightToastContainer;
+	            const toastEl = this.$refs.sightToast;
+
+	            const wrapperRect = this.$el.getBoundingClientRect();
+	            const anchorRect = anchorEl.getBoundingClientRect();
+
+	            const padding = 8;
+	            const gap = 12;
+
+	            const applyPlacement = (placement) => {
+	                const isBelow = placement === 'below';
+	                containerEl.classList.toggle('is-below', isBelow);
+	                const left = (anchorRect.left + anchorRect.width / 2) - wrapperRect.left;
+	                const top = isBelow ? (anchorRect.bottom - wrapperRect.top) : (anchorRect.top - wrapperRect.top);
+	                containerEl.style.left = `${left}px`;
+	                containerEl.style.top = `${top}px`;
+	                return { left, top, isBelow };
+	            };
+
+	            if (mode !== 'auto') {
+	                applyPlacement(mode);
+	                return;
+	            }
+
+	            applyPlacement('above');
+
+	            const toastRect = toastEl.getBoundingClientRect();
+	            const canAbove = (anchorRect.top - gap - toastRect.height) >= (wrapperRect.top + padding);
+	            const canBelow = (anchorRect.bottom + gap + toastRect.height) <= (wrapperRect.bottom - padding);
+	            applyPlacement(!canAbove && canBelow ? 'below' : 'above');
+
+	            const toastRect2 = toastEl.getBoundingClientRect();
+	            const leftWithin = toastRect2.left - wrapperRect.left;
+	            const rightWithin = toastRect2.right - wrapperRect.left;
+	            const maxRight = wrapperRect.width - padding;
+	            const minLeft = padding;
+
+	            let deltaX = 0;
+	            if (leftWithin < minLeft) deltaX = minLeft - leftWithin;
+	            if (rightWithin > maxRight) deltaX = maxRight - rightWithin;
+
+	            if (deltaX) {
+	                const currentLeft = parseFloat(containerEl.style.left || '0');
+	                containerEl.style.left = `${currentLeft + deltaX}px`;
+	            }
+	        },
+	        showSightToast({ title, body, anchorEl }) {
 	            if (!this.$refs.sightToastTitle || !this.$refs.sightToastBody) return;
 	            if (!this.sightToastInstance) this.initSightToast();
 	            if (!this.sightToastInstance) return;
@@ -116,7 +165,9 @@ const TravellingView = {
 	            const text = (body || '').toString().trim();
 	            this.$refs.sightToastBody.textContent = text;
 	            this.$refs.sightToastBody.style.display = text ? '' : 'none';
+	            this.positionSightToast(anchorEl, { mode: 'above' });
 	            this.sightToastInstance.show();
+	            requestAnimationFrame(() => this.positionSightToast(anchorEl, { mode: 'auto' }));
 	        },
 	        handleThemeChange() {
 	            const storedTheme = localStorage.getItem('theme') || 'auto';
@@ -255,15 +306,15 @@ const TravellingView = {
                         hoveredSightIcon = null;
                         this.mapTooltip.classList.remove('visible');
                     });
-	                    icon.addEventListener('click', (e) => {
-	                        e.stopPropagation();
-	                        const name = f.properties.name || "Unknown";
-	                        const when = (f.properties.when || "").toString().trim();
-	                        this.showSightToast({ title: name, body: when });
-	                    });
-	                });
-	                updateSightsFilter();
-	            });
+		                    icon.addEventListener('click', (e) => {
+		                        e.stopPropagation();
+		                        const name = f.properties.name || "Unknown";
+		                        const when = (f.properties.when || "").toString().trim();
+		                        this.showSightToast({ title: name, body: when, anchorEl: e.currentTarget });
+		                    });
+		                });
+		                updateSightsFilter();
+		            });
 
             this.$el.addEventListener('change', (e) => {
                 if (e.target.classList.contains('filter-cb')) updateTripFilter();

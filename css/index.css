@@ -443,9 +443,16 @@
 .map-toast-container {
     z-index: 20;
     max-width: 360px;
+    transform: translate(-50%, -100%) translateY(-12px);
+    pointer-events: none;
+}
+
+.map-toast-container.is-below {
+    transform: translate(-50%, 0) translateY(12px);
 }
 
 .map-toast-container .toast {
+    pointer-events: auto;
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
     border: 1px solid var(--bs-border-color);
@@ -455,6 +462,75 @@
     background-color: var(--bs-tertiary-bg);
     color: var(--bs-body-color);
     border-bottom: 1px solid var(--bs-border-color);
+}
+
+/* Departures */
+.departure-line-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.departure-line-text {
+    white-space: nowrap;
+}
+
+.line-logo-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 26px;
+    min-width: 44px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid var(--bs-border-color);
+}
+
+.line-logo {
+    height: 14px;
+    width: auto;
+    display: block;
+}
+
+.line-logo-fallback {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.line-logo-pill--white {
+    background: #fff;
+    border-color: var(--bs-border-color);
+}
+
+.line-logo-pill--sbahn {
+    background: var(--bs-success);
+    border-color: var(--bs-success);
+    color: #fff;
+}
+
+.line-logo-pill--subway {
+    background: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff;
+}
+
+.line-logo-pill--bus {
+    background: #6f42c1;
+    border-color: #6f42c1;
+    color: #fff;
+}
+
+.line-logo-pill--tram {
+    background: var(--bs-danger);
+    border-color: var(--bs-danger);
+    color: #fff;
+}
+
+.line-logo-pill--default {
+    background: var(--bs-secondary-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
 }
 
 .legend-color {
