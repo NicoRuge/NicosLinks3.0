@@ -89,38 +89,40 @@
 		                        <div class="table-responsive">
 		                            <table class="table table-hover mb-0 align-middle departures-table">
 		                                <colgroup>
-		                                    <col style="width: var(--departures-col-line, 150px);">
-		                                    <col>
+		                                    <col style="width: var(--departures-col-mode, 64px);">
+		                                    <col style="width: var(--departures-col-line, 120px);">
+		                                    <col style="width: var(--departures-col-destination, auto);">
 		                                    <col style="width: var(--departures-col-platform, 110px);">
 		                                    <col style="width: var(--departures-col-time, 130px);">
 		                                </colgroup>
-		                                <thead class="table-light">
+		                                <thead>
 		                                    <tr>
-		                                        <th scope="col">Line</th>
+			                                        <th scope="col">Line</th>
+			                                        <th scope="col">No.</th>
 		                                        <th scope="col">Destination</th>
 		                                        <th scope="col">Platform</th>
-	                                        <th scope="col" class="text-end">Time</th>
-	                                    </tr>
-	                                </thead>
-	                                <tbody>
-	                                    <tr v-if="station && departures.length === 0">
-	                                        <td colspan="4" class="text-center py-4 text-secondary">
-	                                            No departures found in the next 60 minutes.
-	                                        </td>
-	                                    </tr>
-	                                    <tr v-for="dep in (station ? departures : sampleDepartures)" :key="dep.tripId + dep.line.name">
-	                                        <td>
-	                                            <div class="departure-line-cell">
-	                                                <img v-if="getLineIconSrc(dep.line)" :src="getLineIconSrc(dep.line)" alt="" class="departure-line-icon" loading="lazy" :title="dep.line.name || dep.line.product || 'Line'">
-	                                                <span v-else class="departure-line-icon-fallback" :title="dep.line.name || dep.line.product || 'Line'">{{ getLineFallbackLabel(dep.line) }}</span>
-		                                                <span class="departure-line-text fw-bold">{{ getLineNumberText(dep.line) }}</span>
-		                                            </div>
+		                                        <th scope="col" class="text-end">Time</th>
+		                                    </tr>
+		                                </thead>
+		                                <tbody>
+		                                    <tr v-if="station && departures.length === 0">
+		                                        <td colspan="5" class="text-center py-4 text-secondary">
+		                                            No departures found in the next 60 minutes.
 		                                        </td>
-		                                        <td class="fw-medium departures-destination">
-		                                            <div class="departures-destination-text">
-		                                                <span class="departures-destination-inner">{{ dep.direction }}</span>
-		                                            </div>
-		                                        </td>
+		                                    </tr>
+		                                    <tr v-for="dep in (station ? departures : sampleDepartures)" :key="dep.tripId + dep.line.name">
+		                                        <td>
+		                                            <div class="departure-line-cell">
+		                                                <img v-if="getLineIconSrc(dep.line)" :src="getLineIconSrc(dep.line)" alt="" :class="['departure-line-icon', getLineIconSizeClass(dep.line)]" loading="lazy" :title="dep.line.name || dep.line.product || 'Line'">
+		                                                <span v-else :class="['departure-line-icon-fallback', getLineFallbackClass(dep.line)]" :title="dep.line.name || dep.line.product || 'Line'">{{ getLineFallbackLabel(dep.line) }}</span>
+			                                            </div>
+			                                        </td>
+		                                        <td class="departure-line-number fw-bold">{{ getLineNumberText(dep.line) }}</td>
+			                                        <td class="fw-medium departures-destination">
+			                                            <div class="departures-destination-text">
+			                                                <span class="departures-destination-inner">{{ dep.direction }}</span>
+			                                            </div>
+			                                        </td>
 		                                        <td>{{ dep.platform || dep.plannedPlatform || '-' }}</td>
 		                                        <td class="text-end">
 		                                            <div class="d-flex flex-column align-items-end">
@@ -302,63 +304,77 @@
 	            // delay is in seconds
 	            return dep.delay ? Math.floor(dep.delay / 60) : 0;
 	        },
-	        getLineModeKey(line) {
-	            const name = (line?.name || '').toString().trim().toUpperCase();
-	            const product = (line?.product || '').toString().trim().toLowerCase();
+		        getLineModeKey(line) {
+		            const name = (line?.name || '').toString().trim().toUpperCase();
+		            const product = (line?.product || '').toString().trim().toLowerCase();
 
-	            if (name.startsWith('ICE')) return 'ice';
-	            if (name.startsWith('IC')) return 'ic';
-	            if (/^EN\b/.test(name)) return 'en';
-	            if (/^RJ\b/.test(name)) return 'rj';
-	            if (name.startsWith('FLX') || name.startsWith('FLIXTRAIN')) return 'flx';
-	            if (/^(RE|RB)\b/.test(name)) return 'rerb';
-	            if (product === 'suburban' || product === 's-bahn') return 'sbahn';
-	            if (product === 'subway' || product === 'subway-train') return 'subway';
-	            if (product === 'bus') return 'bus';
-	            if (product === 'tram') return 'tram';
-	            return 'default';
-	        },
-	        getLineIconSrc(line) {
-	            const mode = this.getLineModeKey(line);
-	            if (mode === 'ice') return 'assets/icons/InterCityExpress.svg';
-	            if (mode === 'ic') return 'assets/icons/InterCity.svg';
-	            if (mode === 'en') return 'assets/icons/EN.svg';
-	            if (mode === 'rj') return 'assets/icons/Railjet.svg';
-	            if (mode === 'flx') return 'assets/icons/FLX.svg';
-	            if (mode === 'rerb') return 'assets/icons/RE_RB.svg';
-	            if (mode === 'sbahn') return 'assets/icons/SBahn.svg';
-	            if (mode === 'subway') return 'assets/icons/Subway.svg';
-	            if (mode === 'bus') return 'assets/icons/bus.svg';
-	            if (mode === 'tram') return 'assets/icons/Tram.svg';
-	            return null;
-	        },
-	        getLineNumberText(line) {
-	            if (!line) return '?';
-	            if (line.fahrtNr) return (line.fahrtNr || '').toString().trim() || '?';
+		            if (name.startsWith('ICE')) return 'ice';
+		            if (name.startsWith('IC')) return 'ic';
+		            if (/^EN\b/.test(name)) return 'en';
+		            if (/^RJ\b/.test(name)) return 'rj';
+		            if (/^FEX\b/.test(name)) return 'fex';
+		            if (name.startsWith('FLX') || name.startsWith('FLIXTRAIN')) return 'flx';
+		            if (/^(RE|RB)\s*\d*/.test(name)) return 'rerb';
+		            if (product === 'suburban' || product === 's-bahn') return 'sbahn';
+		            if (product === 'subway' || product === 'subway-train') return 'subway';
+		            if (product === 'bus') return 'bus';
+		            if (product === 'tram') return 'tram';
+		            return 'default';
+		        },
+		        getLineIconSrc(line) {
+		            const mode = this.getLineModeKey(line);
+		            if (mode === 'ice') return 'assets/icons/InterCityExpress.svg';
+		            if (mode === 'ic') return 'assets/icons/InterCity.svg';
+		            if (mode === 'en') return 'assets/icons/EN.svg';
+		            if (mode === 'rj') return 'assets/icons/Railjet.svg';
+		            if (mode === 'fex') return null;
+		            if (mode === 'flx') return 'assets/icons/FLX.svg';
+		            if (mode === 'rerb') return 'assets/icons/RE_RB.svg';
+		            if (mode === 'sbahn') return 'assets/icons/SBahn.svg';
+		            if (mode === 'subway') return 'assets/icons/Subway.svg';
+		            if (mode === 'bus') return 'assets/icons/bus.svg';
+		            if (mode === 'tram') return 'assets/icons/Tram.svg';
+		            return null;
+		        },
+		        getLineIconSizeClass(line) {
+		            const mode = this.getLineModeKey(line);
+		            if (mode === 'flx' || mode === 'en') return 'departure-line-icon--small';
+		            return 'departure-line-icon--up';
+		        },
+		        getLineFallbackClass(line) {
+		            const mode = this.getLineModeKey(line);
+		            if (mode === 'fex') return 'departure-line-icon-fallback--fex';
+		            return 'departure-line-icon-fallback--default';
+		        },
+		        getLineNumberText(line) {
+		            if (!line) return '?';
+		            if (line.fahrtNr) return (line.fahrtNr || '').toString().trim() || '?';
 
-	            const mode = this.getLineModeKey(line);
-	            const raw = (line.name || '').toString().trim();
-	            if (!raw) return '?';
+		            const mode = this.getLineModeKey(line);
+		            const raw = (line.name || '').toString().trim();
+		            if (!raw) return '?';
 
-	            if (mode === 'ice') return raw.replace(/^ICE\s*/i, '').trim() || raw;
-	            if (mode === 'ic') return raw.replace(/^IC\s*/i, '').trim() || raw;
-	            if (mode === 'en') return raw.replace(/^EN\s*/i, '').trim() || raw;
-	            if (mode === 'rj') return raw.replace(/^RJ\s*/i, '').trim() || raw;
-	            if (mode === 'flx') return raw.replace(/^(FLX|FLIXTRAIN)\s*/i, '').trim() || raw;
-	            if (mode === 'rerb') return raw.replace(/^(RE|RB)\s*/i, '').trim() || raw;
-	            return raw;
-	        },
-	        getLineFallbackLabel(line) {
-	            const name = (line?.name || '').toString().trim().toUpperCase();
-	            const mode = this.getLineModeKey(line);
-	            if (mode === 'ice') return 'ICE';
-	            if (mode === 'ic') return 'IC';
-	            if (mode === 'en') return 'EN';
-	            if (mode === 'rj') return 'RJ';
-	            if (mode === 'flx') return 'FLX';
-	            if (mode === 'rerb') return name.startsWith('RB') ? 'RB' : 'RE';
-	            if (mode === 'sbahn') return 'S';
-	            if (mode === 'subway') return 'U';
+		            if (mode === 'ice') return raw.replace(/^ICE\s*/i, '').trim() || raw;
+		            if (mode === 'ic') return raw.replace(/^IC\s*/i, '').trim() || raw;
+		            if (mode === 'en') return raw.replace(/^EN\s*/i, '').trim() || raw;
+		            if (mode === 'rj') return raw.replace(/^RJ\s*/i, '').trim() || raw;
+		            if (mode === 'fex') return raw.replace(/^FEX\s*/i, '').trim() || raw;
+		            if (mode === 'flx') return raw.replace(/^(FLX|FLIXTRAIN)\s*/i, '').trim() || raw;
+		            if (mode === 'rerb') return raw;
+		            return raw;
+		        },
+		        getLineFallbackLabel(line) {
+		            const name = (line?.name || '').toString().trim().toUpperCase();
+		            const mode = this.getLineModeKey(line);
+		            if (mode === 'ice') return 'ICE';
+		            if (mode === 'ic') return 'IC';
+		            if (mode === 'en') return 'EN';
+		            if (mode === 'rj') return 'RJ';
+		            if (mode === 'fex') return 'FEX';
+		            if (mode === 'flx') return 'FLX';
+		            if (mode === 'rerb') return name.startsWith('RB') ? 'RB' : 'RE';
+		            if (mode === 'sbahn') return 'S';
+		            if (mode === 'subway') return 'U';
 	            if (mode === 'bus') return 'Bus';
 	            if (mode === 'tram') return 'Tram';
 	            return (line?.name || '?').toString().trim().slice(0, 4) || '?';
