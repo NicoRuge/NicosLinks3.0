@@ -1,12 +1,21 @@
 const TravellingView = {
     template: `
-        <div class="map-container-wrapper">
-            <div ref="mapContainer" id="map"></div>
-            <div class="map-controls">
-                <!-- Train Rides -->
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                        Train Rides
+	        <div class="map-container-wrapper">
+	            <div ref="mapContainer" id="map"></div>
+	            <div class="toast-container position-absolute bottom-0 end-0 p-3 map-toast-container pe-none">
+	                <div ref="sightToast" class="toast align-items-center shadow pe-auto" role="alert" aria-live="polite" aria-atomic="true">
+	                    <div class="toast-header">
+	                        <strong ref="sightToastTitle" class="me-auto"></strong>
+	                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+	                    </div>
+	                    <div ref="sightToastBody" class="toast-body"></div>
+	                </div>
+	            </div>
+	            <div class="map-controls">
+	                <!-- Train Rides -->
+	                <div class="dropdown">
+	                    <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+	                        Train Rides
                     </button>
                     <ul class="dropdown-menu shadow" id="group-trains">
                         <li>
@@ -70,33 +79,49 @@ const TravellingView = {
             </div>
         </div>
     `,
-    data() {
-        return {
-            map: null,
-            mapStyles: null,
-            sightMarkers: [],
-            mapTooltip: null
-        };
-    },
-    mounted() {
-        this.initMap();
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', this.handleThemeChange);
-    },
-    beforeUnmount() {
-        if (this.mapTooltip && this.mapTooltip.parentNode) {
-            this.mapTooltip.parentNode.removeChild(this.mapTooltip);
-        }
+	    data() {
+	        return {
+	            map: null,
+	            mapStyles: null,
+	            sightMarkers: [],
+	            mapTooltip: null,
+	            sightToastInstance: null
+	        };
+	    },
+	    mounted() {
+	        this.initMap();
+	        this.initSightToast();
+	        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', this.handleThemeChange);
+	    },
+	    beforeUnmount() {
+	        if (this.mapTooltip && this.mapTooltip.parentNode) {
+	            this.mapTooltip.parentNode.removeChild(this.mapTooltip);
+	        }
         if (this.map) {
             this.map.remove();
             this.map = null;
         }
         window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleThemeChange);
-    },
-    methods: {
-        handleThemeChange() {
-            const storedTheme = localStorage.getItem('theme') || 'auto';
-            if (storedTheme === 'auto') {
-                this.applyMapTheme();
+	    },
+	    methods: {
+	        initSightToast() {
+	            if (!this.$refs.sightToast || typeof bootstrap === 'undefined' || !bootstrap.Toast) return;
+	            this.sightToastInstance = bootstrap.Toast.getOrCreateInstance(this.$refs.sightToast, { autohide: true, delay: 4500 });
+	        },
+	        showSightToast({ title, body }) {
+	            if (!this.$refs.sightToastTitle || !this.$refs.sightToastBody) return;
+	            if (!this.sightToastInstance) this.initSightToast();
+	            if (!this.sightToastInstance) return;
+	            this.$refs.sightToastTitle.textContent = title || '';
+	            const text = (body || '').toString().trim();
+	            this.$refs.sightToastBody.textContent = text;
+	            this.$refs.sightToastBody.style.display = text ? '' : 'none';
+	            this.sightToastInstance.show();
+	        },
+	        handleThemeChange() {
+	            const storedTheme = localStorage.getItem('theme') || 'auto';
+	            if (storedTheme === 'auto') {
+	                this.applyMapTheme();
             }
         },
         applyMapTheme() {
@@ -209,17 +234,17 @@ const TravellingView = {
                 }
             });
 
-            fetch("assets/geojson/sights.geojson").then(r => r.json()).then(data => {
-                data.features.forEach(f => {
-                    const wrapper = document.createElement('div'); wrapper.className = 'sight-marker';
-                    const inner = document.createElement('div'); inner.className = 'sight-marker-inner';
-                    const icon = document.createElement('div'); icon.className = 'sight-icon';
-                    icon.innerText = { "Monument": "⭐", "Airport": "✈️", "Station": "🚆" }[f.properties.type] || "📍";
-                    inner.appendChild(icon);
-                    wrapper.appendChild(inner);
-                    const marker = new mapboxgl.Marker({ element: wrapper }).setLngLat(f.geometry.coordinates).addTo(map);
-                    const mObj = { marker, element: wrapper, iconElement: icon, type: f.properties.type };
-                    this.sightMarkers.push(mObj);
+	            fetch("assets/geojson/sights.geojson").then(r => r.json()).then(data => {
+	                data.features.forEach(f => {
+	                    const wrapper = document.createElement('div'); wrapper.className = 'sight-marker';
+	                    const inner = document.createElement('div'); inner.className = 'sight-marker-inner';
+	                    const icon = document.createElement('div'); icon.className = 'sight-icon';
+	                    icon.innerText = { "Monument": "⭐", "Airport": "✈️", "Station": "🚆" }[f.properties.type] || "📍";
+	                    inner.appendChild(icon);
+	                    wrapper.appendChild(inner);
+	                    const marker = new mapboxgl.Marker({ element: wrapper }).setLngLat(f.geometry.coordinates).addTo(map);
+	                    const mObj = { marker, element: wrapper, iconElement: icon, type: f.properties.type };
+	                    this.sightMarkers.push(mObj);
                     icon.addEventListener('mouseenter', (e) => {
                         hoveredSightIcon = icon;
                         this.mapTooltip.innerText = f.properties.name || "Unknown";
@@ -230,13 +255,15 @@ const TravellingView = {
                         hoveredSightIcon = null;
                         this.mapTooltip.classList.remove('visible');
                     });
-                    icon.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        new mapboxgl.Popup({ offset: 25, className: 'translucent-popup' }).setLngLat(marker.getLngLat()).setHTML(`<strong>${f.properties.name}</strong><br>${f.properties.when || ""}`).addTo(map);
-                    });
-                });
-                updateSightsFilter();
-            });
+	                    icon.addEventListener('click', (e) => {
+	                        e.stopPropagation();
+	                        const name = f.properties.name || "Unknown";
+	                        const when = (f.properties.when || "").toString().trim();
+	                        this.showSightToast({ title: name, body: when });
+	                    });
+	                });
+	                updateSightsFilter();
+	            });
 
             this.$el.addEventListener('change', (e) => {
                 if (e.target.classList.contains('filter-cb')) updateTripFilter();

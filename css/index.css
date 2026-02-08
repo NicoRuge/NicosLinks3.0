@@ -440,6 +440,23 @@
     gap: 0.5rem;
 }
 
+.map-toast-container {
+    z-index: 20;
+    max-width: 360px;
+}
+
+.map-toast-container .toast {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+}
+
+.map-toast-container .toast-header {
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
 .legend-color {
     width: 14px;
     height: 14px;
