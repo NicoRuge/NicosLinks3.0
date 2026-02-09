@@ -89,6 +89,7 @@
                 <music-view v-else-if="currentHash === 'music'"></music-view>
                 <github-view v-else-if="currentHash === 'github'"></github-view>
                 <chess-view v-else-if="currentHash === 'chess'"></chess-view>
+                <x-thread-viewer-view v-else-if="currentHash === 'x-thread-viewer'"></x-thread-viewer-view>
                 <div v-else v-html="contentFragment"></div>
             </div>
 
@@ -136,6 +137,7 @@
     <script src="assets/js/page_other.js"></script>
     <script src="assets/js/page_departures.js"></script>
     <script src="assets/js/page_camera_equipment.js"></script>
+    <script src="assets/js/page_x_thread_viewer.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script>
         const { createApp } = Vue
@@ -150,7 +152,8 @@
                 'blog-view': BlogView,
                 'music-view': MusicView,
                 'github-view': GitHubView,
-                'chess-view': ChessView
+                'chess-view': ChessView,
+                'x-thread-viewer-view': XThreadViewerView
             },
             data() {
                 return {
@@ -177,7 +180,8 @@
                                 { id: 'blog', label: 'Blog (WIP)', icon: 'book-open-text.svg', wip: true },
                                 { id: 'music', label: 'Music (WIP)', icon: 'music.svg', wip: true },
                                 { id: 'github', label: 'GitHub (WIP)', icon: 'git-branch.svg', wip: true },
-                                { id: 'chess', label: 'Chess (WIP)', icon: 'chess.svg', wip: true }
+                                { id: 'chess', label: 'Chess (WIP)', icon: 'chess.svg', wip: true },
+                                { id: 'x-thread-viewer', label: 'X Thread Viewer', icon: 'twitter.svg' }
                             ]
                         }
                     ],
