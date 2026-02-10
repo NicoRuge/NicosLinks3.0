@@ -85,6 +85,30 @@
 	                                    <i class="bi bi-arrow-clockwise"></i>
 	                                </button>
 	                            </div>
+                                <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                                    <span class="small text-secondary">Modes:</span>
+                                    <div class="d-flex flex-wrap gap-1" role="group" aria-label="Filter by mode">
+                                        <template v-for="opt in modeFilterOptions" :key="opt.key">
+                                            <input
+                                                class="btn-check"
+                                                type="checkbox"
+                                                :id="'mode-filter-' + opt.key"
+                                                v-model="modeFilters[opt.key]"
+                                                @change="onFiltersChanged"
+                                            >
+                                            <label
+                                                class="btn btn-sm btn-outline-secondary"
+                                                :for="'mode-filter-' + opt.key"
+                                                :title="opt.title"
+                                            >
+                                                {{ opt.label }}
+                                            </label>
+                                        </template>
+                                    </div>
+                                    <button v-if="!isAllModesEnabled" type="button" class="btn btn-sm btn-link ms-auto py-0" @click="resetModeFilters">
+                                        Reset
+                                    </button>
+                                </div>
 	                        </div>
 		                        <div class="table-responsive">
 		                            <table class="table table-hover mb-0 align-middle departures-table">
@@ -105,18 +129,19 @@
 		                                    </tr>
 		                                </thead>
 		                                <tbody>
-		                                    <tr v-if="station && departures.length === 0">
+		                                    <tr v-if="station && filteredDepartures.length === 0">
 		                                        <td colspan="5" class="text-center py-4 text-secondary">
-		                                            No departures found in the next 60 minutes.
+		                                            <span v-if="departures.length === 0">No departures found in the next 60 minutes.</span>
+                                                    <span v-else>No departures match the selected modes.</span>
 		                                        </td>
 		                                    </tr>
-		                                    <tr v-for="dep in (station ? departures : sampleDepartures)" :key="dep.tripId + dep.line.name">
+		                                    <tr v-for="dep in filteredDepartures" :key="dep.tripId + (dep.line?.name || '')">
 		                                        <td>
 		                                            <div class="departure-line-cell">
 		                                                <img v-if="getLineIconSrc(dep.line)" :src="getLineIconSrc(dep.line)" alt="" :class="['departure-line-icon', getLineIconSizeClass(dep.line)]" loading="lazy" :title="dep.line.name || dep.line.product || 'Line'">
 		                                                <span v-else :class="['departure-line-icon-fallback', getLineFallbackClass(dep.line)]" :title="dep.line.name || dep.line.product || 'Line'">{{ getLineFallbackLabel(dep.line) }}</span>
-			                                            </div>
-			                                        </td>
+				                                            </div>
+				                                        </td>
 		                                        <td class="departure-line-number fw-bold">{{ getLineNumberText(dep.line) }}</td>
 			                                        <td class="fw-medium departures-destination">
 			                                            <div class="departures-destination-text">
@@ -148,12 +173,32 @@
 	        return {
 	            query: '',
 	            suggestions: [],
-	            station: null,
-	            departures: [],
-		            autocompleteLoading: false,
-		            stationSearchSeq: 0,
-		            stationSearchAbortController: null,
-		            stationSearchCache: new Map(),
+		            station: null,
+		            departures: [],
+		            modeFilterOptions: [
+		                { key: 'ice', label: 'ICE', title: 'ICE trains' },
+		                { key: 'ic', label: 'IC', title: 'IC/EC trains' },
+		                { key: 'rerb', label: 'RE/RB', title: 'Regional trains (RE/RB)' },
+		                { key: 'sbahn', label: 'S', title: 'S-Bahn' },
+		                { key: 'subway', label: 'U', title: 'Subway / U-Bahn' },
+		                { key: 'bus', label: 'Bus', title: 'Buses' },
+		                { key: 'tram', label: 'Tram', title: 'Trams' },
+		                { key: 'other', label: 'Other', title: 'Other modes' }
+		            ],
+		            modeFilters: {
+		                ice: true,
+		                ic: true,
+		                rerb: true,
+		                sbahn: true,
+		                subway: true,
+		                bus: true,
+		                tram: true,
+		                other: true
+		            },
+			            autocompleteLoading: false,
+			            stationSearchSeq: 0,
+			            stationSearchAbortController: null,
+			            stationSearchCache: new Map(),
 		            destinationResizeObserver: null,
 		            sampleDepartures: [
 		                {
@@ -167,13 +212,25 @@
 	            ],
 	            loading: false,
 	            error: null,
-		            debounceTimeout: null
-		        };
-		    },
-		    mounted() {
-		        this.initDestinationMarqueeObserver();
-		        this.$nextTick(() => this.updateDestinationMarquee());
-		    },
+			            debounceTimeout: null
+			        };
+			    },
+			    computed: {
+			        isAllModesEnabled() {
+			            return this.modeFilterOptions.every((opt) => !!this.modeFilters?.[opt.key]);
+			        },
+			        filteredDepartures() {
+			            const source = this.station ? (this.departures || []) : (this.sampleDepartures || []);
+			            return source.filter((dep) => {
+			                const key = this.getFilterModeKey(dep?.line);
+			                return this.modeFilters?.[key] !== false;
+			            });
+			        }
+			    },
+			    mounted() {
+			        this.initDestinationMarqueeObserver();
+			        this.$nextTick(() => this.updateDestinationMarquee());
+			    },
 		    beforeUnmount() {
 		        if (this.destinationResizeObserver) this.destinationResizeObserver.disconnect();
 		        this.destinationResizeObserver = null;
@@ -300,13 +357,33 @@
 	            if (!isoString) return '';
 	            return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	        },
-	        getDelay(dep) {
-	            // delay is in seconds
-	            return dep.delay ? Math.floor(dep.delay / 60) : 0;
-	        },
-		        getLineModeKey(line) {
-		            const name = (line?.name || '').toString().trim().toUpperCase();
-		            const product = (line?.product || '').toString().trim().toLowerCase();
+		        getDelay(dep) {
+		            // delay is in seconds
+		            return dep.delay ? Math.floor(dep.delay / 60) : 0;
+		        },
+		        onFiltersChanged() {
+		            this.$nextTick(() => this.updateDestinationMarquee());
+		        },
+		        resetModeFilters() {
+		            this.modeFilterOptions.forEach((opt) => {
+		                this.modeFilters[opt.key] = true;
+		            });
+		            this.onFiltersChanged();
+		        },
+		        getFilterModeKey(line) {
+		            const mode = this.getLineModeKey(line);
+		            if (mode === 'ice') return 'ice';
+		            if (mode === 'ic') return 'ic';
+		            if (mode === 'rerb') return 'rerb';
+		            if (mode === 'sbahn') return 'sbahn';
+		            if (mode === 'subway') return 'subway';
+		            if (mode === 'bus') return 'bus';
+		            if (mode === 'tram') return 'tram';
+		            return 'other';
+		        },
+			        getLineModeKey(line) {
+			            const name = (line?.name || '').toString().trim().toUpperCase();
+			            const product = (line?.product || '').toString().trim().toLowerCase();
 
 		            if (name.startsWith('ICE')) return 'ice';
 		            if (name.startsWith('IC')) return 'ic';
