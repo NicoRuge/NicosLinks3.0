@@ -1,5 +1,5 @@
-	const DeparturesView = {
-	    template: `
+const DeparturesView = {
+	template: `
 	        <div class="container-fluid">
 	            <div class="row justify-content-center">
 	                <div class="col-12 col-md-10 col-lg-8 col-xl-6 departures-panel">
@@ -110,351 +110,434 @@
                                     </button>
                                 </div>
 	                        </div>
-		                        <div class="table-responsive">
-		                            <table class="table table-hover mb-0 align-middle departures-table">
-		                                <colgroup>
-		                                    <col style="width: var(--departures-col-mode, 64px);">
-		                                    <col style="width: var(--departures-col-line, 120px);">
-		                                    <col style="width: var(--departures-col-destination, auto);">
-		                                    <col style="width: var(--departures-col-platform, 110px);">
-		                                    <col style="width: var(--departures-col-time, 130px);">
-		                                </colgroup>
-		                                <thead>
-		                                    <tr>
-			                                        <th scope="col">Line</th>
-			                                        <th scope="col">No.</th>
-		                                        <th scope="col">Destination</th>
-		                                        <th scope="col">Platform</th>
-		                                        <th scope="col" class="text-end">Time</th>
-		                                    </tr>
-		                                </thead>
-		                                <tbody>
-		                                    <tr v-if="station && filteredDepartures.length === 0">
-		                                        <td colspan="5" class="text-center py-4 text-secondary">
-		                                            <span v-if="departures.length === 0">No departures found in the next 60 minutes.</span>
-                                                    <span v-else>No departures match the selected modes.</span>
-		                                        </td>
-		                                    </tr>
-		                                    <tr v-for="dep in filteredDepartures" :key="dep.tripId + (dep.line?.name || '')">
-		                                        <td>
-		                                            <div class="departure-line-cell">
-		                                                <img v-if="getLineIconSrc(dep.line)" :src="getLineIconSrc(dep.line)" alt="" :class="['departure-line-icon', getLineIconSizeClass(dep.line)]" loading="lazy" :title="dep.line.name || dep.line.product || 'Line'">
-		                                                <span v-else :class="['departure-line-icon-fallback', getLineFallbackClass(dep.line)]" :title="dep.line.name || dep.line.product || 'Line'">{{ getLineFallbackLabel(dep.line) }}</span>
-				                                            </div>
-				                                        </td>
-		                                        <td class="departure-line-number fw-bold">{{ getLineNumberText(dep.line) }}</td>
-			                                        <td class="fw-medium departures-destination">
-			                                            <div class="departures-destination-text">
-			                                                <span class="departures-destination-inner">{{ dep.direction }}</span>
-			                                            </div>
-			                                        </td>
-		                                        <td>{{ dep.platform || dep.plannedPlatform || '-' }}</td>
-		                                        <td class="text-end">
-		                                            <div class="d-flex flex-column align-items-end">
-		                                                <span class="fw-bold">{{ getDisplayTime(dep) }}</span>
-	                                                <small v-if="getDelay(dep) > 0" class="text-danger fw-bold">
-	                                                    +{{ getDelay(dep) }} min
-	                                                </small>
-	                                                <small v-else-if="getDelay(dep) < 0" class="text-success">
-                                                    {{ getDelay(dep) }} min
-                                                </small>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="departure-list">
+                                <div v-if="station && filteredDepartures.length === 0" class="text-center py-5 text-secondary">
+                                    <span v-if="departures.length === 0">No departures found in the next 60 minutes.</span>
+                                    <span v-else>No departures match the selected modes.</span>
+                                </div>
+                                
+                                <div v-for="dep in filteredDepartures" :key="dep.tripId + (dep.line?.name || '')" class="departure-card">
+                                    <!-- Line Icon/Name -->
+                                    <div class="departure-card-line">
+                                        <div class="departure-line-cell">
+                                            <img v-if="getLineIconSrc(dep.line)" :src="getLineIconSrc(dep.line)" alt="" :class="['departure-line-icon', getLineIconSizeClass(dep.line)]" loading="lazy" :title="dep.line.name || dep.line.product || 'Line'">
+                                            <span v-else :class="['departure-line-icon-fallback', getLineFallbackClass(dep.line)]" :title="dep.line.name || dep.line.product || 'Line'">{{ getLineFallbackLabel(dep.line) }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Line Number -->
+                                    <div class="departure-card-number fw-bold">
+                                        {{ getLineNumberText(dep.line) }}
+                                    </div>
+
+                                    <!-- Destination -->
+                                    <div class="departure-card-destination fw-medium">
+                                        <div class="departures-destination-text">
+                                            <span class="departures-destination-inner">{{ dep.direction }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Platform -->
+                                    <div class="departure-card-platform text-secondary small">
+                                        <span v-if="dep.platform || dep.plannedPlatform">Pl. {{ dep.platform || dep.plannedPlatform }}</span>
+                                        <span v-else>-</span>
+                                    </div>
+
+                                    <!-- Time -->
+                                    <div class="departure-card-time text-end">
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="fw-bold">{{ getDisplayTime(dep) }}</span>
+                                            <small v-if="getDelay(dep) > 0" class="text-danger fw-bold">
+                                                +{{ getDelay(dep) }} min
+                                            </small>
+                                            <small v-else-if="getDelay(dep) < 0" class="text-success">
+                                                {{ getDelay(dep) }} min
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     `,
-	    data() {
-	        return {
-	            query: '',
-	            suggestions: [],
-		            station: null,
-		            departures: [],
-		            modeFilterOptions: [
-		                { key: 'ice', label: 'ICE', title: 'ICE trains' },
-		                { key: 'ic', label: 'IC', title: 'IC/EC trains' },
-		                { key: 'rerb', label: 'RE/RB', title: 'Regional trains (RE/RB)' },
-		                { key: 'sbahn', label: 'S', title: 'S-Bahn' },
-		                { key: 'subway', label: 'U', title: 'Subway / U-Bahn' },
-		                { key: 'bus', label: 'Bus', title: 'Buses' },
-		                { key: 'tram', label: 'Tram', title: 'Trams' },
-		                { key: 'other', label: 'Other', title: 'Other modes' }
-		            ],
-		            modeFilters: {
-		                ice: true,
-		                ic: true,
-		                rerb: true,
-		                sbahn: true,
-		                subway: true,
-		                bus: true,
-		                tram: true,
-		                other: true
-		            },
-			            autocompleteLoading: false,
-			            stationSearchSeq: 0,
-			            stationSearchAbortController: null,
-			            stationSearchCache: new Map(),
-		            destinationResizeObserver: null,
-		            sampleDepartures: [
-		                {
-		                    tripId: 'sample-ice-100',
-		                    line: { name: 'ICE 100', product: 'nationalExpress' },
-	                    direction: 'Rostock',
-	                    platform: '99',
-	                    delay: 99 * 60,
-	                    _displayTime: '12:00'
-	                }
-	            ],
-	            loading: false,
-	            error: null,
-			            debounceTimeout: null
-			        };
-			    },
-			    computed: {
-			        isAllModesEnabled() {
-			            return this.modeFilterOptions.every((opt) => !!this.modeFilters?.[opt.key]);
-			        },
-			        filteredDepartures() {
-			            const source = this.station ? (this.departures || []) : (this.sampleDepartures || []);
-			            return source.filter((dep) => {
-			                const key = this.getFilterModeKey(dep?.line);
-			                return this.modeFilters?.[key] !== false;
-			            });
-			        }
-			    },
-			    mounted() {
-			        this.initDestinationMarqueeObserver();
-			        this.$nextTick(() => this.updateDestinationMarquee());
-			    },
-		    beforeUnmount() {
-		        if (this.destinationResizeObserver) this.destinationResizeObserver.disconnect();
-		        this.destinationResizeObserver = null;
-		        if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
-		    },
-		    methods: {
-		        initDestinationMarqueeObserver() {
-		            if (typeof ResizeObserver === 'undefined') return;
-		            if (this.destinationResizeObserver) this.destinationResizeObserver.disconnect();
-		            this.destinationResizeObserver = new ResizeObserver(() => this.updateDestinationMarquee());
-		            this.destinationResizeObserver.observe(this.$el);
-		        },
-		        updateDestinationMarquee() {
-		            const wrappers = this.$el?.querySelectorAll?.('.departures-destination-text');
-		            if (!wrappers || !wrappers.length) return;
+	data() {
+		return {
+			query: '',
+			suggestions: [],
+			station: null,
+			departures: [],
+			modeFilterOptions: [
+				{ key: 'ice', label: 'ICE', title: 'ICE trains' },
+				{ key: 'ic', label: 'IC', title: 'IC/EC trains' },
+				{ key: 'rerb', label: 'RE/RB', title: 'Regional trains (RE/RB)' },
+				{ key: 'sbahn', label: 'S', title: 'S-Bahn' },
+				{ key: 'subway', label: 'U', title: 'Subway / U-Bahn' },
+				{ key: 'bus', label: 'Bus', title: 'Buses' },
+				{ key: 'tram', label: 'Tram', title: 'Trams' },
+				{ key: 'other', label: 'Other', title: 'Other modes' }
+			],
+			modeFilters: {
+				ice: true,
+				ic: true,
+				rerb: true,
+				sbahn: true,
+				subway: true,
+				bus: true,
+				tram: true,
+				other: true
+			},
+			autocompleteLoading: false,
+			stationSearchSeq: 0,
+			stationSearchAbortController: null,
+			stationSearchCache: new Map(),
+			destinationResizeObserver: null,
+			sampleDepartures: [
+				{
+					tripId: 'sample-ice-100',
+					line: { name: 'ICE 100', product: 'nationalExpress' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-ic-100',
+					line: { name: 'IC 100', product: 'national' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-en-100',
+					line: { name: 'EN 100', product: 'national' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-rj-100',
+					line: { name: 'RJ 100', product: 'national' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-fex-100',
+					line: { name: 'FEX 100', product: 'regional' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-flx-100',
+					line: { name: 'FLX 100', product: 'regional' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-re-100',
+					line: { name: 'RE 100', product: 'regional' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-rb-100',
+					line: { name: 'RB 100', product: 'regional' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-s-100',
+					line: { name: 'S 100', product: 'suburban' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-u-100',
+					line: { name: 'U 100', product: 'subway' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-tram-100',
+					line: { name: 'Tram 100', product: 'tram' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				},
+				{
+					tripId: 'sample-bus-100',
+					line: { name: 'Bus 100', product: 'bus' },
+					direction: 'Rostock',
+					platform: '99',
+					delay: 99 * 60,
+					_displayTime: '12:00'
+				}
+			],
+			loading: false,
+			error: null,
+			debounceTimeout: null
+		};
+	},
+	computed: {
+		isAllModesEnabled() {
+			return this.modeFilterOptions.every((opt) => !!this.modeFilters?.[opt.key]);
+		},
+		filteredDepartures() {
+			const source = this.station ? (this.departures || []) : (this.sampleDepartures || []);
+			return source.filter((dep) => {
+				const key = this.getFilterModeKey(dep?.line);
+				return this.modeFilters?.[key] !== false;
+			});
+		}
+	},
+	mounted() {
+		this.initDestinationMarqueeObserver();
+		this.$nextTick(() => this.updateDestinationMarquee());
+	},
+	beforeUnmount() {
+		if (this.destinationResizeObserver) this.destinationResizeObserver.disconnect();
+		this.destinationResizeObserver = null;
+		if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
+	},
+	methods: {
+		initDestinationMarqueeObserver() {
+			if (typeof ResizeObserver === 'undefined') return;
+			if (this.destinationResizeObserver) this.destinationResizeObserver.disconnect();
+			this.destinationResizeObserver = new ResizeObserver(() => this.updateDestinationMarquee());
+			this.destinationResizeObserver.observe(this.$el);
+		},
+		updateDestinationMarquee() {
+			const wrappers = this.$el?.querySelectorAll?.('.departures-destination-text');
+			if (!wrappers || !wrappers.length) return;
 
-		            wrappers.forEach((wrapper) => {
-		                const inner = wrapper.querySelector('.departures-destination-inner');
-		                if (!inner) return;
+			wrappers.forEach((wrapper) => {
+				const inner = wrapper.querySelector('.departures-destination-inner');
+				if (!inner) return;
 
-		                wrapper.classList.remove('is-overflowing');
-		                wrapper.style.removeProperty('--marquee-distance');
-		                wrapper.style.removeProperty('--marquee-duration');
+				wrapper.classList.remove('is-overflowing');
+				wrapper.style.removeProperty('--marquee-distance');
+				wrapper.style.removeProperty('--marquee-duration');
 
-		                const wrapperWidth = wrapper.clientWidth;
-		                if (!wrapperWidth) return;
+				const wrapperWidth = wrapper.clientWidth;
+				if (!wrapperWidth) return;
 
-		                const overflow = Math.ceil(inner.scrollWidth - wrapperWidth);
-		                if (overflow <= 4) return;
+				const overflow = Math.ceil(inner.scrollWidth - wrapperWidth);
+				if (overflow <= 4) return;
 
-		                const distance = overflow + 16;
-		                const duration = Math.min(14, Math.max(6, distance / 35));
-		                wrapper.style.setProperty('--marquee-distance', `${distance}px`);
-		                wrapper.style.setProperty('--marquee-duration', `${duration}s`);
-		                wrapper.classList.add('is-overflowing');
-		            });
-		        },
-		        onInput() {
-		            clearTimeout(this.debounceTimeout);
-		            this.debounceTimeout = setTimeout(() => {
-		                this.searchStations();
-	            }, 300);
-	        },
-	        async searchStations() {
-	            const q = (this.query || '').toString().trim();
-	            if (!q || q.length < 2) {
-	                this.autocompleteLoading = false;
-	                if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
-	                this.suggestions = [];
-	                return;
-	            }
+				const distance = overflow + 16;
+				const duration = Math.min(14, Math.max(6, distance / 35));
+				wrapper.style.setProperty('--marquee-distance', `${distance}px`);
+				wrapper.style.setProperty('--marquee-duration', `${duration}s`);
+				wrapper.classList.add('is-overflowing');
+			});
+		},
+		onInput() {
+			clearTimeout(this.debounceTimeout);
+			this.debounceTimeout = setTimeout(() => {
+				this.searchStations();
+			}, 300);
+		},
+		async searchStations() {
+			const q = (this.query || '').toString().trim();
+			if (!q || q.length < 2) {
+				this.autocompleteLoading = false;
+				if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
+				this.suggestions = [];
+				return;
+			}
 
-	            try {
-	                const cached = this.stationSearchCache.get(q);
-	                if (cached) {
-	                    this.suggestions = cached;
-	                    return;
-	                }
+			try {
+				const cached = this.stationSearchCache.get(q);
+				if (cached) {
+					this.suggestions = cached;
+					return;
+				}
 
-	                this.autocompleteLoading = true;
-	                const seq = ++this.stationSearchSeq;
-	                if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
-	                const controller = new AbortController();
-	                this.stationSearchAbortController = controller;
-	                const timeout = setTimeout(() => controller.abort(), 8000);
+				this.autocompleteLoading = true;
+				const seq = ++this.stationSearchSeq;
+				if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
+				const controller = new AbortController();
+				this.stationSearchAbortController = controller;
+				const timeout = setTimeout(() => controller.abort(), 8000);
 
-	                const response = await fetch(`https://v6.db.transport.rest/locations?query=${encodeURIComponent(q)}&results=5&stops=true&addresses=false&poi=false`, { signal: controller.signal });
-	                if (!response.ok) throw new Error('Failed to fetch stations');
-	                const json = await response.json();
-	                clearTimeout(timeout);
-	                if (seq !== this.stationSearchSeq) return;
-	                if (((this.query || '').toString().trim()) !== q) return;
-	                this.stationSearchCache.set(q, json);
-	                this.suggestions = json;
-	            } catch (err) {
-	                if (err && err.name === 'AbortError') return;
-	                console.error(err);
-	                this.suggestions = [];
-	            } finally {
-	                this.autocompleteLoading = false;
-	            }
-	        },
-	        selectStation(station) {
-	            this.station = station;
-	            this.query = station.name;
-	            this.suggestions = [];
-            this.getDepartures(station.id);
-        },
-		        clearSearch() {
-		            if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
-		            this.query = '';
-		            this.suggestions = [];
-		            this.station = null;
-		            this.departures = [];
-		            this.error = null;
-		            this.$nextTick(() => this.updateDestinationMarquee());
-		        },
-	        async getDepartures(stationId) {
-	            this.loading = true;
-	            this.error = null;
-	            try {
-                const response = await fetch(`https://v6.db.transport.rest/stops/${stationId}/departures?results=10&duration=60`);
-	                if (!response.ok) throw new Error('Failed to load departures');
-	                const data = await response.json();
-	                this.departures = data.departures || data;
-	                this.$nextTick(() => this.updateDestinationMarquee());
-	            } catch (err) {
-	                this.error = 'Could not load departures. Please try again.';
-	                console.error(err);
-	            } finally {
-                this.loading = false;
-            }
-        },
-	        refreshDepartures() {
-	            if (this.station) {
-	                this.getDepartures(this.station.id);
-	            }
-	        },
-	        getDisplayTime(dep) {
-	            if (dep && dep._displayTime) return dep._displayTime;
-	            return this.formatTime(dep?.when || dep?.plannedWhen);
-	        },
-	        formatTime(isoString) {
-	            if (!isoString) return '';
-	            return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-	        },
-		        getDelay(dep) {
-		            // delay is in seconds
-		            return dep.delay ? Math.floor(dep.delay / 60) : 0;
-		        },
-		        onFiltersChanged() {
-		            this.$nextTick(() => this.updateDestinationMarquee());
-		        },
-		        resetModeFilters() {
-		            this.modeFilterOptions.forEach((opt) => {
-		                this.modeFilters[opt.key] = true;
-		            });
-		            this.onFiltersChanged();
-		        },
-		        getFilterModeKey(line) {
-		            const mode = this.getLineModeKey(line);
-		            if (mode === 'ice') return 'ice';
-		            if (mode === 'ic') return 'ic';
-		            if (mode === 'rerb') return 'rerb';
-		            if (mode === 'sbahn') return 'sbahn';
-		            if (mode === 'subway') return 'subway';
-		            if (mode === 'bus') return 'bus';
-		            if (mode === 'tram') return 'tram';
-		            return 'other';
-		        },
-			        getLineModeKey(line) {
-			            const name = (line?.name || '').toString().trim().toUpperCase();
-			            const product = (line?.product || '').toString().trim().toLowerCase();
+				const response = await fetch(`https://v6.db.transport.rest/locations?query=${encodeURIComponent(q)}&results=5&stops=true&addresses=false&poi=false`, { signal: controller.signal });
+				if (!response.ok) throw new Error('Failed to fetch stations');
+				const json = await response.json();
+				clearTimeout(timeout);
+				if (seq !== this.stationSearchSeq) return;
+				if (((this.query || '').toString().trim()) !== q) return;
+				this.stationSearchCache.set(q, json);
+				this.suggestions = json;
+			} catch (err) {
+				if (err && err.name === 'AbortError') return;
+				console.error(err);
+				this.suggestions = [];
+			} finally {
+				this.autocompleteLoading = false;
+			}
+		},
+		selectStation(station) {
+			this.station = station;
+			this.query = station.name;
+			this.suggestions = [];
+			this.getDepartures(station.id);
+		},
+		clearSearch() {
+			if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
+			this.query = '';
+			this.suggestions = [];
+			this.station = null;
+			this.departures = [];
+			this.error = null;
+			this.$nextTick(() => this.updateDestinationMarquee());
+		},
+		async getDepartures(stationId) {
+			this.loading = true;
+			this.error = null;
+			try {
+				const response = await fetch(`https://v6.db.transport.rest/stops/${stationId}/departures?results=10&duration=60`);
+				if (!response.ok) throw new Error('Failed to load departures');
+				const data = await response.json();
+				this.departures = data.departures || data;
+				this.$nextTick(() => this.updateDestinationMarquee());
+			} catch (err) {
+				this.error = 'Could not load departures. Please try again.';
+				console.error(err);
+			} finally {
+				this.loading = false;
+			}
+		},
+		refreshDepartures() {
+			if (this.station) {
+				this.getDepartures(this.station.id);
+			}
+		},
+		getDisplayTime(dep) {
+			if (dep && dep._displayTime) return dep._displayTime;
+			return this.formatTime(dep?.when || dep?.plannedWhen);
+		},
+		formatTime(isoString) {
+			if (!isoString) return '';
+			return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+		},
+		getDelay(dep) {
+			// delay is in seconds
+			return dep.delay ? Math.floor(dep.delay / 60) : 0;
+		},
+		onFiltersChanged() {
+			this.$nextTick(() => this.updateDestinationMarquee());
+		},
+		resetModeFilters() {
+			this.modeFilterOptions.forEach((opt) => {
+				this.modeFilters[opt.key] = true;
+			});
+			this.onFiltersChanged();
+		},
+		getFilterModeKey(line) {
+			const mode = this.getLineModeKey(line);
+			if (mode === 'ice') return 'ice';
+			if (mode === 'ic') return 'ic';
+			if (mode === 'rerb') return 'rerb';
+			if (mode === 'sbahn') return 'sbahn';
+			if (mode === 'subway') return 'subway';
+			if (mode === 'bus') return 'bus';
+			if (mode === 'tram') return 'tram';
+			return 'other';
+		},
+		getLineModeKey(line) {
+			const name = (line?.name || '').toString().trim().toUpperCase();
+			const product = (line?.product || '').toString().trim().toLowerCase();
 
-		            if (name.startsWith('ICE')) return 'ice';
-		            if (name.startsWith('IC')) return 'ic';
-		            if (/^EN\b/.test(name)) return 'en';
-		            if (/^RJ\b/.test(name)) return 'rj';
-		            if (/^FEX\b/.test(name)) return 'fex';
-		            if (name.startsWith('FLX') || name.startsWith('FLIXTRAIN')) return 'flx';
-		            if (/^(RE|RB)\s*\d*/.test(name)) return 'rerb';
-		            if (product === 'suburban' || product === 's-bahn') return 'sbahn';
-		            if (product === 'subway' || product === 'subway-train') return 'subway';
-		            if (product === 'bus') return 'bus';
-		            if (product === 'tram') return 'tram';
-		            return 'default';
-		        },
-		        getLineIconSrc(line) {
-		            const mode = this.getLineModeKey(line);
-		            if (mode === 'ice') return 'assets/icons/InterCityExpress.svg';
-		            if (mode === 'ic') return 'assets/icons/InterCity.svg';
-		            if (mode === 'en') return 'assets/icons/EN.svg';
-		            if (mode === 'rj') return 'assets/icons/Railjet.svg';
-		            if (mode === 'fex') return null;
-		            if (mode === 'flx') return 'assets/icons/FLX.svg';
-		            if (mode === 'rerb') return 'assets/icons/RE_RB.svg';
-		            if (mode === 'sbahn') return 'assets/icons/SBahn.svg';
-		            if (mode === 'subway') return 'assets/icons/Subway.svg';
-		            if (mode === 'bus') return 'assets/icons/bus.svg';
-		            if (mode === 'tram') return 'assets/icons/Tram.svg';
-		            return null;
-		        },
-		        getLineIconSizeClass(line) {
-		            const mode = this.getLineModeKey(line);
-		            if (mode === 'flx' || mode === 'en') return 'departure-line-icon--small';
-		            return 'departure-line-icon--up';
-		        },
-		        getLineFallbackClass(line) {
-		            const mode = this.getLineModeKey(line);
-		            if (mode === 'fex') return 'departure-line-icon-fallback--fex';
-		            return 'departure-line-icon-fallback--default';
-		        },
-		        getLineNumberText(line) {
-		            if (!line) return '?';
-		            if (line.fahrtNr) return (line.fahrtNr || '').toString().trim() || '?';
+			if (name.startsWith('ICE')) return 'ice';
+			if (name.startsWith('IC')) return 'ic';
+			if (/^EN\b/.test(name)) return 'en';
+			if (/^RJ\b/.test(name)) return 'rj';
+			if (/^FEX\b/.test(name)) return 'fex';
+			if (name.startsWith('FLX') || name.startsWith('FLIXTRAIN')) return 'flx';
+			if (/^(RE|RB)\s*\d*/.test(name)) return 'rerb';
+			if (product === 'suburban' || product === 's-bahn') return 'sbahn';
+			if (product === 'subway' || product === 'subway-train') return 'subway';
+			if (product === 'bus') return 'bus';
+			if (product === 'tram') return 'tram';
+			return 'default';
+		},
+		getLineIconSrc(line) {
+			const mode = this.getLineModeKey(line);
+			if (mode === 'ice') return 'assets/icons/InterCityExpress.svg';
+			if (mode === 'ic') return 'assets/icons/InterCity.svg';
+			if (mode === 'en') return 'assets/icons/EN.svg';
+			if (mode === 'rj') return 'assets/icons/Railjet.svg';
+			if (mode === 'fex') return null;
+			if (mode === 'flx') return 'assets/icons/FLX.svg';
+			if (mode === 'rerb') return 'assets/icons/RE_RB.svg';
+			if (mode === 'sbahn') return 'assets/icons/SBahn.svg';
+			if (mode === 'subway') return 'assets/icons/Subway.svg';
+			if (mode === 'bus') return 'assets/icons/bus.svg';
+			if (mode === 'tram') return 'assets/icons/Tram.svg';
+			return null;
+		},
+		getLineIconSizeClass(line) {
+			const mode = this.getLineModeKey(line);
+			if (mode === 'flx') return 'departure-line-icon--small';
+			if (mode === 'rj' || mode === 'rerb' || mode === 'en') return 'departure-line-icon--scaled';
+			return 'departure-line-icon--up';
+		},
+		getLineFallbackClass(line) {
+			const mode = this.getLineModeKey(line);
+			if (mode === 'fex') return 'departure-line-icon-fallback--fex';
+			return 'departure-line-icon-fallback--default';
+		},
+		getLineNumberText(line) {
+			if (!line) return '?';
+			if (line.fahrtNr) return (line.fahrtNr || '').toString().trim() || '?';
 
-		            const mode = this.getLineModeKey(line);
-		            const raw = (line.name || '').toString().trim();
-		            if (!raw) return '?';
+			const mode = this.getLineModeKey(line);
+			const raw = (line.name || '').toString().trim();
+			if (!raw) return '?';
 
-		            if (mode === 'ice') return raw.replace(/^ICE\s*/i, '').trim() || raw;
-		            if (mode === 'ic') return raw.replace(/^IC\s*/i, '').trim() || raw;
-		            if (mode === 'en') return raw.replace(/^EN\s*/i, '').trim() || raw;
-		            if (mode === 'rj') return raw.replace(/^RJ\s*/i, '').trim() || raw;
-		            if (mode === 'fex') return raw.replace(/^FEX\s*/i, '').trim() || raw;
-		            if (mode === 'flx') return raw.replace(/^(FLX|FLIXTRAIN)\s*/i, '').trim() || raw;
-		            if (mode === 'rerb') return raw;
-		            return raw;
-		        },
-		        getLineFallbackLabel(line) {
-		            const name = (line?.name || '').toString().trim().toUpperCase();
-		            const mode = this.getLineModeKey(line);
-		            if (mode === 'ice') return 'ICE';
-		            if (mode === 'ic') return 'IC';
-		            if (mode === 'en') return 'EN';
-		            if (mode === 'rj') return 'RJ';
-		            if (mode === 'fex') return 'FEX';
-		            if (mode === 'flx') return 'FLX';
-		            if (mode === 'rerb') return name.startsWith('RB') ? 'RB' : 'RE';
-		            if (mode === 'sbahn') return 'S';
-		            if (mode === 'subway') return 'U';
-	            if (mode === 'bus') return 'Bus';
-	            if (mode === 'tram') return 'Tram';
-	            return (line?.name || '?').toString().trim().slice(0, 4) || '?';
-	        }
-	    }
-	};
+			if (mode === 'ice') return raw.replace(/^ICE\s*/i, '').trim() || raw;
+			if (mode === 'ic') return raw.replace(/^IC\s*/i, '').trim() || raw;
+			if (mode === 'en') return raw.replace(/^EN\s*/i, '').trim() || raw;
+			if (mode === 'rj') return raw.replace(/^RJ\s*/i, '').trim() || raw;
+			if (mode === 'fex') return raw.replace(/^FEX\s*/i, '').trim() || raw;
+			if (mode === 'flx') return raw.replace(/^(FLX|FLIXTRAIN)\s*/i, '').trim() || raw;
+			if (mode === 'rerb') return raw;
+			return raw;
+		},
+		getLineFallbackLabel(line) {
+			const name = (line?.name || '').toString().trim().toUpperCase();
+			const mode = this.getLineModeKey(line);
+			if (mode === 'ice') return 'ICE';
+			if (mode === 'ic') return 'IC';
+			if (mode === 'en') return 'EN';
+			if (mode === 'rj') return 'RJ';
+			if (mode === 'fex') return 'FEX';
+			if (mode === 'flx') return 'FLX';
+			if (mode === 'rerb') return name.startsWith('RB') ? 'RB' : 'RE';
+			if (mode === 'sbahn') return 'S';
+			if (mode === 'subway') return 'U';
+			if (mode === 'bus') return 'Bus';
+			if (mode === 'tram') return 'Tram';
+			return (line?.name || '?').toString().trim().slice(0, 4) || '?';
+		}
+	}
+};

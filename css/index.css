@@ -11,6 +11,49 @@
     z-index: 1000;
 }
 
+/* Blog (Tumblr) */
+.blog-card-img {
+    height: 180px;
+    object-fit: cover;
+}
+
+.blog-card-excerpt {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-detail-img {
+    height: 360px;
+}
+
+.blog-clickable-media {
+    cursor: pointer;
+}
+
+.blog-lightbox-img {
+    max-height: 80vh;
+    width: auto;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+.tumblr-embed-content img {
+    max-width: 100%;
+    max-height: 420px;
+    height: auto;
+    width: auto;
+    display: block;
+    margin: 0.5rem auto;
+    object-fit: contain;
+    border-radius: var(--bs-border-radius);
+}
+
+.tumblr-embed-content p:last-child {
+    margin-bottom: 0;
+}
+
 .sidebar .nav-link {
     color: rgba(255, 255, 255, 0.8);
     padding: 0.75rem 1rem;
@@ -465,53 +508,134 @@
 }
 
 /* Departures */
+/* Departures */
 .departures-panel {
     max-width: 980px;
-    --departures-col-mode: 86px;
-    --departures-col-line: 150px;
-    --departures-col-destination: auto;
-    --departures-col-platform: 110px;
-    --departures-col-time: 130px;
 }
 
-.departures-table {
-    table-layout: fixed;
+/* Card List Layout */
+.departure-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
+.departure-card {
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.departure-card:hover {
+    background-color: var(--bs-secondary-bg-subtle);
+}
+
+/* Desktop / Default Layout (Flex Row) */
+.departure-card-line {
+    width: 50px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.departure-card-number {
+    width: 100px;
+    flex-shrink: 0;
+}
+
+.departure-card-destination {
+    flex-grow: 1;
+    min-width: 0;
+    /* Enable text truncation */
+    font-size: 1.1rem;
+}
+
+.departure-card-platform {
+    width: 90px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.departure-card-time {
+    width: 110px;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+/* Mobile Layout (< 576px) */
 @media (max-width: 576px) {
-    .departures-panel {
-        --departures-col-mode: 72px;
-        --departures-col-line: 92px;
-        --departures-col-destination: 220px;
-        --departures-col-platform: 78px;
-        --departures-col-time: 92px;
+    .departure-list {
+        gap: 0.75rem;
     }
 
-    .departures-table thead th {
-        padding-top: 0.4rem;
-        padding-bottom: 0.4rem;
-        font-size: 0.85rem;
-        white-space: nowrap;
+    .departure-card {
+        display: grid;
+        grid-template-columns: max-content auto minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
+        gap: 0.25rem 1.5rem;
+        padding: 0.75rem;
+        align-items: start;
     }
 
-    .departures-table td {
-        padding-top: 0.45rem;
-        padding-bottom: 0.45rem;
+    /* Icon Container - Col 1 */
+    .departure-card-line {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+        width: auto;
+        align-items: center;
+        padding-right: 0.25rem;
+        min-width: 130px;
+        justify-content: center;
     }
 
-    .departure-line-cell {
-        gap: 0.35rem;
+    /* Line Number - Col 2, Row 1 */
+    .departure-card-number {
+        grid-column: 2;
+        grid-row: 1;
+        margin-left: 0;
+        width: auto;
+        font-size: 0.9rem;
+    }
+
+    /* Platform - Col 2, Row 2 */
+    .departure-card-platform {
+        grid-column: 2;
+        grid-row: 2;
+        margin-left: 0;
+        width: auto;
+        text-align: left;
+        font-size: 0.8rem;
+    }
+
+    /* Destination - Col 3 */
+    .departure-card-destination {
+        grid-column: 3;
+        grid-row: 1 / span 2;
+        align-self: center;
+        width: 100%;
+        font-size: 1rem;
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    /* Time - Col 4 */
+    .departure-card-time {
+        grid-column: 4;
+        grid-row: 1 / span 2;
+        width: auto;
+        padding-top: 0.1rem;
     }
 }
 
-@media (min-width: 992px) {
-    .departures-panel {
-        --departures-col-mode: 74px;
-        --departures-col-line: 140px;
-        --departures-col-destination: 300px;
-        --departures-col-platform: 100px;
-        --departures-col-time: 110px;
-    }
+.departure-line-cell {
+    display: inline-flex;
+    align-items: center;
 }
 
 .departures-destination-text {
@@ -547,6 +671,7 @@
     from {
         transform: translateX(0);
     }
+
     to {
         transform: translateX(calc(-1 * var(--marquee-distance, 0px)));
     }
@@ -556,6 +681,7 @@
     .departures-destination-text.is-overflowing {
         text-overflow: ellipsis;
     }
+
     .departures-destination-text.is-overflowing .departures-destination-inner {
         animation: none;
         display: inline;
@@ -589,6 +715,10 @@
 
 .departure-line-icon--small {
     height: 18px;
+}
+
+.departure-line-icon--scaled {
+    height: 14px;
 }
 
 .departure-line-icon-fallback {
@@ -790,8 +920,7 @@
     gap: 1.25rem;
 }
 
-.x-thread-node {
-}
+
 
 .x-thread-children {
     margin-top: 1.25rem;
@@ -868,6 +997,7 @@
 }
 
 @media print {
+
     .sidebar,
     .mobile-menu-toggle,
     .sidebar-overlay,
