@@ -56,24 +56,37 @@
 
         <!-- Sidebar -->
         <nav class="sidebar" :class="{ 'mobile-open': sidebarOpen }">
-            <div class="sidebar-brand">
-                <img src="assets/icons/home.svg" alt="" class="sidebar-icon">
-                Nico's Links
+            <div class="sidebar-main">
+                <div class="sidebar-brand">
+                    <img src="assets/icons/home.svg" alt="" class="sidebar-icon">
+                    Nico's Links
+                </div>
+
+                <div v-for="section in navigation" :key="section.title">
+                    <div v-if="section.title" class="sidebar-section">{{ section.title }}</div>
+                    <ul class="nav flex-column">
+                        <li v-for="item in section.items" :key="item.id" class="nav-item">
+                            <a class="nav-link"
+                                :class="{ active: currentHash === item.id, 'text-secondary opacity-75': item.wip }" href="#"
+                                @click.prevent="navigate(item.id); closeSidebar()">
+                                <img :src="'assets/icons/' + item.icon" alt="" class="sidebar-icon"
+                                    :style="item.wip ? 'opacity: 0.5' : ''">
+                                {{ item.label }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
-            <div v-for="section in navigation" :key="section.title">
-                <div v-if="section.title" class="sidebar-section">{{ section.title }}</div>
-                <ul class="nav flex-column">
-                    <li v-for="item in section.items" :key="item.id" class="nav-item">
-                        <a class="nav-link"
-                            :class="{ active: currentHash === item.id, 'text-secondary opacity-75': item.wip }" href="#"
-                            @click.prevent="navigate(item.id); closeSidebar()">
-                            <img :src="'assets/icons/' + item.icon" alt="" class="sidebar-icon"
-                                :style="item.wip ? 'opacity: 0.5' : ''">
-                            {{ item.label }}
-                        </a>
-                    </li>
-                </ul>
+            <div class="sidebar-legal">
+                <a class="nav-link sidebar-legal-link" :class="{ active: currentHash === 'imprint' }" href="#"
+                    @click.prevent="navigate('imprint'); closeSidebar()">
+                    Imprint
+                </a>
+                <a class="nav-link sidebar-legal-link" :class="{ active: currentHash === 'privacy-policy' }" href="#"
+                    @click.prevent="navigate('privacy-policy'); closeSidebar()">
+                    Privacy Policy
+                </a>
             </div>
         </nav>
 
@@ -90,6 +103,8 @@
                 <github-view v-else-if="currentHash === 'github'"></github-view>
                 <chess-view v-else-if="currentHash === 'chess'"></chess-view>
                 <x-thread-viewer-view v-else-if="currentHash === 'x-thread-viewer'"></x-thread-viewer-view>
+                <imprint-view v-else-if="currentHash === 'imprint'"></imprint-view>
+                <privacy-policy-view v-else-if="currentHash === 'privacy-policy'"></privacy-policy-view>
                 <div v-else v-html="contentFragment"></div>
             </div>
 
@@ -138,6 +153,7 @@
     <script src="assets/js/page_departures.js"></script>
     <script src="assets/js/page_camera_equipment.js"></script>
     <script src="assets/js/page_x_thread_viewer.js"></script>
+    <script src="assets/js/page_legal.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script>
         const { createApp } = Vue
@@ -153,7 +169,9 @@
                 'music-view': MusicView,
                 'github-view': GitHubView,
                 'chess-view': ChessView,
-                'x-thread-viewer-view': XThreadViewerView
+                'x-thread-viewer-view': XThreadViewerView,
+                'imprint-view': ImprintView,
+                'privacy-policy-view': PrivacyPolicyView
             },
             data() {
                 return {
@@ -212,9 +230,21 @@
                 navigate(page) {
                     window.location.hash = page
                 },
+                syncRobotsMeta() {
+                    const isImprint = this.currentHash === 'imprint'
+                    const desiredContent = isImprint ? 'noindex, follow' : 'index, follow'
+                    let robotsMeta = document.querySelector('meta[name="robots"]')
+                    if (!robotsMeta) {
+                        robotsMeta = document.createElement('meta')
+                        robotsMeta.setAttribute('name', 'robots')
+                        document.head.appendChild(robotsMeta)
+                    }
+                    robotsMeta.setAttribute('content', desiredContent)
+                },
                 updateFromHash() {
                     this.currentHash = window.location.hash.substring(1) || 'home'
                     this.loadPageContent(this.currentHash)
+                    this.syncRobotsMeta()
                 },
                 setTheme(theme) {
                     this.storedTheme = theme

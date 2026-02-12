@@ -414,13 +414,43 @@ const DeparturesView = {
 			this.loading = true;
 			this.error = null;
 			try {
-				const response = await fetch(`https://v6.db.transport.rest/stops/${stationId}/departures?results=10&duration=60`);
-				if (!response.ok) throw new Error('Failed to load departures');
+				const normalizedStationId = (stationId || '').toString().trim();
+				if (!normalizedStationId) throw new Error('Selected station has no valid ID.');
+
+				const controller = new AbortController();
+				const timeout = setTimeout(() => controller.abort(), 12000);
+				let response;
+				try {
+					response = await fetch(`https://v6.db.transport.rest/stops/${encodeURIComponent(normalizedStationId)}/departures?results=10&duration=60`, { signal: controller.signal });
+				} finally {
+					clearTimeout(timeout);
+				}
+				if (!response.ok) {
+					let details = '';
+					try {
+						const body = await response.json();
+						details = (body?.message || body?.error || '').toString().trim();
+					} catch (_) {
+						try {
+							details = (await response.text()).toString().trim();
+						} catch (_) {
+							details = '';
+						}
+					}
+					const detailSuffix = details ? ` (${details.slice(0, 180)})` : '';
+					throw new Error(`HTTP ${response.status} ${response.statusText}${detailSuffix}`);
+				}
 				const data = await response.json();
+				if (!Array.isArray(data) && !Array.isArray(data?.departures)) {
+					throw new Error('Unexpected API response format for departures.');
+				}
 				this.departures = data.departures || data;
 				this.$nextTick(() => this.updateDestinationMarquee());
 			} catch (err) {
-				this.error = 'Could not load departures. Please try again.';
+				const reason = (err && err.name === 'AbortError')
+					? 'Request timed out after 12 seconds.'
+					: ((err && err.message) ? err.message : 'Unknown error.');
+				this.error = `Could not load departures: ${reason}`;
 				console.error(err);
 			} finally {
 				this.loading = false;
@@ -508,10 +538,18 @@ const DeparturesView = {
 		},
 		getLineNumberText(line) {
 			if (!line) return '?';
-			if (line.fahrtNr) return (line.fahrtNr || '').toString().trim() || '?';
+			const raw = [
+				line.public,
+				line.label,
+				line.name,
+				line.line,
+				line.number
+			]
+				.filter((value) => typeof value === 'string' || typeof value === 'number')
+				.map((value) => value.toString().trim())
+				.find((value) => value.length > 0);
 
 			const mode = this.getLineModeKey(line);
-			const raw = (line.name || '').toString().trim();
 			if (!raw) return '?';
 
 			if (mode === 'ice') return raw.replace(/^ICE\s*/i, '').trim() || raw;
@@ -521,6 +559,8 @@ const DeparturesView = {
 			if (mode === 'fex') return raw.replace(/^FEX\s*/i, '').trim() || raw;
 			if (mode === 'flx') return raw.replace(/^(FLX|FLIXTRAIN)\s*/i, '').trim() || raw;
 			if (mode === 'rerb') return raw;
+			if (mode === 'bus') return raw.replace(/^BUS\s*/i, '').trim() || raw;
+			if (mode === 'tram') return raw.replace(/^TRAM\s*/i, '').trim() || raw;
 			return raw;
 		},
 		getLineFallbackLabel(line) {
