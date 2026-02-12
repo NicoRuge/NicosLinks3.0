@@ -83,8 +83,9 @@
                     @click.prevent="navigate('imprint'); closeSidebar()">
                     Imprint
                 </a>
-                <a class="nav-link sidebar-legal-link" :class="{ active: currentHash === 'privacy-policy' }" href="#"
-                    @click.prevent="navigate('privacy-policy'); closeSidebar()">
+                <a class="nav-link sidebar-legal-link"
+                    :class="{ active: currentHash === 'privacy-policy' || currentHash === 'privacy-policy-main' || currentHash === 'privacy-policy-cloud' }"
+                    href="#" @click.prevent="navigate('privacy-policy-main'); closeSidebar()">
                     Privacy Policy
                 </a>
             </div>
@@ -104,7 +105,9 @@
                 <chess-view v-else-if="currentHash === 'chess'"></chess-view>
                 <x-thread-viewer-view v-else-if="currentHash === 'x-thread-viewer'"></x-thread-viewer-view>
                 <imprint-view v-else-if="currentHash === 'imprint'"></imprint-view>
-                <privacy-policy-view v-else-if="currentHash === 'privacy-policy'"></privacy-policy-view>
+                <privacy-policy-view
+                    v-else-if="currentHash === 'privacy-policy' || currentHash === 'privacy-policy-main' || currentHash === 'privacy-policy-cloud'">
+                </privacy-policy-view>
                 <div v-else v-html="contentFragment"></div>
             </div>
 
@@ -242,7 +245,8 @@
                     robotsMeta.setAttribute('content', desiredContent)
                 },
                 updateFromHash() {
-                    this.currentHash = window.location.hash.substring(1) || 'home'
+                    const hash = window.location.hash.substring(1) || 'home'
+                    this.currentHash = hash === 'privacy-policy' ? 'privacy-policy-main' : hash
                     this.loadPageContent(this.currentHash)
                     this.syncRobotsMeta()
                 },
