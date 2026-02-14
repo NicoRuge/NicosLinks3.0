@@ -105,20 +105,20 @@ const BlogView = {
                         <div class="card-body">
                             <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                                 <span class="badge text-bg-secondary-subtle text-secondary-emphasis text-uppercase">{{ selectedPost.typeLabel }}</span>
-                                <span class="text-secondary small">{{ selectedPost.dateLabel }}</span>
-                                <span v-if="selectedPost.noteCount !== null" class="badge text-bg-light border text-secondary ms-auto">
-                                    <i class="bi bi-heart me-1"></i>
-                                    {{ selectedPost.noteCount }} notes
-                                </span>
+                                    <span class="small blog-meta">{{ selectedPost.dateLabel }}</span>
+                                    <span v-if="selectedPost.noteCount !== null" class="badge blog-tag ms-auto">
+                                        <i class="bi bi-heart me-1"></i>
+                                        {{ selectedPost.noteCount }} notes
+                                    </span>
                             </div>
 
                             <h2 v-if="selectedPost.title" class="h5 mb-3">{{ selectedPost.title }}</h2>
 
                             <div v-if="selectedPost.contentHtml" class="tumblr-embed-content" v-html="selectedPost.contentHtml"></div>
-                            <div v-else class="text-secondary">No content.</div>
+                            <div v-else class="blog-meta">No content.</div>
 
                             <div v-if="selectedPost.tags && selectedPost.tags.length" class="d-flex flex-wrap gap-1 mt-4">
-                                <span v-for="t in selectedPost.tags" :key="selectedPost.id + '-dt-' + t" class="badge rounded-pill text-bg-light border text-secondary">
+                                <span v-for="t in selectedPost.tags" :key="selectedPost.id + '-dt-' + t" class="badge rounded-pill blog-tag">
                                     #{{ t }}
                                 </span>
                             </div>
@@ -249,14 +249,14 @@ const BlogView = {
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex align-items-start gap-2 mb-2">
                                         <span class="badge text-bg-secondary-subtle text-secondary-emphasis text-uppercase">{{ post.typeLabel }}</span>
-                                        <span class="small text-secondary ms-auto">{{ post.dateLabel }}</span>
+                                        <span class="small blog-meta ms-auto">{{ post.dateLabel }}</span>
                                     </div>
 
                                     <h2 v-if="post.title" class="h6 mb-2">{{ post.title }}</h2>
-                                    <p v-if="post.excerpt" class="text-secondary mb-3 blog-card-excerpt">{{ post.excerpt }}</p>
+                                    <p v-if="post.excerpt" class="blog-excerpt mb-3 blog-card-excerpt">{{ post.excerpt }}</p>
 
                                     <div v-if="post.tags && post.tags.length" class="d-flex flex-wrap gap-1 mb-3">
-                                        <span v-for="t in post.tags.slice(0, 6)" :key="post.id + '-' + t" class="badge rounded-pill text-bg-light border text-secondary">
+                                        <span v-for="t in post.tags.slice(0, 6)" :key="post.id + '-' + t" class="badge rounded-pill blog-tag">
                                             #{{ t }}
                                         </span>
                                     </div>
@@ -658,31 +658,4 @@ const BlogView = {
             if (carouselEl) carouselEl.removeEventListener('slid.bs.carousel', this._lightboxSlideHandler)
         }
     }
-};
-
-const MusicView = {
-    template: `
-        <div class="container-fluid">
-            <h1 class="h3 mb-4">Music</h1>
-            <p class="text-secondary">Nothing here yet.</p>
-        </div>
-    `
-};
-
-const GitHubView = {
-    template: `
-        <div class="container-fluid">
-            <h1 class="h3 mb-4">GitHub</h1>
-            <p class="text-secondary">Nothing here yet.</p>
-        </div>
-    `
-};
-
-const ChessView = {
-    template: `
-        <div class="container-fluid">
-            <h1 class="h3 mb-4">Chess</h1>
-            <p class="text-secondary">Nothing here yet.</p>
-        </div>
-    `
 };

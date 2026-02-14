@@ -100,9 +100,6 @@
                 <departures-view v-else-if="currentHash === 'departures'"></departures-view>
                 <camera-equipment-view v-else-if="currentHash === 'camera-equipment'"></camera-equipment-view>
                 <blog-view v-else-if="currentHash === 'blog'"></blog-view>
-                <music-view v-else-if="currentHash === 'music'"></music-view>
-                <github-view v-else-if="currentHash === 'github'"></github-view>
-                <chess-view v-else-if="currentHash === 'chess'"></chess-view>
                 <x-thread-viewer-view v-else-if="currentHash === 'x-thread-viewer'"></x-thread-viewer-view>
                 <imprint-view v-else-if="currentHash === 'imprint'"></imprint-view>
                 <privacy-policy-view
@@ -169,9 +166,6 @@
                 'departures-view': DeparturesView,
                 'camera-equipment-view': CameraEquipmentView,
                 'blog-view': BlogView,
-                'music-view': MusicView,
-                'github-view': GitHubView,
-                'chess-view': ChessView,
                 'x-thread-viewer-view': XThreadViewerView,
                 'imprint-view': ImprintView,
                 'privacy-policy-view': PrivacyPolicyView
@@ -199,9 +193,6 @@
                         {
                             title: 'Other Stuff', items: [
                                 { id: 'blog', label: 'Blog', icon: 'book-open-text.svg' },
-                                { id: 'music', label: 'Music (WIP)', icon: 'music.svg', wip: true },
-                                { id: 'github', label: 'GitHub (WIP)', icon: 'git-branch.svg', wip: true },
-                                { id: 'chess', label: 'Chess (WIP)', icon: 'chess.svg', wip: true },
                                 { id: 'x-thread-viewer', label: 'X Thread Viewer', icon: 'twitter.svg' }
                             ]
                         }

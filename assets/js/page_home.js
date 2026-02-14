@@ -21,7 +21,7 @@ const HomeView = {
                             My Photography Portfolio
                         </a>
                         <a href="https://unsplash.com/@nico_ruge" class="btn btn-outline-secondary btn-lg px-4" target="_blank"
-                            rel="noopener noreferrer" onclick="parent.location.hash='github'">
+                            rel="noopener noreferrer">
                             My Images on Unsplash.com
                         </a>
                     </div>
