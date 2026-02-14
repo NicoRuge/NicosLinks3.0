@@ -58,8 +58,11 @@
         <nav class="sidebar" :class="{ 'mobile-open': sidebarOpen }">
             <div class="sidebar-main">
                 <div class="sidebar-brand">
-                    <img src="assets/icons/home.svg" alt="" class="sidebar-icon">
-                    Nico's Links
+                    <img
+                        src="assets/icons/Logo_White.svg"
+                        alt="Nico's Links"
+                        class="sidebar-brand-logo"
+                    >
                 </div>
 
                 <div v-for="section in navigation" :key="section.title">
@@ -175,6 +178,7 @@
                     currentHash: 'home',
                     contentFragment: '',
                     storedTheme: localStorage.getItem('theme') || 'auto',
+                    activeTheme: 'light',
                     sidebarOpen: false,
                     navigation: [
                         { items: [{ id: 'home', label: 'Home', icon: 'home.svg' }] },
@@ -250,6 +254,7 @@
                     const actualTheme = this.storedTheme === 'auto'
                         ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
                         : this.storedTheme
+                    this.activeTheme = actualTheme
                     document.documentElement.setAttribute('data-bs-theme', actualTheme)
                 }
             },

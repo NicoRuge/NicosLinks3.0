@@ -1,6 +1,7 @@
 const CameraEquipmentView = {
     data() {
         return {
+            affiliateNoticeLanguage: 'de',
             cameras: [
                 { name: 'Sony Alpha 7 III', detail: 'ILCE-7M3', affiliateUrl: 'https://amzn.to/4atHut9' },
                 { name: 'Praktica Mat', detail: '35mm (ca. 1965)', affiliateUrl: '' },
@@ -8,22 +9,22 @@ const CameraEquipmentView = {
                 { name: 'Google Pixel 9 Pro', detail: '', affiliateUrl: 'https://amzn.to/46y93jM' }
             ],
             lenses: [
-                { name: 'Sony FE 70-200mm f/4 G OSS', detail: '', affiliateUrl: '' },
-                { name: 'Sigma Makro 105mm f/2.8 DG OS HSM', detail: '', affiliateUrl: '' },
+                { name: 'Sony FE 70-200mm f/4 G OSS', detail: '', affiliateUrl: 'https://amzn.to/4tswZim' },
+                { name: 'Sigma Makro 105mm f/2.8 DG OS HSM', detail: '', affiliateUrl: 'https://amzn.to/4cuZp5f' },
                 { name: 'Sony FE 28-70 f/3.5-5.6', detail: '', affiliateUrl: '' },
-                { name: 'Samyang T1.5 24mm ED AS IF UMC II', detail: '', affiliateUrl: '' }
+                { name: 'Samyang T1.5 24mm ED AS IF UMC II', detail: '', affiliateUrl: 'https://amzn.to/4asct8Y' }
             ],
             storageInCamera: [
-                { name: 'RAW - SanDisk Extreme Pro 256 GB', detail: '', affiliateUrl: '' },
-                { name: 'JPEG - SanDisk Ultra 32 GB', detail: '', affiliateUrl: '' }
+                { name: 'RAW - SanDisk Extreme Pro 256 GB', detail: '', affiliateUrl: 'https://amzn.to/4tJrR9V' },
+                { name: 'JPEG - SanDisk Ultra 32 GB', detail: '', affiliateUrl: 'https://amzn.to/4ahPuyv' }
             ],
             storageExternal: [
-                { name: 'Samsung T7 500 GB', detail: '', affiliateUrl: '' },
+                { name: 'Samsung T7 500 GB', detail: '', affiliateUrl: 'https://amzn.to/4qEVPJn' },
                 { name: 'WD MyBook 4 TB', detail: '', affiliateUrl: '' },
                 { name: 'Google Photos', detail: '', affiliateUrl: '' }
             ],
             flashItems: [
-                { name: 'Yongnou Speedlite YN560 IV', detail: '', affiliateUrl: '' }
+                { name: 'Yongnou Speedlite YN560 IV', detail: '', affiliateUrl: 'https://amzn.to/4kKcb24' }
             ],
             software: [
                 { name: 'Affinity', detail: '', affiliateUrl: '' },
@@ -35,14 +36,33 @@ const CameraEquipmentView = {
     methods: {
         hasAffiliateUrl(item) {
             return !!(item && item.affiliateUrl && item.affiliateUrl.trim());
+        },
+        setAffiliateNoticeLanguage(language) {
+            this.affiliateNoticeLanguage = language === 'en' ? 'en' : 'de';
+        },
+        getAffiliateNoticeText() {
+            if (this.affiliateNoticeLanguage === 'en') {
+                return 'Some links on this page are affiliate links. If you buy something through them, I may receive a small commission. The price stays the same for you.';
+            }
+
+            return 'Einige der Links auf dieser Seite sind Affiliate Links. Wenn du darüber etwas kaufst, bekomme ich eine kleine Provision. Der Preis für dich bleibt gleich.';
         }
     },
     template: `
         <div class="container-fluid px-4 py-5">
             <h1 class="display-5 fw-bold mb-5">Camera Equipment</h1>
             <div class="alert alert-secondary py-2 px-3 mb-4 small" role="note">
-                <i class="bi bi-info-circle me-2"></i>
-                Einige der Links auf dieser Seite sind Affiliate Links. Wenn du darüber etwas kaufst, bekomme ich eine kleine Provision. Der Preis für dich bleibt gleich.
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+                    <div>
+                        <i class="bi bi-info-circle me-2"></i>
+                        {{ getAffiliateNoticeText() }}
+                        <a href="#privacy-policy-main" class="ms-1">{{ affiliateNoticeLanguage === 'de' ? 'Hier geht es zur Datenschutzerklaerung.' : 'See the Privacy Policy here.' }}</a>
+                    </div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Affiliate notice language">
+                        <button type="button" class="btn" :class="affiliateNoticeLanguage === 'de' ? 'btn-secondary' : 'btn-outline-secondary'" @click="setAffiliateNoticeLanguage('de')">DE</button>
+                        <button type="button" class="btn" :class="affiliateNoticeLanguage === 'en' ? 'btn-secondary' : 'btn-outline-secondary'" @click="setAffiliateNoticeLanguage('en')">EN</button>
+                    </div>
+                </div>
             </div>
 
             <div class="row g-4">
