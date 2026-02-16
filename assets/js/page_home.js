@@ -2,6 +2,11 @@ const HomeView = {
     template: `
         <!-- Hero Section -->
         <div class="container-fluid px-4 py-2">
+            <div class="row pt-2">
+                <div class="col-12 text-center text-lg-start">
+                    <h1 class="display-4 fw-bold lh-1 mb-3">Hi, I'm Nico</h1>
+                </div>
+            </div>
             <div class="row align-items-center g-3 pt-2 pb-2 text-center text-lg-start">
                 <div class="col-lg-2">
                     <img src="assets/images/profile.jpg" class="d-block mx-auto img-fluid rounded-4 shadow-lg profile-image"
@@ -9,7 +14,6 @@ const HomeView = {
                         onerror="this.src='https://via.placeholder.com/600x400/dee2e6/6c757d?text=Your+Image+Here'">
                 </div>
                 <div class="col-lg-8">
-                    <h1 class="display-4 fw-bold lh-1 mb-3">Hi, I'm Nico</h1>
                     <p class="lead text-secondary">
                         Hobby Photographer & Data Analyst based in Germany.
                         Welcome to my page where you can find my work,

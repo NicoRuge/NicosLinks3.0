@@ -111,6 +111,20 @@
                 <div v-else v-html="contentFragment"></div>
             </div>
 
+            <div class="nico-toast-container">
+                <div id="desktop-random-toast" class="toast nico-random-toast" role="status" aria-live="polite"
+                    aria-atomic="true">
+                    <div class="toast-header nico-random-toast-header">
+                        <small class="text-body-secondary">Hinweis</small>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        {{ activeToastMessage }}
+                    </div>
+                </div>
+            </div>
+
             <footer class="footer mt-auto py-3 bg-body-tertiary border-top">
                 <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center">
                     <div class="col-md-4 d-flex align-items-center">
@@ -180,6 +194,34 @@
                     storedTheme: localStorage.getItem('theme') || 'auto',
                     activeTheme: 'light',
                     sidebarOpen: false,
+                    activeToastMessage: '',
+                    toastMessages: [
+                        'Wer schweigt, stimmt zu - lasst Faschisten nicht in Ruh!',
+                        'Kein Platz für Rassismus!',
+                        'Trans rights are human rights!',
+                        'Kein Mensch ist illegal!',
+                        'Menschenrechte statt rechte Menschen!',
+                        'NoAfD!',
+                        'FCKAFD!',
+                        'Nie wieder ist jetzt!',
+                        'Alerta, alerta, antifascista!',
+                        'Solidarität statt Hass!',
+                        'Bunt statt braun!',
+                        'Nazis raus!',
+                        'Vielfalt verteidigen!',
+                        'Demokratie verteidigen!',
+                        'Gegen jeden Antisemitismus!',
+                        'Love wins!',
+                        'Rechte Hetze stoppen!',
+                        'Zusammen gegen Rechts!',
+                        'Kein Vergessen, kein Vergeben!',
+                        'Refugees welcome!',
+                        'Hass ist keine Meinung!',
+                        'Faschismus ist keine Alternative!',
+                        'Unsere Alternative heißt Solidarität!',
+                        'Queer gegen Rechts!',
+                        'Nie wieder 1933!',
+                    ],
                     navigation: [
                         { items: [{ id: 'home', label: 'Home', icon: 'home.svg' }] },
                         {
@@ -256,11 +298,27 @@
                         : this.storedTheme
                     this.activeTheme = actualTheme
                     document.documentElement.setAttribute('data-bs-theme', actualTheme)
+                },
+                showDesktopToast() {
+                    const toastElement = document.getElementById('desktop-random-toast')
+                    if (!toastElement || !window.bootstrap?.Toast || this.toastMessages.length === 0) return
+
+                    const randomIndex = Math.floor(Math.random() * this.toastMessages.length)
+                    this.activeToastMessage = this.toastMessages[randomIndex]
+
+                    this.$nextTick(() => {
+                        const toast = bootstrap.Toast.getOrCreateInstance(toastElement, {
+                            autohide: true,
+                            delay: 6000
+                        })
+                        toast.show()
+                    })
                 }
             },
             mounted() {
                 this.updateFromHash()
                 this.applyTheme()
+                this.showDesktopToast()
                 window.addEventListener('hashchange', this.updateFromHash)
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                     if (this.storedTheme === 'auto') this.applyTheme()
