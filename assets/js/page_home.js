@@ -1,92 +1,54 @@
 const HomeView = {
     template: `
-        <!-- Hero Section -->
-        <div class="container-fluid px-4 py-2">
-            <div class="row pt-2">
-                <div class="col-12 text-center text-lg-start">
-                    <h1 class="display-4 fw-bold lh-1 mb-3">Hi, I'm Nico</h1>
-                </div>
-            </div>
-            <div class="row align-items-center g-3 pt-2 pb-2 text-center text-lg-start">
-                <div class="col-lg-2">
-                    <img src="assets/images/profile.jpg" class="d-block mx-auto img-fluid rounded-4 shadow-lg profile-image"
-                        alt="Hero Image"
-                        onerror="this.src='https://via.placeholder.com/600x400/dee2e6/6c757d?text=Your+Image+Here'">
-                </div>
-                <div class="col-lg-8">
-                    <p class="lead text-secondary">
-                        Hobby Photographer & Data Analyst based in Germany.
-                        Welcome to my page where you can find my work,
-                        projects, and other stuff I'm interested in.
-                    </p>
-                    <div class="d-grid gap-2 d-md-flex justify-content-center justify-content-lg-start mt-4">
-                        <a href="https://pics.nico-ruge.de" class="btn btn-primary btn-lg px-4" target="_blank"
-                            rel="noopener noreferrer" onclick="parent.location.hash='photography'">
-                            My Photography Portfolio
-                        </a>
-                        <a href="https://unsplash.com/@nico_ruge" class="btn btn-outline-secondary btn-lg px-4" target="_blank"
-                            rel="noopener noreferrer">
-                            My Images on Unsplash.com
-                        </a>
-                    </div>
-                    <!-- Social Icons -->
-                    <div class="social-icons-row justify-content-center justify-content-lg-start">
-                        <a href="https://bsky.app/profile/nico-ruge.de" class="social-icon-link" target="_blank" rel="noopener noreferrer" title="Bluesky">
-                            <div class="social-icon-box shadow">
-                                <img src="assets/icons/bluesky.svg" alt="Bluesky" class="social-icon-img">
+        <div class="container-fluid py-4 home-page">
+            <div class="row justify-content-start">
+                <div class="col-12 hero-page-shell">
+                    <section class="portfolio-hero rounded-4 p-4 p-lg-5 mb-4 home-hero">
+                        <div class="row g-4 align-items-center">
+                            <div class="col-12 col-lg-3">
+                                <img
+                                    src="assets/images/profile.jpg"
+                                    class="d-block mx-auto mx-lg-0 img-fluid rounded-4 shadow-lg profile-image home-hero-profile"
+                                    alt="Profile image of Nico"
+                                    onerror="this.src='https://via.placeholder.com/600x400/dee2e6/6c757d?text=Your+Image+Here'"
+                                >
                             </div>
-                        </a>
-                        <a href="https://www.linkedin.com/in/nico-ruge/" class="social-icon-link" target="_blank" rel="noopener noreferrer" title="LinkedIn">
-                            <div class="social-icon-box shadow">
-                                <img src="assets/icons/linkedin.svg" alt="LinkedIn" class="social-icon-img">
-                            </div>
-                        </a>
-                        <a href="mailto:mail@nico-ruge.de" class="social-icon-link" title="Mail">
-                            <div class="social-icon-box shadow">
-                                <img src="assets/icons/mail.svg" alt="Mail" class="social-icon-img">
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="container-fluid px-4">
-            <hr class="mt-2 mb-5 border-secondary-subtle">
-            <div class="row row-cols-1 row-cols-lg-2 g-4 pb-5 justify-content-center justify-content-lg-start">
-                <div class="col" style="max-width: fit-content;">
-                    <div id="spotify-widget" class="h-100">
-                        <div class="sp-card">
-                            <div class="sp-header">
-                                <div class="skeleton-box" style="width: 18px; height: 18px; margin-right: 8px;"></div>
-                                <div class="skeleton-box" style="width: 150px; height: 14px;"></div>
-                                <div class="skeleton-box" style="width: 60px; height: 12px; margin-left: auto;"></div>
-                            </div>
-                            <div class="sp-content">
-                                <div class="skeleton-box sp-cover"></div>
-                                <div class="sp-info" style="flex: 1;">
-                                    <div class="skeleton-box" style="width: 70%; height: 1.2rem; margin-bottom: 8px;"></div>
-                                    <div class="skeleton-box" style="width: 40%; height: 0.9rem;"></div>
+                            <div class="col-12 col-lg-9 text-center text-lg-start">
+                                <h1 class="hero-title mb-3">Hi, I'm Nico</h1>
+                                <p class="mb-0 hero-subtitle">
+                                    Hobby Photographer & Data Analyst based in Germany.
+                                    Welcome to my page where you can find my work,
+                                    projects, and other stuff I'm interested in.
+                                </p>
+                                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center justify-content-lg-start mt-4">
+                                    <a href="#photography" class="btn btn-primary btn-lg px-4">
+                                        Portfolio
+                                    </a>
+                                    <a href="https://unsplash.com/@nico_ruge" class="btn btn-outline-light btn-lg px-4" target="_blank"
+                                        rel="noopener noreferrer">
+                                        My Images on Unsplash.com
+                                    </a>
+                                </div>
+                                <div class="social-icons-row justify-content-center justify-content-lg-start">
+                                    <a href="https://bsky.app/profile/nico-ruge.de" class="social-icon-link" target="_blank" rel="noopener noreferrer" title="Bluesky">
+                                        <div class="social-icon-box shadow">
+                                            <img src="assets/icons/bluesky.svg" alt="Bluesky" class="social-icon-img">
+                                        </div>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/nico-ruge/" class="social-icon-link" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                                        <div class="social-icon-box shadow">
+                                            <img src="assets/icons/linkedin.svg" alt="LinkedIn" class="social-icon-img">
+                                        </div>
+                                    </a>
+                                    <a href="mailto:mail@nico-ruge.de" class="social-icon-link" title="Mail">
+                                        <div class="social-icon-box shadow">
+                                            <img src="assets/icons/mail.svg" alt="Mail" class="social-icon-img">
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col" style="max-width: fit-content;">
-                    <div id="discord-widget" class="h-100">
-                        <div class="dc-card">
-                            <div class="dc-header">
-                                <div class="skeleton-box" style="width: 10px; height: 10px; border-radius: 50%; margin-right: 12px;"></div>
-                                <div class="skeleton-box" style="width: 120px; height: 14px;"></div>
-                            </div>
-                            <div class="dc-content">
-                                <div class="skeleton-box dc-no-activity" style="width: 48px; height: 48px;"></div>
-                                <div class="dc-info" style="flex: 1;">
-                                    <div class="skeleton-box" style="width: 60%; height: 1.1rem; margin-bottom: 6px;"></div>
-                                    <div class="skeleton-box" style="width: 40%; height: 0.9rem;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>

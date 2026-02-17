@@ -1,259 +1,227 @@
 (function () {
   const CONFIG = {
     apiEndpoint: "https://nico-ruge.netlify.app/.netlify/functions/spotify",
-    targetId: "spotify-widget",
-    fetchIntervalMs: 10000,
-    updateIntervalMs: 1000,
-    classPrefix: "sp-"
+    targetId: "spotify-sidebar-widget",
+    fetchIntervalMs: 20000,
+    tickIntervalMs: 1000,
+    websocketUrl: "wss://api.lanyard.rest/socket",
+    discordId: "269810872619237378",
+    reconnectMs: 5000,
+    initialFallbackMs: 6000
   };
 
-  const $ = (sel) => document.querySelector(sel);
+  let currentData = null;
+  let lastFetchAt = 0;
+  let pollIntervalId = null;
+  let socket = null;
+  let heartbeatIntervalId = null;
+  let webhookReady = false;
 
-  let currentState = {
-    data: null,
-    lastFetchTime: 0,
-    currentTrackSignature: null,
-    isRealtime: false,
-    lastRealtimeState: false,
-    lastIsPlaying: null
-  };
-  function safe(txt) {
-    return String(txt == null ? "" : txt);
+  function safe(value) {
+    return String(value == null ? "" : value);
   }
 
   function formatTime(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const totalSeconds = Math.max(0, Math.floor((ms || 0) / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  }
 
-    if (hours > 0) {
-      return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    } else {
-      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  function getProgressState(data) {
+    const item = data?.item;
+    const durationMs = item?.duration_ms || 0;
+    let progressMs = data?.progress_ms || 0;
+
+    if (data?.isPlaying) {
+      progressMs += Date.now() - lastFetchAt;
     }
+
+    progressMs = Math.min(Math.max(progressMs, 0), durationMs || progressMs);
+    const percent = durationMs > 0 ? (progressMs / durationMs) * 100 : 0;
+
+    return { progressMs, durationMs, percent };
   }
 
-  function getTrackSignature(data) {
-    if (!data || !data.item) return "no-track";
-    return `${data.item.name}-${data.item.id}`;
-  }
-
-  function renderLoading() {
+  function renderEmpty() {
     const container = document.getElementById(CONFIG.targetId);
     if (!container) return;
-    container.innerHTML = `<div class="${CONFIG.classPrefix}card">
-          <div class="${CONFIG.classPrefix}header">
-            <div class="skeleton-box" style="width: 18px; height: 18px; margin-right: 8px;"></div>
-            <div class="skeleton-box" style="width: 150px; height: 14px;"></div>
-            <div class="skeleton-box" style="width: 60px; height: 12px; margin-left: auto;"></div>
-          </div>
-          <div class="${CONFIG.classPrefix}content">
-               <div class="skeleton-box ${CONFIG.classPrefix}cover"></div>
-               <div class="${CONFIG.classPrefix}info" style="flex: 1;">
-                   <div class="skeleton-box" style="width: 70%; height: 1.2rem; margin-bottom: 8px;"></div>
-                   <div class="skeleton-box" style="width: 40%; height: 0.9rem;"></div>
-               </div>
-          </div>
-        </div>`;
+
+    container.innerHTML = `
+      <div class="sidebar-now-playing-label">Last played on Spotify</div>
+      <div class="sidebar-now-playing-meta">Nothing played recently.</div>
+    `;
   }
 
-  function render() {
+  function renderTrack(data, { keepData = false } = {}) {
     const container = document.getElementById(CONFIG.targetId);
     if (!container) return;
-    const data = currentState.data;
-    const isRealtime = currentState.isRealtime;
-    const sourceText = isRealtime ? "Webhook" : "Spotify API";
-    const sourceClass = isRealtime ? "sp-source-webhook" : "sp-source-api";
 
     if (!data || !data.item) {
-      if (currentState.currentTrackSignature !== "no-track" || currentState.lastRealtimeState !== isRealtime) {
-        container.innerHTML = `<div class="${CONFIG.classPrefix}card">
-                  <div class="${CONFIG.classPrefix}header">
-                      <span class="${CONFIG.classPrefix}icon sp-icon-stopped"></span>
-                      <div class="${CONFIG.classPrefix}title">Not Playing</div>
-                      <span class="${CONFIG.classPrefix}source-text ${sourceClass}">${sourceText}</span>
-                  </div>
-                </div>`;
-        currentState.currentTrackSignature = "no-track";
-        currentState.lastRealtimeState = isRealtime;
-      }
+      if (!keepData) currentData = null;
+      renderEmpty();
       return;
     }
 
+    if (!keepData) currentData = data;
+
     const item = data.item;
-    const isPlaying = data.isPlaying;
+    const isEpisode = item.type === "episode";
+    const title = safe(item.name || "Unknown title");
 
+    const artist = isEpisode
+      ? safe(item.show?.publisher || item.show?.name || "Podcast")
+      : safe((item.artists || []).map((a) => a.name).join(", ") || "Unknown artist");
 
-    let progress = data.progress_ms;
-    if (isPlaying) {
-      const elapsed = Date.now() - currentState.lastFetchTime;
-      progress += elapsed;
-      if (progress > item.duration_ms) progress = item.duration_ms;
-    }
+    const coverUrl = isEpisode
+      ? safe(item.images?.[0]?.url || item.show?.images?.[0]?.url || "")
+      : safe(item.album?.images?.[0]?.url || "");
 
-    const duration = item.duration_ms;
-    const pct = (progress / duration) * 100;
+    const trackUrl = safe(item.external_urls?.spotify || "https://open.spotify.com/");
+    const label = data.isPlaying ? "I'm currently listening to" : "I last listened to";
+    const labelClass = data.isPlaying ? "sidebar-now-playing-label is-playing" : "sidebar-now-playing-label";
+    const { progressMs, durationMs, percent } = getProgressState(data);
 
-    const newSignature = getTrackSignature(data);
+    container.innerHTML = `
+      <div class="${labelClass}">${label}</div>
+      <div class="sidebar-now-playing-row">
+        ${coverUrl ? `<img src="${coverUrl}" alt="${title}" class="sidebar-now-playing-cover">` : ""}
+        <div class="sidebar-now-playing-info">
+          <a href="${trackUrl}" target="_blank" rel="noopener noreferrer" class="sidebar-now-playing-title">${title}</a>
+          <div class="sidebar-now-playing-meta">${artist}</div>
+        </div>
+      </div>
+      <div class="sidebar-now-playing-progress-wrap ${data.isPlaying ? "" : "is-idle"}">
+        <div class="sidebar-now-playing-progress">
+          <div class="sidebar-now-playing-progress-fill" style="width: ${percent}%"></div>
+        </div>
+        <div class="sidebar-now-playing-time">${formatTime(progressMs)} / ${formatTime(durationMs)}</div>
+      </div>
+    `;
+  }
 
-    // Re-render if track changed OR if realtime state changed OR if playing state changed
-    if (newSignature !== currentState.currentTrackSignature ||
-      currentState.lastRealtimeState !== isRealtime ||
-      currentState.lastIsPlaying !== isPlaying) {
-
-      // ... (metadata extraction) ...
-      const isEpisode = item.type === 'episode';
-      let coverUrl = '', title = item.name, artistName = '', contextName = '', trackUrl = '', artistUrl = '';
-
-      if (isEpisode) {
-        coverUrl = item.images?.[0]?.url || item.show?.images?.[0]?.url || '';
-        artistName = item.show?.publisher || item.show?.name || '';
-        contextName = item.show?.name || '';
-        trackUrl = item.external_urls?.spotify || '#';
-        artistUrl = item.show?.external_urls?.spotify || '#';
-      } else {
-        coverUrl = item.album?.images?.[0]?.url || '';
-        artistName = item.artists?.map(a => a.name).join(', ') || '';
-        contextName = item.album?.name || '';
-        trackUrl = item.external_urls?.spotify || '#';
-        artistUrl = item.artists?.[0]?.external_urls?.spotify || '#';
+  function mapLanyardSpotify(spotify) {
+    return {
+      isPlaying: true,
+      progress_ms: Date.now() - spotify.timestamps.start,
+      item: {
+        id: spotify.track_id,
+        name: spotify.song,
+        duration_ms: spotify.timestamps.end - spotify.timestamps.start,
+        type: "track",
+        artists: spotify.artist.split("; ").map((name) => ({ name })),
+        album: {
+          name: spotify.album,
+          images: [{ url: spotify.album_art_url }]
+        },
+        external_urls: {
+          spotify: `https://open.spotify.com/track/${spotify.track_id}`
+        }
       }
-
-      const statusText = isPlaying ? "Spotify - Currently listening to:" : "Spotify - Last listened to:";
-      const iconClass = isPlaying ? "sp-icon-playing" : "sp-icon-stopped";
-      const statusClass = isPlaying ? "sp-status-playing" : "sp-status-stopped";
-
-      const html = `
-            <div class="${CONFIG.classPrefix}card">
-              <div class="${CONFIG.classPrefix}header">
-                <span class="${CONFIG.classPrefix}icon ${iconClass}"></span>
-                <span class="${CONFIG.classPrefix}status ${statusClass}">${statusText}</span>
-                <span class="${CONFIG.classPrefix}source-text ${sourceClass}">${sourceText}</span>
-              </div>
-              
-              <div class="${CONFIG.classPrefix}content">
-                <img src="${coverUrl}" alt="${safe(contextName)}" class="${CONFIG.classPrefix}cover">
-                <div class="${CONFIG.classPrefix}info">
-                  <a href="${trackUrl}" target="_blank" rel="noopener noreferrer" class="${CONFIG.classPrefix}track">${safe(title)}</a>
-                  <a href="${artistUrl}" target="_blank" rel="noopener noreferrer" class="${CONFIG.classPrefix}artist">${safe(artistName)}</a>
-                </div>
-              </div>
-      
-              <div class="${CONFIG.classPrefix}progress-container ${!isPlaying ? 'sp-progress-inactive' : ''}" id="sp-progress-container">
-                <div class="${CONFIG.classPrefix}time" id="sp-current-time">${formatTime(progress)}</div>
-                <div class="progress flex-grow-1" style="height: 6px; background-color: var(--bs-secondary-bg-subtle);">
-                   <div class="progress-bar ${isPlaying ? 'bg-success' : ''}" id="sp-progress-fill" role="progressbar" style="width:${pct}%" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="${CONFIG.classPrefix}time">${formatTime(duration)}</div>
-              </div>
-            </div>
-          `;
-      container.innerHTML = html;
-      currentState.currentTrackSignature = newSignature;
-      currentState.lastRealtimeState = isRealtime;
-      currentState.lastIsPlaying = isPlaying;
-    } else if (isPlaying) {
-      const timeEl = document.getElementById("sp-current-time");
-      const fillEl = document.getElementById("sp-progress-fill");
-
-      if (timeEl) timeEl.textContent = formatTime(progress);
-      if (fillEl) {
-        fillEl.style.width = `${pct}%`;
-        fillEl.setAttribute('aria-valuenow', pct);
-      }
-    }
+    };
   }
 
   async function fetchStatus() {
     try {
       const res = await fetch(CONFIG.apiEndpoint);
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error("Spotify Backend Error:", errText);
-        throw new Error(`HTTP ${res.status}: ${errText}`);
-      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      console.log("Spotify Widget Response:", json);
-      currentState.data = json;
-      currentState.lastFetchTime = Date.now();
-
-      console.log("Spotify Widget Response:", json);
-      currentState.data = json;
-      currentState.lastFetchTime = Date.now();
-      render();
-    } catch (e) {
-      console.error("Spotify Widget Error:", e);
+      lastFetchAt = Date.now();
+      renderTrack(json);
+    } catch (_error) {
+      if (!currentData) {
+        renderEmpty();
+      }
     }
   }
 
-  let fetchIntervalId = null;
-
   function startPolling() {
-    if (!fetchIntervalId) {
-      console.log("Spotify: Switching to Fallback Polling (20s)");
-      currentState.isRealtime = false;
-      render(); // Update dot immediately
-      fetchIntervalId = setInterval(fetchStatus, 20000);
-      fetchStatus();
-    }
+    if (pollIntervalId) return;
+    fetchStatus();
+    pollIntervalId = setInterval(fetchStatus, CONFIG.fetchIntervalMs);
   }
 
   function stopPolling() {
-    if (fetchIntervalId) {
-      console.log("Spotify: Switching to Real-time (WebSocket)");
-      clearInterval(fetchIntervalId);
-      fetchIntervalId = null;
-    }
-    // Always set to true when stopping polling (implied switch to WS)
-    if (!currentState.isRealtime) {
-      currentState.isRealtime = true;
-      render(); // Update dot immediately
-    }
+    if (!pollIntervalId) return;
+    clearInterval(pollIntervalId);
+    pollIntervalId = null;
   }
 
-  // Exposed function for Lanyard WebSocket (Real-time updates)
-  window.updateSpotifyWidget = function (lanyardSpotify) {
-    if (!lanyardSpotify) {
-      // Lanyard says no Spotify. 
-      // Could be: Nothing playing OR Discord closed/offline.
-      // Switch to Fallback Polling to check directly with Spotify API.
-      startPolling();
-      return;
-    }
+  function stopHeartbeat() {
+    if (!heartbeatIntervalId) return;
+    clearInterval(heartbeatIntervalId);
+    heartbeatIntervalId = null;
+  }
 
-    // We have valid data from WebSocket -> Stop polling
-    stopPolling();
+  function connectWebhook() {
+    socket = new WebSocket(CONFIG.websocketUrl);
 
-    // Map Lanyard data to our internal structure
-    const mappedData = {
-      isPlaying: true, // Lanyard only sends spotify if playing
-      progress_ms: Date.now() - lanyardSpotify.timestamps.start,
-      item: {
-        id: lanyardSpotify.track_id,
-        name: lanyardSpotify.song,
-        duration_ms: lanyardSpotify.timestamps.end - lanyardSpotify.timestamps.start,
-        type: 'track', // Lanyard usually sends tracks
-        artists: lanyardSpotify.artist.split('; ').map(name => ({ name })), // Lanyard separates artists with "; "
-        album: {
-          name: lanyardSpotify.album,
-          images: [{ url: lanyardSpotify.album_art_url }]
-        },
-        external_urls: {
-          spotify: `https://open.spotify.com/track/${lanyardSpotify.track_id}`
-        }
+    socket.onmessage = (event) => {
+      let payload;
+      try {
+        payload = JSON.parse(event.data);
+      } catch (_error) {
+        return;
       }
+
+      const { op, d, t } = payload;
+
+      if (op === 1) {
+        stopHeartbeat();
+        heartbeatIntervalId = setInterval(() => {
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ op: 3 }));
+          }
+        }, d.heartbeat_interval);
+
+        socket.send(
+          JSON.stringify({
+            op: 2,
+            d: { subscribe_to_id: CONFIG.discordId }
+          })
+        );
+        return;
+      }
+
+      if (op !== 0) return;
+      if (t !== "INIT_STATE" && t !== "PRESENCE_UPDATE") return;
+
+      webhookReady = true;
+      const spotify = d?.spotify;
+      if (spotify) {
+        stopPolling();
+        lastFetchAt = Date.now();
+        renderTrack(mapLanyardSpotify(spotify));
+        return;
+      }
+
+      startPolling();
     };
 
-    currentState.data = mappedData;
-    currentState.lastFetchTime = Date.now();
-    render();
-  };
+    socket.onclose = () => {
+      webhookReady = false;
+      stopHeartbeat();
+      startPolling();
+      setTimeout(connectWebhook, CONFIG.reconnectMs);
+    };
 
-  renderLoading();
-  // Start with polling (Fallback mode default)
-  startPolling();
+    socket.onerror = () => {
+      if (socket) socket.close();
+    };
+  }
 
-  // Local progress bar update (always runs)
-  setInterval(render, CONFIG.updateIntervalMs);
+  function tickProgress() {
+    if (!currentData || !currentData.item) return;
+    renderTrack(currentData, { keepData: true });
+  }
+
+  connectWebhook();
+
+  setTimeout(() => {
+    if (!webhookReady) {
+      startPolling();
+    }
+  }, CONFIG.initialFallbackMs);
+
+  setInterval(tickProgress, CONFIG.tickIntervalMs);
 })();

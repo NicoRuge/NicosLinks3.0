@@ -1,27 +1,37 @@
 const BlogView = {
     template: `
-        <div class="container-fluid py-4">
+        <div class="container-fluid py-4 blog-page">
             <div class="row justify-content-center">
-                <div class="col-12 col-xl-10" style="max-width: 1100px;">
-                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-                        <button v-if="selectedPost" class="btn btn-sm btn-outline-secondary" type="button" @click="closePost">
-                            <i class="bi bi-arrow-left me-1"></i>
-                            Back
-                        </button>
+                <div class="col-12 hero-page-shell">
+                    <section class="portfolio-hero blog-hero rounded-4 p-4 p-lg-5 mb-3">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
+                            <div>
+                                <h1 class="hero-title mb-2">{{ selectedPost ? (blogTitle || 'Blog') : 'Blog' }}</h1>
+                                <p class="mb-0 hero-subtitle">
+                                    <span v-if="selectedPost">Viewing post details.</span>
+                                    <span v-else>Latest posts from {{ blogTitle || 'lnx-photo' }}.</span>
+                                </p>
+                            </div>
 
-                        <h1 class="h3 mb-0 me-auto">{{ selectedPost ? (blogTitle || 'Blog') : 'Blog' }}</h1>
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <button v-if="selectedPost" class="btn btn-sm btn-outline-light" type="button" @click="closePost">
+                                    <i class="bi bi-arrow-left me-1"></i>
+                                    Back
+                                </button>
 
-                        <a class="btn btn-sm btn-outline-secondary" :href="publicBlogUrl" target="_blank" rel="noopener noreferrer">
-                            <i class="bi bi-box-arrow-up-right me-1"></i>
-                            Open on Tumblr
-                        </a>
+                                <a class="btn btn-sm btn-outline-light" :href="publicBlogUrl" target="_blank" rel="noopener noreferrer">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>
+                                    Open on Tumblr
+                                </a>
 
-                        <button class="btn btn-sm btn-outline-primary" type="button" @click="refresh" :disabled="loading">
-                            <span v-if="loading" class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-                            <i v-else class="bi bi-arrow-clockwise me-1"></i>
-                            Refresh
-                        </button>
-                    </div>
+                                <button class="btn btn-sm btn-light text-dark" type="button" @click="refresh" :disabled="loading">
+                                    <span v-if="loading" class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                                    <i v-else class="bi bi-arrow-clockwise me-1"></i>
+                                    Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </section>
 
                     <div v-if="!selectedPost" class="card shadow-sm border-0 mb-3">
                         <div class="card-body">

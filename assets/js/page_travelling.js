@@ -1,6 +1,27 @@
 const TravellingView = {
 	    template: `
-		        <div class="map-container-wrapper">
+		        <div class="container-fluid py-4 travelling-page">
+		            <div class="row justify-content-center">
+		                <div class="col-12 hero-page-shell">
+		                    <section class="portfolio-hero rounded-4 p-4 p-lg-5 mb-4">
+		                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
+		                            <div>
+		                                <h1 class="hero-title mb-2">Travelling</h1>
+		                                <p class="mb-0 hero-subtitle">Explore mapped rides, transport types, and sights from one interactive view.</p>
+		                            </div>
+		                            <button
+		                                class="btn btn-sm"
+		                                :class="isMapFullscreen ? 'btn-light text-dark' : 'btn-outline-light'"
+		                                type="button"
+		                                @click="toggleMapFullscreen"
+		                            >
+		                                <i class="bi" :class="isMapFullscreen ? 'bi-fullscreen-exit' : 'bi-arrows-fullscreen'"></i>
+		                                {{ isMapFullscreen ? 'Exit Fullscreen' : 'Fullscreen Map' }}
+		                            </button>
+		                        </div>
+		                    </section>
+
+		                    <div class="map-container-wrapper" ref="mapWrapper">
 		            <div ref="mapContainer" id="map"></div>
 		            <div ref="sightToastContainer" class="toast-container position-absolute p-2 map-toast-container pe-none">
 		                <div ref="sightToast" class="toast align-items-center shadow pe-auto" role="alert" aria-live="polite" aria-atomic="true">
@@ -74,9 +95,12 @@ const TravellingView = {
                         <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Airport" checked id="cb-air"><label class="form-check-label d-flex align-items-center" for="cb-air"><span class="legend-icon">✈️</span> Airport</label></div></div></li>
                         <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Station" checked id="cb-stat"><label class="form-check-label d-flex align-items-center" for="cb-stat"><span class="legend-icon">🚆</span> Station</label></div></div></li>
                         <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Other" checked id="cb-oth"><label class="form-check-label d-flex align-items-center" for="cb-oth"><span class="legend-icon">📍</span> Others</label></div></div></li>
-                    </ul>
-                </div>
-            </div>
+	                    </ul>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
         </div>
     `,
 	    data() {
@@ -85,13 +109,15 @@ const TravellingView = {
 	            mapStyles: null,
 	            sightMarkers: [],
 	            mapTooltip: null,
-	            sightToastInstance: null
+	            sightToastInstance: null,
+	            isMapFullscreen: false
 	        };
 	    },
 	    mounted() {
 	        this.initMap();
 	        this.initSightToast();
 	        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', this.handleThemeChange);
+	        document.addEventListener('fullscreenchange', this.handleFullscreenChange);
 	    },
 	    beforeUnmount() {
 	        if (this.mapTooltip && this.mapTooltip.parentNode) {
@@ -102,8 +128,27 @@ const TravellingView = {
             this.map = null;
         }
         window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleThemeChange);
+	        document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
 	    },
 	    methods: {
+	        toggleMapFullscreen() {
+	            const wrapper = this.$refs.mapWrapper;
+	            if (!wrapper) return;
+
+	            if (document.fullscreenElement === wrapper) {
+	                if (document.exitFullscreen) document.exitFullscreen();
+	                return;
+	            }
+
+	            if (wrapper.requestFullscreen) {
+	                wrapper.requestFullscreen().catch(() => {});
+	            }
+	        },
+	        handleFullscreenChange() {
+	            const wrapper = this.$refs.mapWrapper;
+	            this.isMapFullscreen = !!wrapper && document.fullscreenElement === wrapper;
+	            if (this.map) this.map.resize();
+	        },
 	        initSightToast() {
 	            if (!this.$refs.sightToast || typeof bootstrap === 'undefined' || !bootstrap.Toast) return;
 	            this.sightToastInstance = bootstrap.Toast.getOrCreateInstance(this.$refs.sightToast, { autohide: true, delay: 4500 });
@@ -114,7 +159,8 @@ const TravellingView = {
 	            const containerEl = this.$refs.sightToastContainer;
 	            const toastEl = this.$refs.sightToast;
 
-	            const wrapperRect = this.$el.getBoundingClientRect();
+	            const wrapperRect = (this.$refs.mapWrapper && this.$refs.mapWrapper.getBoundingClientRect())
+	                || this.$el.getBoundingClientRect();
 	            const anchorRect = anchorEl.getBoundingClientRect();
 
 	            const padding = 8;

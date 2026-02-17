@@ -1,40 +1,46 @@
 const DeparturesView = {
 	template: `
-	        <div class="container-fluid">
-	            <div class="row justify-content-center">
-	                <div class="col-12 col-md-10 col-lg-8 col-xl-6 departures-panel">
-	                    <h1 class="h3 mb-4">Departures</h1>
-	                    
-	                    <div class="mb-4">
-	                        <label for="station-search" class="form-label visually-hidden">Search Station</label>
-		                        <div class="position-relative">
-	                            <div class="input-group flex-nowrap">
-	                                <span class="input-group-text" id="addon-wrapping">
-	                                    <i class="bi bi-search"></i>
-	                                </span>
-	                                <input 
-	                                    type="text" 
-	                                    id="station-search" 
-	                                    class="form-control" 
-	                                    placeholder="Search for a station..." 
-	                                    aria-label="Search for a station..." 
-	                                    aria-describedby="addon-wrapping"
-	                                    v-model="query" 
-	                                    @input="onInput"
-	                                    autocomplete="off"
-	                                    aria-autocomplete="list"
-	                                    :aria-expanded="suggestions.length > 0"
-	                                    aria-controls="search-suggestions"
-	                                >
-	                                <span v-if="autocompleteLoading" class="input-group-text" title="Searching…">
-	                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-	                                </span>
-	                                <button v-if="query" class="btn btn-outline-secondary" type="button" @click="clearSearch" aria-label="Clear search">
-	                                    <i class="bi bi-x-lg"></i>
-	                                </button>
-	                            </div>
+		        <div class="container-fluid py-4 departures-page">
+		            <div class="row justify-content-center">
+		                <div class="col-12 hero-page-shell departures-panel">
+		                    <section class="portfolio-hero departures-hero rounded-4 p-4 p-lg-5 mb-4">
+                                <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+                                    <div>
+                                        <h1 class="hero-title mb-2">Departures</h1>
+                                        <p class="mb-0 hero-subtitle">
+                                            Search a station and filter live departures by transport mode.
+                                        </p>
+                                    </div>
+                                </div>
 
-                            <!-- Autocomplete Suggestions -->
+		                        <label for="station-search" class="form-label visually-hidden">Search Station</label>
+			                        <div class="position-relative mb-3">
+		                            <div class="input-group flex-nowrap">
+		                                <span class="input-group-text" id="addon-wrapping">
+		                                    <i class="bi bi-search"></i>
+		                                </span>
+		                                <input 
+		                                    type="text" 
+		                                    id="station-search" 
+		                                    class="form-control" 
+		                                    placeholder="Search for a station..." 
+		                                    aria-label="Search for a station..." 
+		                                    aria-describedby="addon-wrapping"
+		                                    v-model="query" 
+		                                    @input="onInput"
+		                                    autocomplete="off"
+		                                    aria-autocomplete="list"
+		                                    :aria-expanded="suggestions.length > 0"
+		                                    aria-controls="search-suggestions"
+		                                >
+		                                <span v-if="autocompleteLoading" class="input-group-text" title="Searching…">
+		                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+		                                </span>
+		                                <button v-if="query" class="btn btn-outline-secondary" type="button" @click="clearSearch" aria-label="Clear search">
+		                                    <i class="bi bi-x-lg"></i>
+		                                </button>
+		                            </div>
+
                             <ul 
                                 id="search-suggestions" 
                                 class="list-group position-absolute w-100 shadow mt-1" 
@@ -58,7 +64,32 @@ const DeparturesView = {
                                 </li>
                             </ul>
                         </div>
-                    </div>
+
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                <span class="small text-white-50">Modes:</span>
+                                <div class="d-flex flex-wrap gap-1" role="group" aria-label="Filter by mode">
+                                    <template v-for="opt in modeFilterOptions" :key="opt.key">
+                                        <input
+                                            class="btn-check"
+                                            type="checkbox"
+                                            :id="'mode-filter-' + opt.key"
+                                            v-model="modeFilters[opt.key]"
+                                            @change="onFiltersChanged"
+                                        >
+                                        <label
+                                            class="btn btn-sm btn-outline-light"
+                                            :for="'mode-filter-' + opt.key"
+                                            :title="opt.title"
+                                        >
+                                            {{ opt.label }}
+                                        </label>
+                                    </template>
+                                </div>
+                                <button v-if="!isAllModesEnabled" type="button" class="btn btn-sm btn-link text-white ms-auto py-0" @click="resetModeFilters">
+                                    Reset
+                                </button>
+                            </div>
+                            </section>
 
                     <!-- Loading State -->
                     <div v-if="loading" class="text-center p-5">
@@ -85,30 +116,6 @@ const DeparturesView = {
 	                                    <i class="bi bi-arrow-clockwise"></i>
 	                                </button>
 	                            </div>
-                                <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
-                                    <span class="small text-secondary">Modes:</span>
-                                    <div class="d-flex flex-wrap gap-1" role="group" aria-label="Filter by mode">
-                                        <template v-for="opt in modeFilterOptions" :key="opt.key">
-                                            <input
-                                                class="btn-check"
-                                                type="checkbox"
-                                                :id="'mode-filter-' + opt.key"
-                                                v-model="modeFilters[opt.key]"
-                                                @change="onFiltersChanged"
-                                            >
-                                            <label
-                                                class="btn btn-sm btn-outline-secondary"
-                                                :for="'mode-filter-' + opt.key"
-                                                :title="opt.title"
-                                            >
-                                                {{ opt.label }}
-                                            </label>
-                                        </template>
-                                    </div>
-                                    <button v-if="!isAllModesEnabled" type="button" class="btn btn-sm btn-link ms-auto py-0" @click="resetModeFilters">
-                                        Reset
-                                    </button>
-                                </div>
 	                        </div>
                             <div class="departure-list">
                                 <div v-if="station && filteredDepartures.length === 0" class="text-center py-5 text-secondary">
