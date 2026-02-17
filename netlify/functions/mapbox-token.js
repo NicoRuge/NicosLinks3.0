@@ -1,5 +1,9 @@
 exports.handler = async () => {
-    const token = process.env.MAPBOX_PUBLIC_TOKEN;
+    const token =
+        process.env.MAPBOX_PUBLIC_TOKEN ||
+        process.env.MAPBOX_TOKEN ||
+        process.env.NEXT_PUBLIC_MAPBOX_TOKEN ||
+        process.env.VITE_MAPBOX_TOKEN;
 
     if (!token) {
         return {
@@ -8,7 +12,7 @@ exports.handler = async () => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                error: "MAPBOX_PUBLIC_TOKEN is not configured"
+                error: "Mapbox token is not configured. Set MAPBOX_PUBLIC_TOKEN (or MAPBOX_TOKEN)."
             })
         };
     }

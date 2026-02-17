@@ -234,7 +234,14 @@ const TravellingView = {
                 headers: { Accept: 'application/json' }
             });
             if (!response.ok) {
-                throw new Error(`Mapbox token endpoint failed: ${response.status}`);
+                let detail = '';
+                try {
+                    const payload = await response.json();
+                    detail = payload?.error || '';
+                } catch (_) {
+                    detail = await response.text();
+                }
+                throw new Error(`Mapbox token endpoint failed: ${response.status}${detail ? ` - ${detail}` : ''}`);
             }
 
             const payload = await response.json();
