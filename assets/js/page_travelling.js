@@ -110,7 +110,8 @@ const TravellingView = {
 	            sightMarkers: [],
 	            mapTooltip: null,
 	            sightToastInstance: null,
-	            isMapFullscreen: false
+	            isMapFullscreen: false,
+	            mapboxAccessToken: null
 	        };
 	    },
 	    mounted() {
@@ -226,12 +227,38 @@ const TravellingView = {
             const actualTheme = document.documentElement.getAttribute('data-bs-theme');
             this.map.setStyle(this.mapStyles[actualTheme === 'dark' ? 'dark' : 'light']);
         },
-        initMap() {
+        async fetchMapboxToken() {
+            if (this.mapboxAccessToken) return this.mapboxAccessToken;
+
+            const response = await fetch('/.netlify/functions/mapbox-token', {
+                headers: { Accept: 'application/json' }
+            });
+            if (!response.ok) {
+                throw new Error(`Mapbox token endpoint failed: ${response.status}`);
+            }
+
+            const payload = await response.json();
+            const token = payload && typeof payload.token === 'string' ? payload.token.trim() : '';
+            if (!token) {
+                throw new Error('Mapbox token payload was empty');
+            }
+
+            this.mapboxAccessToken = token;
+            return token;
+        },
+        async initMap() {
             if (typeof mapboxgl === 'undefined' || !this.$refs.mapContainer) {
                 setTimeout(() => this.initMap(), 200);
                 return;
             }
-            mapboxgl.accessToken = "pk.eyJ1Ijoibmljb3J1Z2UiLCJhIjoiY21nODVoZ2R2MDNqOTJqczg3c3F4cmZ3MiJ9.1fgkuGwAxjLf26gtzgOm0w";
+
+            try {
+                mapboxgl.accessToken = await this.fetchMapboxToken();
+            } catch (error) {
+                console.error('Failed to initialize map token:', error);
+                return;
+            }
+
             const actualTheme = document.documentElement.getAttribute('data-bs-theme');
             this.mapStyles = {
                 dark: 'mapbox://styles/mapbox/dark-v11',
