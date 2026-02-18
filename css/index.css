@@ -39,7 +39,14 @@ body {
 
 .sidebar-main {
     min-height: 0;
+    height: 100%;
     overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.sidebar-main::-webkit-scrollbar {
+    display: none;
 }
 
 .sidebar-legal {
@@ -275,7 +282,7 @@ body {
 
 .camera-equipment-page .equipment-item-row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.75rem;
     border: 1px solid color-mix(in srgb, var(--bs-body-color) 24%, transparent);
     background: color-mix(in srgb, var(--bs-body-bg) 94%, var(--bs-body-color) 6%);
@@ -485,9 +492,24 @@ body {
     flex-direction: column;
 }
 
+.scroll-hint-shell {
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-main-shell {
+    flex: 1;
+    min-height: 0;
+}
+
+.content-scroll-shell {
+    flex: 1;
+    min-height: 0;
+}
+
 #content-container {
     width: 100%;
-    flex: 1;
+    height: 100%;
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -497,6 +519,71 @@ body {
 
 #content-container::-webkit-scrollbar {
     display: none;
+}
+
+.scroll-hint-target {
+    position: relative;
+    --scroll-hint-color: color-mix(in srgb, var(--bs-body-color) 46%, transparent);
+    --scroll-hint-fade: color-mix(in srgb, var(--bs-body-bg) 95%, transparent);
+    --scroll-hint-dot-bg: color-mix(in srgb, var(--bs-body-bg) 75%, var(--bs-body-color) 25%);
+}
+
+.scroll-hint-target::before {
+    content: none;
+}
+
+.scroll-hint-target::after {
+    content: "\2193";
+    position: absolute;
+    left: 50%;
+    bottom: 0.3rem;
+    transform: translateX(-50%);
+    color: var(--scroll-hint-color);
+    font-size: 0.68rem;
+    line-height: 1;
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: var(--scroll-hint-dot-bg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 3;
+    padding: 0;
+}
+
+.scroll-hint-target.show-scroll-hint::before,
+.scroll-hint-target.show-scroll-hint::after {
+    opacity: 1;
+}
+
+.scroll-hint-target.show-scroll-hint::after {
+    animation: scrollHintBounce 1.8s ease-in-out infinite;
+}
+
+.sidebar-main-shell.scroll-hint-target {
+    --scroll-hint-color: rgba(255, 255, 255, 0.85);
+    --scroll-hint-fade: rgba(33, 37, 41, 0.96);
+    --scroll-hint-dot-bg: rgba(255, 255, 255, 0.16);
+}
+
+@keyframes scrollHintBounce {
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(2px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-hint-target.show-scroll-hint::after {
+        animation: none;
+    }
 }
 
 @keyframes fadeIn {
@@ -883,12 +970,13 @@ body {
     /* Fallback color */
 }
 
-.travelling-page .map-container-wrapper:fullscreen,
-.travelling-page .map-container-wrapper:-webkit-full-screen {
-    width: 100vw;
-    height: 100vh;
-    max-width: none;
-    border-radius: 0;
+.travelling-page.map-expanded .portfolio-hero {
+    display: none;
+}
+
+.travelling-page.map-expanded .map-container-wrapper {
+    height: calc(100vh - 120px);
+    min-height: 620px;
 }
 
 #map {
@@ -900,9 +988,8 @@ body {
     border-radius: 12px;
 }
 
-.travelling-page .map-container-wrapper:fullscreen #map,
-.travelling-page .map-container-wrapper:-webkit-full-screen #map {
-    border-radius: 0;
+.travelling-page.map-expanded #map {
+    border-radius: 12px;
 }
 
 .map-controls {
@@ -916,10 +1003,26 @@ body {
     gap: 0.5rem;
 }
 
+.map-collapse-btn {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 12;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    line-height: 1;
+}
+
 @media (max-width: 991.98px) {
     .map-container-wrapper {
         height: calc(100vh - 330px);
         min-height: 420px;
+    }
+
+    .travelling-page.map-expanded .map-container-wrapper {
+        height: calc(100vh - 100px);
+        min-height: 480px;
     }
 
     .home-hero .home-hero-profile {

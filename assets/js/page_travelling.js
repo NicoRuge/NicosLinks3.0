@@ -1,9 +1,11 @@
+const DEFAULT_PUBLIC_MAPBOX_TOKEN = "pk.eyJ1Ijoibmljb3J1Z2UiLCJhIjoiY21nODVoZ2R2MDNqOTJqczg3c3F4cmZ3MiJ9.1fgkuGwAxjLf26gtzgOm0w";
+
 const TravellingView = {
 	    template: `
-		        <div class="container-fluid py-4 travelling-page">
+		        <div class="container-fluid py-4 travelling-page" :class="{ 'map-expanded': isMapFullscreen }">
 		            <div class="row justify-content-center">
 		                <div class="col-12 hero-page-shell">
-		                    <section class="portfolio-hero rounded-4 p-4 p-lg-5 mb-4">
+		                    <section v-if="!isMapFullscreen" class="portfolio-hero rounded-4 p-4 p-lg-5 mb-4">
 		                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
 		                            <div>
 		                                <h1 class="hero-title mb-2">Travelling</h1>
@@ -16,13 +18,21 @@ const TravellingView = {
 		                                @click="toggleMapFullscreen"
 		                            >
 		                                <i class="bi" :class="isMapFullscreen ? 'bi-fullscreen-exit' : 'bi-arrows-fullscreen'"></i>
-		                                {{ isMapFullscreen ? 'Exit Fullscreen' : 'Fullscreen Map' }}
+		                                {{ isMapFullscreen ? 'Close Map' : 'Expand Map' }}
 		                            </button>
 		                        </div>
 		                    </section>
 
 		                    <div class="map-container-wrapper" ref="mapWrapper">
 		            <div ref="mapContainer" id="map"></div>
+                    <button
+                        v-if="isMapFullscreen"
+                        type="button"
+                        class="btn btn-light btn-sm shadow-sm map-collapse-btn"
+                        @click="toggleMapFullscreen"
+                    >
+                        <i class="bi bi-x-lg"></i>
+                    </button>
 		            <div ref="sightToastContainer" class="toast-container position-absolute p-2 map-toast-container pe-none">
 		                <div ref="sightToast" class="toast align-items-center shadow pe-auto" role="alert" aria-live="polite" aria-atomic="true">
 		                    <div class="toast-header">
@@ -118,7 +128,6 @@ const TravellingView = {
 	        this.initMap();
 	        this.initSightToast();
 	        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', this.handleThemeChange);
-	        document.addEventListener('fullscreenchange', this.handleFullscreenChange);
 	    },
 	    beforeUnmount() {
 	        if (this.mapTooltip && this.mapTooltip.parentNode) {
@@ -129,26 +138,13 @@ const TravellingView = {
             this.map = null;
         }
         window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleThemeChange);
-	        document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
 	    },
 	    methods: {
 	        toggleMapFullscreen() {
-	            const wrapper = this.$refs.mapWrapper;
-	            if (!wrapper) return;
-
-	            if (document.fullscreenElement === wrapper) {
-	                if (document.exitFullscreen) document.exitFullscreen();
-	                return;
-	            }
-
-	            if (wrapper.requestFullscreen) {
-	                wrapper.requestFullscreen().catch(() => {});
-	            }
-	        },
-	        handleFullscreenChange() {
-	            const wrapper = this.$refs.mapWrapper;
-	            this.isMapFullscreen = !!wrapper && document.fullscreenElement === wrapper;
-	            if (this.map) this.map.resize();
+	            this.isMapFullscreen = !this.isMapFullscreen;
+	            this.$nextTick(() => {
+	                if (this.map) this.map.resize();
+	            });
 	        },
 	        initSightToast() {
 	            if (!this.$refs.sightToast || typeof bootstrap === 'undefined' || !bootstrap.Toast) return;
@@ -227,32 +223,68 @@ const TravellingView = {
             const actualTheme = document.documentElement.getAttribute('data-bs-theme');
             this.map.setStyle(this.mapStyles[actualTheme === 'dark' ? 'dark' : 'light']);
         },
-        async fetchMapboxToken() {
-            if (this.mapboxAccessToken) return this.mapboxAccessToken;
+        hideUnwantedBaseLayers() {
+            if (!this.map || !this.map.getStyle) return;
+            const style = this.map.getStyle();
+            const layers = Array.isArray(style?.layers) ? style.layers : [];
+            const shouldHideLayer = (id) => {
+                const lid = String(id || '').toLowerCase();
+                const isMajorRoad =
+                    lid.includes('motorway') ||
+                    lid.includes('autobahn') ||
+                    lid.includes('trunk') ||
+                    lid.includes('primary');
+                const isStateBorder =
+                    lid.includes('admin-1') ||
+                    lid.includes('state-boundary') ||
+                    lid.includes('bundesland');
+                return isMajorRoad || isStateBorder;
+            };
 
-            const response = await fetch('/.netlify/functions/mapbox-token', {
-                headers: { Accept: 'application/json' }
-            });
-            if (!response.ok) {
-                let detail = '';
+            layers.forEach((layer) => {
+                if (!shouldHideLayer(layer.id)) return;
+                if (!this.map.getLayer(layer.id)) return;
                 try {
-                    const payload = await response.json();
-                    detail = payload?.error || '';
+                    this.map.setLayoutProperty(layer.id, 'visibility', 'none');
                 } catch (_) {
-                    detail = await response.text();
+                    // Ignore non-layout layers and keep map rendering.
                 }
-                throw new Error(`Mapbox token endpoint failed: ${response.status}${detail ? ` - ${detail}` : ''}`);
-            }
-
-            const payload = await response.json();
-            const token = payload && typeof payload.token === 'string' ? payload.token.trim() : '';
-            if (!token) {
-                throw new Error('Mapbox token payload was empty');
-            }
-
-            this.mapboxAccessToken = token;
-            return token;
+            });
         },
+	        async fetchMapboxToken() {
+	            if (this.mapboxAccessToken) return this.mapboxAccessToken;
+	            const isValidPublicToken = (value) => typeof value === 'string' && value.trim().startsWith('pk.');
+
+	            try {
+	                const response = await fetch('/.netlify/functions/mapbox-token', {
+	                    headers: { Accept: 'application/json' }
+	                });
+	                if (!response.ok) {
+	                    let detail = '';
+	                    try {
+	                        const payload = await response.json();
+	                        detail = payload?.error || '';
+	                    } catch (_) {
+	                        detail = await response.text();
+	                    }
+	                    throw new Error(`Mapbox token endpoint failed: ${response.status}${detail ? ` - ${detail}` : ''}`);
+	                }
+
+	                const payload = await response.json();
+	                const token = payload && typeof payload.token === 'string' ? payload.token.trim() : '';
+	                if (isValidPublicToken(token)) {
+	                    this.mapboxAccessToken = token;
+	                    return token;
+	                }
+
+	                console.warn('Netlify returned a non-public Mapbox token. Falling back to default public token.');
+	            } catch (error) {
+	                console.warn('Could not load Mapbox token from Netlify function. Falling back to default public token.', error);
+	            }
+
+	            this.mapboxAccessToken = DEFAULT_PUBLIC_MAPBOX_TOKEN;
+	            return this.mapboxAccessToken;
+	        },
         async initMap() {
             if (typeof mapboxgl === 'undefined' || !this.$refs.mapContainer) {
                 setTimeout(() => this.initMap(), 200);
@@ -325,6 +357,7 @@ const TravellingView = {
             };
 
             map.on("style.load", () => {
+                this.hideUnwantedBaseLayers();
                 if (tripsData) {
                     if (!map.getSource("trips")) map.addSource("trips", { type: "geojson", data: tripsData });
                     if (!map.getLayer("trips-lines")) {

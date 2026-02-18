@@ -56,28 +56,30 @@
 
         <!-- Sidebar -->
         <nav class="sidebar" :class="{ 'mobile-open': sidebarOpen }">
-            <div class="sidebar-main">
-                <div class="sidebar-brand">
-                    <img
-                        src="assets/icons/Logo_White.svg"
-                        alt="Nico's Links"
-                        class="sidebar-brand-logo"
-                    >
-                </div>
+            <div class="scroll-hint-shell sidebar-main-shell">
+                <div class="sidebar-main">
+                    <div class="sidebar-brand">
+                        <img
+                            src="assets/icons/Logo_White.svg"
+                            alt="Nico's Links"
+                            class="sidebar-brand-logo"
+                        >
+                    </div>
 
-                <div v-for="section in navigation" :key="section.title">
-                    <div v-if="section.title" class="sidebar-section">{{ section.title }}</div>
-                    <ul class="nav flex-column">
-                        <li v-for="item in section.items" :key="item.id" class="nav-item">
-                            <a class="nav-link"
-                                :class="{ active: currentHash === item.id, 'text-secondary opacity-75': item.wip }" href="#"
-                                @click.prevent="navigate(item.id); closeSidebar()">
-                                <img :src="'assets/icons/' + item.icon" alt="" class="sidebar-icon"
-                                    :style="item.wip ? 'opacity: 0.5' : ''">
-                                {{ item.label }}
-                            </a>
-                        </li>
-                    </ul>
+                    <div v-for="section in navigation" :key="section.title">
+                        <div v-if="section.title" class="sidebar-section">{{ section.title }}</div>
+                        <ul class="nav flex-column">
+                            <li v-for="item in section.items" :key="item.id" class="nav-item">
+                                <a class="nav-link"
+                                    :class="{ active: currentHash === item.id, 'text-secondary opacity-75': item.wip }" href="#"
+                                    @click.prevent="navigate(item.id); closeSidebar()">
+                                    <img :src="'assets/icons/' + item.icon" alt="" class="sidebar-icon"
+                                        :style="item.wip ? 'opacity: 0.5' : ''">
+                                    {{ item.label }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -109,20 +111,22 @@
 
         <!-- Main content -->
         <main class="main-content">
-            <div id="content-container" class="page-content py-4">
-                <home-view v-if="currentHash === 'home'"></home-view>
-                <card-view v-else-if="currentHash === 'card'"></card-view>
-                <photography-view v-else-if="currentHash === 'photography'"></photography-view>
-                <travelling-view v-else-if="currentHash === 'travelling'"></travelling-view>
-                <departures-view v-else-if="currentHash === 'departures'"></departures-view>
-                <camera-equipment-view v-else-if="currentHash === 'camera-equipment'"></camera-equipment-view>
-                <blog-view v-else-if="currentHash === 'blog'"></blog-view>
-                <x-thread-viewer-view v-else-if="currentHash === 'x-thread-viewer'"></x-thread-viewer-view>
-                <imprint-view v-else-if="currentHash === 'imprint'"></imprint-view>
-                <privacy-policy-view
-                    v-else-if="currentHash === 'privacy-policy' || currentHash === 'privacy-policy-main' || currentHash === 'privacy-policy-cloud'">
-                </privacy-policy-view>
-                <div v-else v-html="contentFragment"></div>
+            <div class="scroll-hint-shell content-scroll-shell">
+                <div id="content-container" class="page-content py-4">
+                    <home-view v-if="currentHash === 'home'"></home-view>
+                    <card-view v-else-if="currentHash === 'card'"></card-view>
+                    <photography-view v-else-if="currentHash === 'photography'"></photography-view>
+                    <travelling-view v-else-if="currentHash === 'travelling'"></travelling-view>
+                    <departures-view v-else-if="currentHash === 'departures'"></departures-view>
+                    <camera-equipment-view v-else-if="currentHash === 'camera-equipment'"></camera-equipment-view>
+                    <blog-view v-else-if="currentHash === 'blog'"></blog-view>
+                    <x-thread-viewer-view v-else-if="currentHash === 'x-thread-viewer'"></x-thread-viewer-view>
+                    <imprint-view v-else-if="currentHash === 'imprint'"></imprint-view>
+                    <privacy-policy-view
+                        v-else-if="currentHash === 'privacy-policy' || currentHash === 'privacy-policy-main' || currentHash === 'privacy-policy-cloud'">
+                    </privacy-policy-view>
+                    <div v-else v-html="contentFragment"></div>
+                </div>
             </div>
 
             <div class="nico-toast-container">
@@ -209,6 +213,8 @@
                     storedTheme: localStorage.getItem('theme') || 'auto',
                     activeTheme: 'light',
                     sidebarOpen: false,
+                    scrollHintUpdate: null,
+                    scrollHintTeardown: null,
                     activeToastMessage: '',
                     toastMessages: [
                         'Wer schweigt, stimmt zu - lasst Faschisten nicht in Ruh!',
@@ -306,6 +312,7 @@
                     this.currentHash = hash === 'privacy-policy' ? 'privacy-policy-main' : hash
                     this.loadPageContent(this.currentHash)
                     this.syncRobotsMeta()
+                    this.$nextTick(() => this.refreshScrollHints())
                 },
                 setTheme(theme) {
                     this.storedTheme = theme
@@ -333,16 +340,77 @@
                         })
                         toast.show()
                     })
+                },
+                setupScrollHints() {
+                    const targets = [
+                        document.querySelector('.sidebar-main'),
+                        document.getElementById('content-container')
+                    ]
+                        .filter(Boolean)
+                        .map((el) => ({
+                            el,
+                            shell: el.closest('.scroll-hint-shell') || el
+                        }))
+                    if (targets.length === 0) return
+
+                    const threshold = 6
+                    const updateTarget = ({ el, shell }) => {
+                        const canScroll = el.scrollHeight - el.clientHeight > threshold
+                        const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold
+                        shell.classList.add('scroll-hint-target')
+                        shell.classList.toggle('show-scroll-hint', canScroll && !atBottom)
+                    }
+                    const updateAll = () => {
+                        targets.forEach(updateTarget)
+                    }
+                    const onScroll = (event) => {
+                        const target = targets.find((entry) => entry.el === event.currentTarget)
+                        if (target) updateTarget(target)
+                    }
+
+                    targets.forEach(({ el }) => {
+                        el.addEventListener('scroll', onScroll, { passive: true })
+                    })
+                    window.addEventListener('resize', updateAll)
+
+                    let resizeObserver = null
+                    if ('ResizeObserver' in window) {
+                        resizeObserver = new ResizeObserver(updateAll)
+                        targets.forEach(({ el }) => resizeObserver.observe(el))
+                    }
+
+                    this.scrollHintUpdate = () => {
+                        window.requestAnimationFrame(updateAll)
+                    }
+                    this.scrollHintTeardown = () => {
+                        targets.forEach(({ el }) => {
+                            el.removeEventListener('scroll', onScroll)
+                        })
+                        window.removeEventListener('resize', updateAll)
+                        if (resizeObserver) resizeObserver.disconnect()
+                    }
+                    this.scrollHintUpdate()
+                },
+                refreshScrollHints() {
+                    if (typeof this.scrollHintUpdate === 'function') {
+                        this.scrollHintUpdate()
+                    }
                 }
             },
             mounted() {
                 this.updateFromHash()
                 this.applyTheme()
                 this.showDesktopToast()
+                this.setupScrollHints()
                 window.addEventListener('hashchange', this.updateFromHash)
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                     if (this.storedTheme === 'auto') this.applyTheme()
                 })
+            },
+            beforeUnmount() {
+                if (typeof this.scrollHintTeardown === 'function') {
+                    this.scrollHintTeardown()
+                }
             }
         }).mount('#app')
     </script>
