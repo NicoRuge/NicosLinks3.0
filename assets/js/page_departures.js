@@ -63,6 +63,14 @@ const DeparturesView = {
                                     </span>
                                 </li>
                             </ul>
+                            <div
+                                v-if="!autocompleteLoading && autocompleteMessage"
+                                class="small mt-2 text-light"
+                                role="status"
+                                aria-live="polite"
+                            >
+                                {{ autocompleteMessage }}
+                            </div>
                         </div>
 
                             <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -197,6 +205,7 @@ const DeparturesView = {
 				other: true
 			},
 			autocompleteLoading: false,
+			autocompleteMessage: '',
 			stationSearchSeq: 0,
 			stationSearchAbortController: null,
 			stationSearchCache: new Map(),
@@ -324,6 +333,7 @@ const DeparturesView = {
 		if (this.destinationResizeObserver) this.destinationResizeObserver.disconnect();
 		this.destinationResizeObserver = null;
 		if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
+		clearTimeout(this.debounceTimeout);
 	},
 	methods: {
 		initDestinationMarqueeObserver() {
@@ -367,51 +377,130 @@ const DeparturesView = {
 			const q = (this.query || '').toString().trim();
 			if (!q || q.length < 2) {
 				this.autocompleteLoading = false;
+				this.autocompleteMessage = '';
 				if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
 				this.suggestions = [];
 				return;
 			}
 
+				const parseSuggestions = (payload) => {
+					const raw = Array.isArray(payload)
+						? payload
+						: (Array.isArray(payload?.stations) ? payload.stations : []);
+				if (!Array.isArray(raw)) return [];
+
+				const unique = new Map();
+				raw.forEach((item) => {
+					if (!item || typeof item !== 'object') return;
+					const type = (item.type || 'stop').toString().toLowerCase();
+					if (type === 'poi' || type === 'address') return;
+					const id = (item.id || item.station?.id || item.stop?.id || '').toString().trim();
+					const name = (item.name || item.station?.name || item.stop?.name || '').toString().trim();
+					if (!id || !name) return;
+					if (!unique.has(id)) unique.set(id, item);
+				});
+				return Array.from(unique.values()).slice(0, 5);
+			};
+
+			const fetchSuggestionsWithRetry = async (query, controller, retries = 1) => {
+				const fetchAndParse = async (url) => {
+					const response = await fetch(url, {
+						signal: controller.signal,
+						cache: 'no-store'
+					});
+					if (!response.ok) {
+						throw new Error(`Failed to fetch stations (HTTP ${response.status}).`);
+					}
+					const json = await response.json();
+					return parseSuggestions(json);
+				};
+
+				let lastError = null;
+				for (let attempt = 0; attempt <= retries; attempt += 1) {
+					try {
+						const strictUrl = `https://v6.db.transport.rest/locations?query=${encodeURIComponent(query)}&results=5&stops=true&addresses=false&poi=false`;
+						const strictSuggestions = await fetchAndParse(strictUrl);
+						if (strictSuggestions.length) return strictSuggestions;
+
+						const broadUrl = `https://v6.db.transport.rest/locations?query=${encodeURIComponent(query)}&results=10`;
+						const broadSuggestions = await fetchAndParse(broadUrl);
+						if (broadSuggestions.length) return broadSuggestions.slice(0, 5);
+
+						const stopsUrl = `https://v6.db.transport.rest/stops?query=${encodeURIComponent(query)}&results=10`;
+						const stopsSuggestions = await fetchAndParse(stopsUrl);
+						return stopsSuggestions.slice(0, 5);
+					} catch (err) {
+						lastError = err;
+						if (err?.name === 'AbortError') throw err;
+						if (String(err?.message || '').includes('HTTP 5') && attempt < retries) continue;
+						if (attempt >= retries) throw err;
+					}
+				}
+				throw lastError || new Error('Failed to fetch stations.');
+			};
+
+			let seq = 0;
 			try {
 				const cached = this.stationSearchCache.get(q);
 				if (cached) {
 					this.suggestions = cached;
+					this.autocompleteMessage = cached.length
+						? ''
+						: 'No matching stations found. Try a more specific query (e.g. Berlin Hbf).';
 					return;
 				}
 
 				this.autocompleteLoading = true;
-				const seq = ++this.stationSearchSeq;
+				this.autocompleteMessage = '';
+				seq = ++this.stationSearchSeq;
 				if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
 				const controller = new AbortController();
 				this.stationSearchAbortController = controller;
-				const timeout = setTimeout(() => controller.abort(), 8000);
-
-				const response = await fetch(`https://v6.db.transport.rest/locations?query=${encodeURIComponent(q)}&results=5&stops=true&addresses=false&poi=false`, { signal: controller.signal });
-				if (!response.ok) throw new Error('Failed to fetch stations');
-				const json = await response.json();
-				clearTimeout(timeout);
-				if (seq !== this.stationSearchSeq) return;
-				if (((this.query || '').toString().trim()) !== q) return;
-				this.stationSearchCache.set(q, json);
-				this.suggestions = json;
+				const timeout = setTimeout(() => controller.abort(), 14000);
+				try {
+					const suggestions = await fetchSuggestionsWithRetry(q, controller, 1);
+					if (seq !== this.stationSearchSeq) return;
+					if (((this.query || '').toString().trim()) !== q) return;
+					if (suggestions.length) this.stationSearchCache.set(q, suggestions);
+					this.suggestions = suggestions;
+					this.autocompleteMessage = suggestions.length
+						? ''
+						: 'No matching stations found. Try a more specific query (e.g. Berlin Hbf).';
+				} finally {
+					clearTimeout(timeout);
+				}
 			} catch (err) {
-				if (err && err.name === 'AbortError') return;
+				if (err && err.name === 'AbortError') {
+					if (seq === this.stationSearchSeq) {
+						this.suggestions = [];
+						this.autocompleteMessage = 'Station search timed out. Please try again.';
+					}
+					return;
+				}
 				console.error(err);
-				this.suggestions = [];
+				if (seq === this.stationSearchSeq) {
+					this.suggestions = [];
+					this.autocompleteMessage = 'Could not load station suggestions. Please try again.';
+				}
 			} finally {
-				this.autocompleteLoading = false;
+				if (seq === this.stationSearchSeq && this.stationSearchAbortController?.signal?.aborted) {
+					this.stationSearchAbortController = null;
+				}
+				if (seq === this.stationSearchSeq) this.autocompleteLoading = false;
 			}
 		},
 		selectStation(station) {
 			this.station = station;
 			this.query = station.name;
 			this.suggestions = [];
+			this.autocompleteMessage = '';
 			this.getDepartures(station.id);
 		},
 		clearSearch() {
 			if (this.stationSearchAbortController) this.stationSearchAbortController.abort();
 			this.query = '';
 			this.suggestions = [];
+			this.autocompleteMessage = '';
 			this.station = null;
 			this.departures = [];
 			this.error = null;
