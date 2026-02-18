@@ -160,7 +160,7 @@
 
                         // Pass Spotify data to Spotify Widget if function exists
                         if (typeof window.updateSpotifyWidget === 'function') {
-                            window.updateSpotifyWidget(d.spotify);
+                            window.updateSpotifyWidget(d.spotify, d.listening_to_spotify);
                         }
                     }
                     break;
@@ -172,7 +172,7 @@
 
             // Force Spotify Widget to fallback to polling
             if (typeof window.updateSpotifyWidget === 'function') {
-                window.updateSpotifyWidget(null);
+                window.updateSpotifyWidget(null, false);
             }
 
             clearInterval(heartbeatInterval);

@@ -363,6 +363,28 @@ body {
     margin: 0;
 }
 
+.business-card {
+    background: linear-gradient(155deg, color-mix(in srgb, var(--bs-body-bg) 95%, #0c1320 5%) 0%, color-mix(in srgb, var(--bs-body-bg) 90%, #0c1320 10%) 100%);
+    border: 1px solid color-mix(in srgb, var(--bs-body-color) 18%, transparent);
+}
+
+.business-card-ribbon {
+    height: 8px;
+    background: linear-gradient(90deg, #2563eb 0%, #0ea5e9 40%, #14b8a6 100%);
+}
+
+.business-card-avatar {
+    max-width: 180px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.business-card-location {
+    color: color-mix(in srgb, var(--bs-body-color) 78%, transparent);
+    font-weight: 500;
+}
+
 .photo-carousel-img {
     height: 100%;
     object-fit: cover;

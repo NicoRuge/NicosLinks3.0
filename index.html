@@ -111,6 +111,7 @@
         <main class="main-content">
             <div id="content-container" class="page-content py-4">
                 <home-view v-if="currentHash === 'home'"></home-view>
+                <card-view v-else-if="currentHash === 'card'"></card-view>
                 <photography-view v-else-if="currentHash === 'photography'"></photography-view>
                 <travelling-view v-else-if="currentHash === 'travelling'"></travelling-view>
                 <departures-view v-else-if="currentHash === 'departures'"></departures-view>
@@ -176,6 +177,7 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="assets/js/widget_spotify.js"></script>
     <script src="assets/js/page_home.js"></script>
+    <script src="assets/js/page_card.js"></script>
     <script src="assets/js/page_photography.js"></script>
     <script src="assets/js/page_travelling.js"></script>
     <script src="assets/js/page_other.js"></script>
@@ -190,6 +192,7 @@
         createApp({
             components: {
                 'home-view': HomeView,
+                'card-view': CardView,
                 'photography-view': PhotographyView,
                 'travelling-view': TravellingView,
                 'departures-view': DeparturesView,
@@ -235,7 +238,12 @@
                         'Nie wieder 1933!',
                     ],
                     navigation: [
-                        { items: [{ id: 'home', label: 'Home', icon: 'home.svg' }] },
+                        {
+                            items: [
+                                { id: 'home', label: 'Home', icon: 'home.svg' },
+                                { id: 'card', label: 'Business Card', icon: 'briefcase.svg' }
+                            ]
+                        },
                         {
                             title: 'Work', items: [
                                 { id: 'photography', label: 'Photography', icon: 'images.svg' },
