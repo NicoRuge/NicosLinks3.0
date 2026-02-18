@@ -71,6 +71,15 @@ async function spotifyGet(url, accessToken) {
   return { status: res.status, json };
 }
 
+function extractSpotifyError(result) {
+  const message =
+    result?.json?.error?.message ||
+    result?.json?.error_description ||
+    result?.json?.error ||
+    "Unknown Spotify API error";
+  return { status: result?.status || 0, message };
+}
+
 function normalizeCurrentPlaying(payload) {
   const item = payload?.item;
   if (!item) return null;
@@ -102,24 +111,50 @@ exports.handler = async (event) => {
 
   try {
     const accessToken = await getAccessToken();
+    const debug = {};
 
     const current = await spotifyGet(SPOTIFY_CURRENTLY_PLAYING_URL, accessToken);
+    debug.currently_playing_status = current.status;
     if (current.status === 200) {
       const normalizedCurrent = normalizeCurrentPlaying(current.json);
       if (normalizedCurrent) {
         return jsonResponse(200, normalizedCurrent);
       }
     }
+    if (current.status !== 200 && current.status !== 204) {
+      const err = extractSpotifyError(current);
+      return jsonResponse(502, {
+        error: "Spotify currently-playing request failed",
+        detail: err.message,
+        status: err.status,
+        hint: "Check token scopes and account playback permissions."
+      });
+    }
 
     const recent = await spotifyGet(SPOTIFY_RECENTLY_PLAYED_URL, accessToken);
+    debug.recently_played_status = recent.status;
     if (recent.status === 200) {
       const normalizedRecent = normalizeRecentlyPlayed(recent.json);
       if (normalizedRecent) {
         return jsonResponse(200, normalizedRecent);
       }
     }
+    if (recent.status !== 200) {
+      const err = extractSpotifyError(recent);
+      return jsonResponse(502, {
+        error: "Spotify recently-played request failed",
+        detail: err.message,
+        status: err.status,
+        hint: "Ensure refresh token includes user-read-recently-played scope."
+      });
+    }
 
-    return jsonResponse(200, { isPlaying: false, item: null });
+    return jsonResponse(200, {
+      isPlaying: false,
+      item: null,
+      detail: "No current or recent track found.",
+      debug
+    });
   } catch (error) {
     return jsonResponse(500, {
       error: "Spotify widget backend failed",

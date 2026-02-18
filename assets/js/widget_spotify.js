@@ -1,6 +1,6 @@
 (function () {
   const CONFIG = {
-    apiEndpoints: ["/.netlify/functions/spotify"],
+    apiEndpoints: ["/.netlify/functions/spotify", "https://nico-ruge.netlify.app/.netlify/functions/spotify"],
     targetId: "spotify-sidebar-widget",
     fetchIntervalMs: 20000,
     tickIntervalMs: 1000,
@@ -50,6 +50,15 @@
     container.innerHTML = `
       <div class="sidebar-now-playing-label">Last played on Spotify</div>
       <div class="sidebar-now-playing-meta">Nothing played recently.</div>
+    `;
+  }
+
+  function renderError(message) {
+    const container = document.getElementById(CONFIG.targetId);
+    if (!container) return;
+    container.innerHTML = `
+      <div class="sidebar-now-playing-label">Last played on Spotify</div>
+      <div class="sidebar-now-playing-meta">${safe(message || "Spotify status unavailable.")}</div>
     `;
   }
 
@@ -247,7 +256,6 @@
     for (const endpoint of CONFIG.apiEndpoints) {
       try {
         const res = await fetch(endpoint);
-        if (!res.ok) continue;
 
         const text = await res.text();
         if (!text) continue;
@@ -256,6 +264,14 @@
         try {
           json = JSON.parse(text);
         } catch (_error) {
+          continue;
+        }
+
+        if (!res.ok) {
+          const errorText = json?.detail || json?.error || `Spotify endpoint error (${res.status})`;
+          if (!currentData) {
+            renderError(errorText);
+          }
           continue;
         }
 
