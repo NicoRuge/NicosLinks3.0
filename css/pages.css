@@ -3,4 +3,6 @@ body {
     margin: 0;
     padding: 1.5rem;
     min-height: 100vh;
+    background-color: var(--color-bg, var(--bs-body-bg, #0a0a12));
+    color: var(--color-text, var(--bs-body-color, #f2f1ec));
 }
