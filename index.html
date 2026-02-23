@@ -46,16 +46,16 @@
 
     <div id="app" v-cloak>
         <!-- Mobile Menu Toggle -->
-        <button class="btn btn-secondary d-lg-none mobile-menu-toggle" @click="toggleSidebar"
+        <button v-if="currentHash !== 'qr'" class="btn btn-secondary d-lg-none mobile-menu-toggle" @click="toggleSidebar"
             aria-label="Toggle navigation">
             <i class="bi bi-list fs-5"></i>
         </button>
 
         <!-- Sidebar Overlay -->
-        <div class="sidebar-overlay" :class="{ show: sidebarOpen }" @click="closeSidebar"></div>
+        <div v-if="currentHash !== 'qr'" class="sidebar-overlay" :class="{ show: sidebarOpen }" @click="closeSidebar"></div>
 
         <!-- Sidebar -->
-        <nav class="sidebar" :class="{ 'mobile-open': sidebarOpen }">
+        <nav v-if="currentHash !== 'qr'" class="sidebar" :class="{ 'mobile-open': sidebarOpen }">
             <div class="scroll-hint-shell sidebar-main-shell">
                 <div class="sidebar-main">
                     <div class="sidebar-brand">
@@ -110,11 +110,11 @@
         </nav>
 
         <!-- Main content -->
-        <main class="main-content">
+        <main class="main-content" :class="{ 'qr-page-mode': currentHash === 'qr' }">
             <div class="scroll-hint-shell content-scroll-shell">
-                <div id="content-container" class="page-content py-4">
+                <div id="content-container" class="page-content" :class="currentHash === 'qr' ? 'py-0' : 'py-4'">
                     <home-view v-if="currentHash === 'home'"></home-view>
-                    <card-view v-else-if="currentHash === 'card'"></card-view>
+                    <qr-view v-else-if="currentHash === 'qr'"></qr-view>
                     <photography-view v-else-if="currentHash === 'photography'"></photography-view>
                     <travelling-view v-else-if="currentHash === 'travelling'"></travelling-view>
                     <departures-view v-else-if="currentHash === 'departures'"></departures-view>
@@ -181,7 +181,7 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="assets/js/widget_spotify.js"></script>
     <script src="assets/js/page_home.js"></script>
-    <script src="assets/js/page_card.js"></script>
+    <script src="assets/js/page_qr.js"></script>
     <script src="assets/js/page_photography.js"></script>
     <script src="assets/js/page_travelling.js"></script>
     <script src="assets/js/page_other.js"></script>
@@ -196,7 +196,7 @@
         createApp({
             components: {
                 'home-view': HomeView,
-                'card-view': CardView,
+                'qr-view': QrView,
                 'photography-view': PhotographyView,
                 'travelling-view': TravellingView,
                 'departures-view': DeparturesView,
@@ -246,8 +246,7 @@
                     navigation: [
                         {
                             items: [
-                                { id: 'home', label: 'Home', icon: 'home.svg' },
-                                { id: 'card', label: 'Business Card', icon: 'briefcase.svg' }
+                                { id: 'home', label: 'Home', icon: 'home.svg' }
                             ]
                         },
                         {
@@ -309,6 +308,10 @@
                 },
                 updateFromHash() {
                     const hash = window.location.hash.substring(1) || 'home'
+                    if (hash === 'card') {
+                        window.location.hash = 'home'
+                        return
+                    }
                     this.currentHash = hash === 'privacy-policy' ? 'privacy-policy-main' : hash
                     this.loadPageContent(this.currentHash)
                     this.syncRobotsMeta()
