@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "updatedAt": "2026-02-25",
+  "trips": [
+    {
+      "id": "ESC-2025",
+      "file": "ESC-2025.json"
+    },
+    {
+      "id": "alps-weekend-2026",
+      "file": "alps-weekend-2026.json"
+    }
+  ]
+}

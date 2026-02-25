@@ -1,0 +1,58 @@
+{
+  "id": "alps-weekend-2026",
+  "name": "Alps Weekend",
+  "dateRange": "Jun 19-22, 2026",
+  "summary": "Compact mountain trip with scenic regional legs and short hikes.",
+  "stops": [
+    {
+      "id": "munich-start",
+      "name": "Munich Start",
+      "date": "2026-06-19",
+      "location": "Munich, Germany",
+      "transport": "Regional Express",
+      "description": "Quick city breakfast before boarding southbound.",
+      "images": [
+        {
+          "src": "https://picsum.photos/id/1033/1400/900",
+          "alt": "Station concourse",
+          "caption": "Morning start in Munich"
+        }
+      ]
+    },
+    {
+      "id": "innsbruck-day",
+      "name": "Innsbruck Midpoint",
+      "date": "2026-06-20",
+      "location": "Innsbruck, Austria",
+      "transport": "EuroCity",
+      "description": "Cable car ride, mountain panoramas, and old-town evening walk.",
+      "images": [
+        {
+          "src": "https://picsum.photos/id/1036/1400/900",
+          "alt": "Mountain skyline",
+          "caption": "View over Innsbruck"
+        },
+        {
+          "src": "https://picsum.photos/id/1073/1400/900",
+          "alt": "Historic street",
+          "caption": "Old-town walk"
+        }
+      ]
+    },
+    {
+      "id": "return-leg",
+      "name": "Return Leg",
+      "date": "2026-06-22",
+      "location": "Back to Munich, Germany",
+      "transport": "Railjet",
+      "description": "Final morning in the Alps and direct return in the afternoon.",
+      "images": [
+        {
+          "src": "https://picsum.photos/id/1059/1400/900",
+          "alt": "Train through mountain valley",
+          "caption": "Scenic return route"
+        }
+      ]
+    }
+  ]
+}

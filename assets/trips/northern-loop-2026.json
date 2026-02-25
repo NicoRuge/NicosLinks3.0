@@ -1,0 +1,63 @@
+{
+  "id": "northern-loop-2026",
+  "name": "Northern Loop",
+  "dateRange": "May 2-8, 2026",
+  "summary": "One week route with rail and ferry segments across northern cities.",
+  "stops": [
+    {
+      "id": "berlin-hbf",
+      "name": "Berlin Departure",
+      "date": "2026-05-02",
+      "location": "Berlin, Germany",
+      "transport": "ICE",
+      "description": "Started early from Berlin Hbf, coffee at the platform, and boarded northbound.",
+      "images": [
+        {
+          "src": "https://picsum.photos/id/1019/1400/900",
+          "alt": "Train platform in morning light",
+          "caption": "Departure from Berlin Hbf"
+        },
+        {
+          "src": "https://picsum.photos/id/1020/1400/900",
+          "alt": "High speed train at station",
+          "caption": "ICE ready for boarding"
+        }
+      ]
+    },
+    {
+      "id": "hamburg-day",
+      "name": "Hamburg Stopover",
+      "date": "2026-05-03",
+      "location": "Hamburg, Germany",
+      "transport": "S-Bahn + Walk",
+      "description": "Harbor walk, warehouse district photos, and an evening around the Elbe.",
+      "images": [
+        {
+          "src": "https://picsum.photos/id/1048/1400/900",
+          "alt": "Harbor view at sunset",
+          "caption": "Sunset by the harbor"
+        }
+      ]
+    },
+    {
+      "id": "copenhagen-arrival",
+      "name": "Copenhagen Arrival",
+      "date": "2026-05-05",
+      "location": "Copenhagen, Denmark",
+      "transport": "Intercity + Metro",
+      "description": "Crossed the border by rail and spent the afternoon around Nyhavn and central canals.",
+      "images": [
+        {
+          "src": "https://picsum.photos/id/1060/1400/900",
+          "alt": "Colorful waterfront houses",
+          "caption": "Evening at Nyhavn"
+        },
+        {
+          "src": "https://picsum.photos/id/1067/1400/900",
+          "alt": "Cyclists in a city street",
+          "caption": "City ride through central district"
+        }
+      ]
+    }
+  ]
+}

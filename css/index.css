@@ -209,6 +209,20 @@ body {
     opacity: 1;
 }
 
+[data-bs-theme="light"] .trips-page .card,
+[data-bs-theme="light"] .trips-page .trip-timeline-list .list-group-item:not(.active) {
+    background-color: #dddddc;
+}
+
+[data-bs-theme="light"] .trips-page .trip-timeline-list .list-group-item:not(.active) {
+    border-color: color-mix(in srgb, var(--film-600) 20%, transparent);
+}
+
+[data-bs-theme="light"] .trips-page .badge.text-bg-light {
+    background-color: #dddddc !important;
+    color: var(--film-900) !important;
+}
+
 /* Sidebar styling */
 .sidebar {
     position: fixed;
@@ -628,6 +642,46 @@ body {
 .sidebar .nav-link.active {
     color: var(--shadow-900);
     background-color: var(--color-primary);
+}
+
+.timeline-progress {
+    height: 0.55rem;
+    border-radius: 999px;
+}
+
+.timeline-progress .progress-bar {
+    background-color: var(--color-primary);
+}
+
+.trips-card-title {
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+}
+
+.trip-timeline-scroll {
+    max-height: 15.9rem;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+}
+
+.trip-timeline-list .list-group-item {
+    border-radius: 0.8rem;
+    margin-bottom: 0.35rem;
+    border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
+}
+
+.trip-timeline-list .list-group-item small {
+    color: color-mix(in srgb, var(--color-text) 58%, transparent);
+}
+
+.trip-timeline-list .list-group-item.active small {
+    color: color-mix(in srgb, var(--shadow-900) 72%, transparent);
+}
+
+.trip-stop-image {
+    width: 100%;
+    height: clamp(240px, 38vw, 500px);
+    object-fit: cover;
 }
 
 .sidebar-icon {

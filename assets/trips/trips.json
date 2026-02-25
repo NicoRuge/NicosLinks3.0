@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "updatedAt": "2026-02-25",
+  "trips": [
+    {
+      "id": "iberian-spring-2025",
+      "name": "Iberian Spring Escape",
+      "dateRange": "Apr 7-14, 2025",
+      "summary": "One week by train through Spain and Portugal with city walks, museums, and sunset viewpoints.",
+      "stops": [
+        {
+          "id": "madrid-arrival",
+          "date": "2025-04-07",
+          "name": "Madrid Arrival",
+          "location": "Madrid, Spain",
+          "transport": "Railjet + Metro",
+          "description": "Checked in near Atocha, explored Retiro Park, and ended the day with tapas in La Latina.",
+          "images": [
+            {
+              "src": "https://picsum.photos/id/1043/1400/900",
+              "alt": "A city avenue with evening light",
+              "caption": "Golden hour near Retiro Park"
+            },
+            {
+              "src": "https://picsum.photos/id/1011/1400/900",
+              "alt": "People walking in a plaza",
+              "caption": "First evening in Madrid"
+            }
+          ]
+        },
+        {
+          "id": "toledo-day-trip",
+          "date": "2025-04-09",
+          "name": "Toledo Day Trip",
+          "location": "Toledo, Spain",
+          "transport": "AVE",
+          "description": "A day trip for old town streets, cathedral views, and river panoramas.",
+          "images": [
+            {
+              "src": "https://picsum.photos/id/1025/1400/900",
+              "alt": "Hilltop city skyline",
+              "caption": "View over the historic center"
+            }
+          ]
+        },
+        {
+          "id": "lisbon-finish",
+          "date": "2025-04-13",
+          "name": "Lisbon Finale",
+          "location": "Lisbon, Portugal",
+          "transport": "Intercity Train",
+          "description": "Rode tram lines, visited the waterfront, and finished the trip with sunset at Miradouro da Senhora do Monte.",
+          "images": [
+            {
+              "src": "https://picsum.photos/id/1056/1400/900",
+              "alt": "Hillside neighborhood at sunset",
+              "caption": "Last evening in Lisbon"
+            },
+            {
+              "src": "https://picsum.photos/id/1074/1400/900",
+              "alt": "Seafront promenade",
+              "caption": "Walking along the Tagus"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "alpine-loop-2024",
+      "name": "Alpine Loop",
+      "dateRange": "Sep 2-8, 2024",
+      "summary": "A scenic mountain loop with stops in Zurich, Innsbruck, and Bolzano.",
+      "stops": [
+        {
+          "id": "zurich-start",
+          "date": "2024-09-02",
+          "name": "Zurich Start",
+          "location": "Zurich, Switzerland",
+          "transport": "S-Bahn",
+          "description": "Started by the lake and visited old town viewpoints before heading east.",
+          "images": [
+            {
+              "src": "https://picsum.photos/id/1003/1400/900",
+              "alt": "Lakefront with mountains",
+              "caption": "Morning at Lake Zurich"
+            }
+          ]
+        },
+        {
+          "id": "innsbruck-midpoint",
+          "date": "2024-09-05",
+          "name": "Innsbruck Midpoint",
+          "location": "Innsbruck, Austria",
+          "transport": "EuroCity",
+          "description": "Mountain backdrop all day, cable car ride, and old town walk at night.",
+          "images": [
+            {
+              "src": "https://picsum.photos/id/1036/1400/900",
+              "alt": "Town with mountains in the background",
+              "caption": "View from Nordkette"
+            },
+            {
+              "src": "https://picsum.photos/id/1038/1400/900",
+              "alt": "Historic town street",
+              "caption": "Evening streets in Innsbruck"
+            }
+          ]
+        },
+        {
+          "id": "bolzano-end",
+          "date": "2024-09-08",
+          "name": "Bolzano Wrap-Up",
+          "location": "Bolzano, Italy",
+          "transport": "Regional Express",
+          "description": "Final stop for coffee, market streets, and a relaxed afternoon before the return.",
+          "images": [
+            {
+              "src": "https://picsum.photos/id/1024/1400/900",
+              "alt": "Open market square",
+              "caption": "Final stop atmosphere"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

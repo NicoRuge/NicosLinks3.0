@@ -1,0 +1,45 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Helvetica;}{\f1 Helvetica-Bold;}}
+\paperw12240\paperh15840\margl900\margr900\margt900\margb900
+\fs22
+\pard\f1\fs32 Nico's Links - App Summary\par
+\pard\fs6\par
+
+\pard\f1\fs24 What it is\f0\fs22\par
+\pard Nico's Links is a personal portfolio and utility web app for Nico Ruge, built as a client-side single-page site with route-based sections. It combines creative showcase pages with practical tools such as transit departures, travel mapping, and an X thread formatter.\par
+\fs6\par
+
+\pard\f1\fs24 Who it's for\f0\fs22\par
+\pard Primary persona: Nico Ruge and visitors interested in his photography, travel activity, and personal web utilities.\par
+\fs6\par
+
+\pard\f1\fs24 What it does\f0\fs22\par
+\pard\li300
+\bullet\tab Presents a themed multi-section SPA shell (Home, Work, Projects, Other) with hash navigation and responsive sidebar.\par
+\bullet\tab Shows a photography portfolio with Unsplash-backed carousels and lightbox links.\par
+\bullet\tab Renders an interactive Mapbox travel map using local GeoJSON layers (trains, buses, ferry, sights) and filters.\par
+\bullet\tab Provides live station lookup and departure boards via transport.rest API calls with mode filtering and refresh.\par
+\bullet\tab Embeds Tumblr blog content with paging, detail view, and media lightbox.\par
+\bullet\tab Includes an X Thread Viewer that builds a Reddit-style nested thread view from pasted X links.\par
+\pard\li0
+\fs6\par
+
+\pard\f1\fs24 How it works (repo evidence)\f0\fs22\par
+\pard\li300
+\bullet\tab Frontend: static HTML + Vue 3 app in \f1 index.html\f0  that mounts page components from \f1 assets/js/page_*.js\f0 .\par
+\bullet\tab UI/styling: Bootstrap 5 + custom CSS in \f1 css/index.css\f0  and \f1 css/pages.css\f0 ; assets in \f1 assets/icons\f0 , \f1 assets/fonts\f0 , \f1 assets/images\f0 .\par
+\bullet\tab Data flow: browser fetches external APIs (transport.rest, Tumblr, X oEmbed, Tr\'e4welling) and local GeoJSON; widgets poll/update in client JS.\par
+\bullet\tab Server-side helpers: Netlify Functions in \f1 netlify/functions\f0  expose Spotify status (credentialed) and Mapbox token endpoints used by frontend.\par
+\bullet\tab Persistence/state: hash route + in-memory component state; theme preference stored in \f1 localStorage\f0 .\par
+\pard\li0
+\fs6\par
+
+\pard\f1\fs24 How to run (minimal)\f0\fs22\par
+\pard\li300
+\bullet\tab Serve the repo root as a static site (for example: \f1 cd /Users/nicoruge/Documents/GitHub/NicosLinks3 && python3 -m http.server 8000\f0 ).\par
+\bullet\tab Open \f1 http://localhost:8000\f0  and navigate sections via hash routes.\par
+\bullet\tab Optional for full behavior: deploy with Netlify Functions and set env vars for Spotify/Mapbox tokens.\par
+\bullet\tab Build scripts / package manager config: \f1 Not found in repo.\f0\par
+\bullet\tab Automated test setup: \f1 Not found in repo.\f0\par
+\pard\li0
+}

@@ -117,6 +117,7 @@
                     <qr-view v-else-if="currentHash === 'qr'"></qr-view>
                     <photography-view v-else-if="currentHash === 'photography'"></photography-view>
                     <travelling-view v-else-if="currentHash === 'travelling'"></travelling-view>
+                    <trip-sample-view v-else-if="currentHash === 'trips'"></trip-sample-view>
                     <departures-view v-else-if="currentHash === 'departures'"></departures-view>
                     <camera-equipment-view v-else-if="currentHash === 'camera-equipment'"></camera-equipment-view>
                     <blog-view v-else-if="currentHash === 'blog'"></blog-view>
@@ -184,6 +185,7 @@
     <script src="assets/js/page_qr.js"></script>
     <script src="assets/js/page_photography.js"></script>
     <script src="assets/js/page_travelling.js"></script>
+    <script src="assets/js/page_trips.js"></script>
     <script src="assets/js/page_other.js"></script>
     <script src="assets/js/page_departures.js"></script>
     <script src="assets/js/page_camera_equipment.js"></script>
@@ -199,6 +201,7 @@
                 'qr-view': QrView,
                 'photography-view': PhotographyView,
                 'travelling-view': TravellingView,
+                'trip-sample-view': TripSampleView,
                 'departures-view': DeparturesView,
                 'camera-equipment-view': CameraEquipmentView,
                 'blog-view': BlogView,
@@ -257,7 +260,8 @@
                         },
                         {
                             title: 'Projects', items: [
-                                { id: 'travelling', label: 'Travelling', icon: 'globe.svg' },
+                                { id: 'travelling', label: 'Travel Map', icon: 'globe.svg' },
+                                { id: 'trips', label: 'Trips', icon: 'plane.svg' },
                                 { id: 'departures', label: 'Departures', icon: 'train-front.svg' }
                             ]
                         },

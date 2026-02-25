@@ -8,7 +8,7 @@ const TravellingView = {
 		                    <section v-if="!isMapFullscreen" class="portfolio-hero rounded-4 p-4 p-lg-5 mb-4">
 		                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
 		                            <div>
-		                                <h1 class="hero-title mb-2">Travelling</h1>
+		                                <h1 class="hero-title mb-2">Travel Map</h1>
 		                                <p class="mb-0 hero-subtitle">Explore mapped rides, transport types, and sights from one interactive view.</p>
 		                            </div>
 		                            <button
