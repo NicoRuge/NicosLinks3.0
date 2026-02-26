@@ -84,6 +84,46 @@
             </div>
 
             <div class="sidebar-now-playing">
+                <div class="sidebar-utility-pill" role="group" aria-label="Theme and language controls">
+                    <div class="dropdown flex-fill">
+                        <button
+                            class="btn sidebar-utility-btn dropdown-toggle d-flex align-items-center justify-content-center w-100"
+                            id="sidebar-theme-toggle" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                            aria-label="Toggle theme">
+                            <i :class="activeThemeIcon" class="me-2 theme-icon-active"></i>
+                            Theme
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li v-for="t in themes" :key="t.value">
+                                <button type="button" class="dropdown-item d-flex align-items-center"
+                                    :class="{ active: storedTheme === t.value }" @click="setTheme(t.value)">
+                                    <i :class="t.icon" class="me-2 opacity-50"></i>
+                                    {{ t.label }}
+                                    <i v-if="storedTheme === t.value" class="bi bi-check2 ms-auto"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="dropdown flex-fill">
+                        <button
+                            class="btn sidebar-utility-btn dropdown-toggle d-flex align-items-center justify-content-center w-100"
+                            id="sidebar-language-toggle" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                            aria-label="Toggle language">
+                            <i class="bi bi-translate me-2"></i>
+                            Language
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li v-for="l in languages" :key="l.value">
+                                <button type="button" class="dropdown-item d-flex align-items-center"
+                                    :class="{ active: lang === l.value }" @click="setLanguage(l.value)">
+                                    <i class="bi bi-translate me-2 opacity-50"></i>
+                                    {{ l.label }}
+                                    <i v-if="lang === l.value" class="bi bi-check2 ms-auto"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 <div id="spotify-sidebar-widget" class="sidebar-now-playing-widget">
                     <div class="skeleton-box" style="width: 70%; height: 12px; margin-bottom: 10px;"></div>
                     <div class="d-flex align-items-center gap-2">
@@ -99,12 +139,12 @@
             <div class="sidebar-legal">
                 <a class="nav-link sidebar-legal-link" :class="{ active: currentHash === 'imprint' }" href="#"
                     @click.prevent="navigate('imprint'); closeSidebar()">
-                    Imprint
+                    {{ t('nav.imprint') }}
                 </a>
                 <a class="nav-link sidebar-legal-link"
                     :class="{ active: currentHash === 'privacy-policy' || currentHash === 'privacy-policy-main' || currentHash === 'privacy-policy-cloud' }"
                     href="#" @click.prevent="navigate('privacy-policy-main'); closeSidebar()">
-                    Privacy Policy
+                    {{ t('nav.privacyPolicy') }}
                 </a>
             </div>
         </nav>
@@ -112,7 +152,7 @@
         <!-- Main content -->
         <main class="main-content" :class="{ 'qr-page-mode': currentHash === 'qr' }">
             <div class="scroll-hint-shell content-scroll-shell">
-                <div id="content-container" class="page-content" :class="currentHash === 'qr' ? 'py-0' : 'py-4'">
+                <div id="content-container" class="page-content" :class="currentHash === 'qr' || currentHash === 'home' ? 'py-0' : 'py-4'">
                     <home-view v-if="currentHash === 'home'"></home-view>
                     <qr-view v-else-if="currentHash === 'qr'"></qr-view>
                     <photography-view v-else-if="currentHash === 'photography'"></photography-view>
@@ -145,34 +185,10 @@
             </div>
 
             <footer class="footer mt-auto py-3 bg-body-tertiary border-top">
-                <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center">
+                <div class="container-fluid d-flex flex-wrap justify-content-start align-items-center">
                     <div class="col-md-4 d-flex align-items-center">
                         <span class="mb-3 mb-md-0 text-body-secondary">Made with ❤ on an ICE 3neo</span>
                     </div>
-
-                    <ul class="nav col-md-4 justify-content-end list-unstyled d-flex align-items-center">
-                        <li class="ms-3">
-                            <div class="dropdown">
-                                <button
-                                    class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center text-body-secondary"
-                                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
-                                    aria-label="Toggle theme">
-                                    <i :class="activeThemeIcon" class="me-2 theme-icon-active"></i>
-                                    <span class="d-lg-none ms-2">Toggle theme</span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow">
-                                    <li v-for="t in themes" :key="t.value">
-                                        <button type="button" class="dropdown-item d-flex align-items-center"
-                                            :class="{ active: storedTheme === t.value }" @click="setTheme(t.value)">
-                                            <i :class="t.icon" class="me-2 opacity-50"></i>
-                                            {{ t.label }}
-                                            <i v-if="storedTheme === t.value" class="bi bi-check2 ms-auto"></i>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
                 </div>
             </footer>
         </main>
@@ -194,6 +210,38 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script>
         const { createApp } = Vue
+        const SIDEBAR_I18N = {
+            de: {
+                'nav.home': 'Start',
+                'nav.section.work': 'Arbeit',
+                'nav.photography': 'Fotografie',
+                'nav.cameraEquipment': 'Kameraausruestung',
+                'nav.section.projects': 'Projekte',
+                'nav.travelMap': 'Reisekarte',
+                'nav.trips': 'Reisen',
+                'nav.departures': 'Abfahrten',
+                'nav.section.otherStuff': 'Sonstiges',
+                'nav.blog': 'Blog',
+                'nav.xThreadViewer': 'X Thread Viewer',
+                'nav.imprint': 'Impressum',
+                'nav.privacyPolicy': 'Datenschutz'
+            },
+            en: {
+                'nav.home': 'Home',
+                'nav.section.work': 'Work',
+                'nav.photography': 'Photography',
+                'nav.cameraEquipment': 'Camera Equipment',
+                'nav.section.projects': 'Projects',
+                'nav.travelMap': 'Travel Map',
+                'nav.trips': 'Trips',
+                'nav.departures': 'Departures',
+                'nav.section.otherStuff': 'Other Stuff',
+                'nav.blog': 'Blog',
+                'nav.xThreadViewer': 'X Thread Viewer',
+                'nav.imprint': 'Imprint',
+                'nav.privacyPolicy': 'Privacy Policy'
+            }
+        }
 
         createApp({
             components: {
@@ -214,6 +262,7 @@
                     currentHash: 'home',
                     contentFragment: '',
                     storedTheme: localStorage.getItem('theme') || 'auto',
+                    lang: localStorage.getItem('lang') || 'de',
                     activeTheme: 'light',
                     sidebarOpen: false,
                     scrollHintUpdate: null,
@@ -246,29 +295,29 @@
                         'Queer gegen Rechts!',
                         'Nie wieder 1933!',
                     ],
-                    navigation: [
+                    navigationConfig: [
                         {
                             items: [
-                                { id: 'home', label: 'Home', icon: 'home.svg' }
+                                { id: 'home', labelKey: 'nav.home', icon: 'home.svg' }
                             ]
                         },
                         {
-                            title: 'Work', items: [
-                                { id: 'photography', label: 'Photography', icon: 'images.svg' },
-                                { id: 'camera-equipment', label: 'Camera Equipment', icon: 'camera.svg' }
+                            titleKey: 'nav.section.work', items: [
+                                { id: 'photography', labelKey: 'nav.photography', icon: 'images.svg' },
+                                { id: 'camera-equipment', labelKey: 'nav.cameraEquipment', icon: 'camera.svg' }
                             ]
                         },
                         {
-                            title: 'Projects', items: [
-                                { id: 'travelling', label: 'Travel Map', icon: 'globe.svg' },
-                                { id: 'trips', label: 'Trips', icon: 'plane.svg' },
-                                { id: 'departures', label: 'Departures', icon: 'train-front.svg' }
+                            titleKey: 'nav.section.projects', items: [
+                                { id: 'travelling', labelKey: 'nav.travelMap', icon: 'globe.svg' },
+                                { id: 'trips', labelKey: 'nav.trips', icon: 'plane.svg' },
+                                { id: 'departures', labelKey: 'nav.departures', icon: 'train-front.svg' }
                             ]
                         },
                         {
-                            title: 'Other Stuff', items: [
-                                { id: 'blog', label: 'Blog', icon: 'book-open-text.svg' },
-                                { id: 'x-thread-viewer', label: 'X Thread Viewer', icon: 'twitter.svg' }
+                            titleKey: 'nav.section.otherStuff', items: [
+                                { id: 'blog', labelKey: 'nav.blog', icon: 'book-open-text.svg' },
+                                { id: 'x-thread-viewer', labelKey: 'nav.xThreadViewer', icon: 'twitter.svg' }
                             ]
                         }
                     ],
@@ -276,6 +325,10 @@
                         { value: 'light', label: 'Light', icon: 'bi-sun-fill text-warning' },
                         { value: 'dark', label: 'Dark', icon: 'bi-moon-stars-fill text-primary' },
                         { value: 'auto', label: 'Auto', icon: 'bi-circle-half' }
+                    ],
+                    languages: [
+                        { value: 'de', label: 'Deutsch' },
+                        { value: 'en', label: 'English' }
                     ]
                 }
             },
@@ -284,9 +337,27 @@
                     const found = this.themes.find(t => t.value === this.storedTheme)
                     const icon = found ? found.icon : 'bi-circle-half'
                     return icon.replace('text-warning', '').replace('text-primary', '')
+                },
+                navigation() {
+                    return this.navigationConfig.map((section) => ({
+                        title: section.titleKey ? this.t(section.titleKey) : '',
+                        items: section.items.map((item) => ({
+                            ...item,
+                            label: this.t(item.labelKey)
+                        }))
+                    }))
                 }
             },
             methods: {
+                t(key) {
+                    return SIDEBAR_I18N[this.lang]?.[key] || SIDEBAR_I18N.en[key] || key
+                },
+                setLanguage(lang) {
+                    const normalized = lang === 'en' ? 'en' : 'de'
+                    this.lang = normalized
+                    localStorage.setItem('lang', normalized)
+                    document.documentElement.setAttribute('lang', normalized)
+                },
                 loadPageContent(page) {
                     this.contentFragment = '';
                 },
@@ -405,6 +476,7 @@
                 }
             },
             mounted() {
+                this.setLanguage(this.lang)
                 this.updateFromHash()
                 this.applyTheme()
                 this.showDesktopToast()
