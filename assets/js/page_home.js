@@ -1,7 +1,7 @@
 const HomeView = {
     template: `
         <div class="container-fluid py-4 home-page">
-            <div class="row justify-content-start">
+            <div class="row justify-content-center">
                 <div class="col-12 hero-page-shell">
                     <section class="portfolio-hero rounded-4 p-4 p-lg-5 mb-4 home-hero">
                         <div class="row g-4 align-items-center">

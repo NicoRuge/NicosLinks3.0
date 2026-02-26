@@ -10,7 +10,7 @@ const TripSampleView = {
                             Explore your journeys stop by stop with a structured timeline, detailed trip notes, and image carousels for every location.
                         </p>
                         <p class="hero-subtitle mb-0">
-                            Tip: Choose a trip on the left, then click any timeline stop to jump directly to that moment. Edit <code>assets/trips/trip-index.json</code> and the trip JSON files in <code>assets/trips/</code> to add your own routes.
+                            Note: Images are currently in <code>.jpg</code> format, so file sizes may be larger.
                         </p>
                     </section>
 
@@ -109,7 +109,7 @@ const TripSampleView = {
                                     v-if="activeStop.images && activeStop.images.length"
                                     :key="activeCarouselId"
                                     :id="activeCarouselId"
-                                    class="carousel slide rounded-4 overflow-hidden border"
+                                    class="carousel slide trip-stop-carousel rounded-4 overflow-hidden border"
                                     data-bs-touch="true"
                                     data-bs-ride="false"
                                 >
