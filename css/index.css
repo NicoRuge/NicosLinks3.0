@@ -682,6 +682,50 @@ body {
     width: 100%;
     height: clamp(240px, 38vw, 500px);
     object-fit: cover;
+    cursor: zoom-in;
+}
+
+.trips-page .carousel-control-prev,
+.trips-page .carousel-control-next {
+    opacity: 1;
+}
+
+.trips-page .carousel-control-prev-icon,
+.trips-page .carousel-control-next-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: #111111;
+    background-size: 52% 52%;
+    filter: none;
+}
+
+.trips-page .carousel-control-prev-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23ffffff' viewBox='0 0 16 16'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+}
+
+.trips-page .carousel-control-next-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23ffffff' viewBox='0 0 16 16'%3e%3cpath d='M4.646 14.354a.5.5 0 0 1 0-.708L10.293 8 4.646 2.354a.5.5 0 1 1 .708-.708l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708 0z'/%3e%3c/svg%3e");
+}
+
+[data-bs-theme="dark"] .trips-page .carousel-control-prev-icon,
+[data-bs-theme="dark"] .trips-page .carousel-control-next-icon {
+    background-color: #f2f1ec;
+    filter: none;
+}
+
+[data-bs-theme="dark"] .trips-page .carousel-control-prev-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23111111' viewBox='0 0 16 16'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+}
+
+[data-bs-theme="dark"] .trips-page .carousel-control-next-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23111111' viewBox='0 0 16 16'%3e%3cpath d='M4.646 14.354a.5.5 0 0 1 0-.708L10.293 8 4.646 2.354a.5.5 0 1 1 .708-.708l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708 0z'/%3e%3c/svg%3e");
+}
+
+.trips-page .carousel-caption,
+.trips-page .carousel-caption p {
+    color: #fff;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
 
 .sidebar-icon {

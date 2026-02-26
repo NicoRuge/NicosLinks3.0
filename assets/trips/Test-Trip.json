@@ -1,0 +1,58 @@
+{
+  "id": "Test-Trip",
+  "name": "Test Trip",
+  "dateRange": "Jun 19-22, 2026",
+  "summary": "Einfach eine Testreise mit einigen Stopps.",
+  "stops": [
+    {
+      "id": "rostock-start",
+      "name": "Rostock",
+      "date": "2026-06-19",
+      "location": "Rostock, Germany",
+      "transport": "Regional Express",
+      "description": "Quick city breakfast before boarding southbound.",
+      "images": [
+        {
+          "src": "https://picsum.photos/id/1033/1400/900",
+          "alt": "Station concourse",
+          "caption": "Morning start in Rostock"
+        }
+      ]
+    },
+    {
+      "id": "Berlin",
+      "name": "Berlin",
+      "date": "2026-06-20",
+      "location": "Berlin, Germany",
+      "transport": "ICE",
+      "description": "Visit to the Brandenburg Gate and Museum Island.",
+      "images": [
+        {
+          "src": "https://picsum.photos/id/1036/1400/900",
+          "alt": "Brandenburg Gate",
+          "caption": "Brandenburg Gate in Berlin"
+        },
+        {
+          "src": "https://picsum.photos/id/1073/1400/900",
+          "alt": "Museum Island",
+          "caption": "Museum Island in Berlin"
+        }
+      ]
+    },
+    {
+      "id": "return-leg",
+      "name": "Return Leg",
+      "date": "2026-06-22",
+      "location": "Back to Munich, Germany",
+      "transport": "Railjet",
+      "description": "Final morning in the Alps and direct return in the afternoon.",
+      "images": [
+        {
+          "src": "https://picsum.photos/id/1059/1400/900",
+          "alt": "Train through mountain valley",
+          "caption": "Scenic return route"
+        }
+      ]
+    }
+  ]
+}

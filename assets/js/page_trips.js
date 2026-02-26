@@ -34,7 +34,8 @@ const TripSampleView = {
                                         <div class="row g-3 align-items-end">
                                             <div class="col-12 col-xl-8">
                                                 <label for="trip-select" class="form-label mb-2 fw-semibold trips-card-title">Select Trip</label>
-                                                <select id="trip-select" class="form-select" v-model.number="activeTripIndex" @change="setStop(0)">
+                                                <select id="trip-select" class="form-select" v-model="activeTripIndex" @change="onTripChange">
+                                                    <option value="">Choose Trip</option>
                                                     <option v-for="(trip, index) in tripOptions" :key="trip.id || index" :value="index">
                                                         {{ trip.name }} ({{ trip.dateRange }})
                                                     </option>
@@ -55,40 +56,45 @@ const TripSampleView = {
                             <div class="col-12 col-lg-6">
                                 <div class="card border-0 shadow-sm h-100">
                                     <div class="card-body p-4">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <div class="form-label mb-0 fw-semibold trips-card-title">Timeline</div>
-                                            <small class="text-secondary">{{ activeTrip.dateRange }}</small>
-                                        </div>
-
-                                        <div class="progress timeline-progress mb-3" role="progressbar" aria-label="Timeline progress" aria-valuemin="0" :aria-valuemax="Math.max(activeStops.length - 1, 1)" :aria-valuenow="activeStopIndex">
-                                            <div class="progress-bar" :style="{ width: progressPercent + '%' }"></div>
-                                        </div>
-
-                                        <div ref="timelineScroll" class="trip-timeline-scroll">
-                                            <div class="list-group trip-timeline-list">
-                                                <button
-                                                    v-for="(stop, index) in activeStops"
-                                                    :key="stop.id || index"
-                                                    :ref="(el) => setTimelineItemRef(el, index)"
-                                                    type="button"
-                                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-start"
-                                                    :class="{ active: index === activeStopIndex }"
-                                                    @click="setStop(index)"
-                                                >
-                                                    <span class="me-3">
-                                                        <span class="badge rounded-pill text-bg-dark me-2">{{ index + 1 }}</span>
-                                                        <span class="fw-semibold">{{ stop.name }}</span>
-                                                    </span>
-                                                    <small>{{ formatDate(stop.date) }}</small>
-                                                </button>
+                                        <template v-if="hasSelectedTrip">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div class="form-label mb-0 fw-semibold trips-card-title">Timeline</div>
+                                                <small class="text-secondary">{{ activeTrip.dateRange }}</small>
                                             </div>
+
+                                            <div class="progress timeline-progress mb-3" role="progressbar" aria-label="Timeline progress" aria-valuemin="0" :aria-valuemax="Math.max(activeStops.length - 1, 1)" :aria-valuenow="activeStopIndex">
+                                                <div class="progress-bar" :style="{ width: progressPercent + '%' }"></div>
+                                            </div>
+
+                                            <div ref="timelineScroll" class="trip-timeline-scroll">
+                                                <div class="list-group trip-timeline-list">
+                                                    <button
+                                                        v-for="(stop, index) in activeStops"
+                                                        :key="stop.id || index"
+                                                        :ref="(el) => setTimelineItemRef(el, index)"
+                                                        type="button"
+                                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-start"
+                                                        :class="{ active: index === activeStopIndex }"
+                                                        @click="setStop(index)"
+                                                    >
+                                                        <span class="me-3">
+                                                            <span class="badge rounded-pill text-bg-dark me-2">{{ index + 1 }}</span>
+                                                            <span class="fw-semibold">{{ stop.name }}</span>
+                                                        </span>
+                                                        <small>{{ formatDate(stop.date) }}</small>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <div v-else class="small text-secondary">
+                                            Choose a trip to unlock timeline stops.
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div v-if="activeStop" class="card border-0 shadow-sm">
+                        <div v-if="hasSelectedTrip && activeStop" class="card border-0 shadow-sm">
                             <div class="card-body p-4">
                                 <div class="d-flex flex-wrap gap-2 mb-3">
                                     <span class="badge text-bg-primary">{{ formatDate(activeStop.date) }}</span>
@@ -127,7 +133,13 @@ const TripSampleView = {
                                             class="carousel-item"
                                             :class="{ active: imageIndex === 0 }"
                                         >
-                                            <img :src="image.src" class="d-block w-100 trip-stop-image" :alt="image.alt || activeStop.name">
+                                            <img
+                                                :src="image.src"
+                                                class="d-block w-100 trip-stop-image"
+                                                :alt="image.alt || activeStop.name"
+                                                :data-caption="image.caption || ''"
+                                                @click="handleTripImageClick"
+                                            >
                                             <div v-if="image.caption" class="carousel-caption d-none d-md-block">
                                                 <p class="mb-0">{{ image.caption }}</p>
                                             </div>
@@ -156,6 +168,23 @@ const TripSampleView = {
                                 </div>
                             </div>
                         </div>
+
+                        <div class="modal fade" id="tripLightboxModal" tabindex="-1" aria-hidden="true" ref="tripLightboxModal">
+                            <div class="modal-dialog modal-dialog-centered modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">{{ tripLightboxTitle }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body p-0 bg-body-tertiary">
+                                        <img v-if="tripLightboxImage" :src="tripLightboxImage" :alt="tripLightboxTitle" class="d-block w-100 photo-lightbox-img">
+                                    </div>
+                                    <div v-if="tripLightboxCaption" class="modal-footer justify-content-start">
+                                        <span class="text-secondary">{{ tripLightboxCaption }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -166,12 +195,19 @@ const TripSampleView = {
             isLoading: true,
             loadError: '',
             tripOptions: [],
-            activeTripIndex: 0,
+            activeTripIndex: '',
             activeStopIndex: 0,
-            timelineItemRefs: {}
+            timelineItemRefs: {},
+            tripLightboxImage: '',
+            tripLightboxTitle: 'Image',
+            tripLightboxCaption: '',
+            _tripLightboxModalInstance: null
         };
     },
     computed: {
+        hasSelectedTrip() {
+            return this.activeTripIndex !== '' && this.tripOptions[this.activeTripIndex] !== undefined;
+        },
         activeTrip() {
             return this.tripOptions[this.activeTripIndex] || { name: '', dateRange: '', summary: '', stops: [] };
         },
@@ -186,7 +222,7 @@ const TripSampleView = {
             return (this.activeStopIndex / (this.activeStops.length - 1)) * 100;
         },
         stopCounterLabel() {
-            if (!this.activeStops.length) return '0 / 0 stops';
+            if (!this.hasSelectedTrip || !this.activeStops.length) return '0 / 0 stops';
             return `${this.activeStopIndex + 1} / ${this.activeStops.length} stops`;
         },
         activeCarouselId() {
@@ -200,6 +236,9 @@ const TripSampleView = {
     },
     beforeUnmount() {
         window.removeEventListener('resize', this.handleTimelineResize);
+        if (this._tripLightboxModalInstance) {
+            this._tripLightboxModalInstance.hide();
+        }
     },
     methods: {
         buildAssetUrl(path) {
@@ -230,13 +269,10 @@ const TripSampleView = {
 
                 const trips = tripJsons.filter((trip) => trip && typeof trip === 'object');
                 this.tripOptions = trips;
-                this.activeTripIndex = 0;
+                this.activeTripIndex = '';
                 this.activeStopIndex = 0;
                 this.timelineItemRefs = {};
-                this.$nextTick(() => {
-                    this.updateTimelineViewportHeight();
-                    this.scrollActiveStopToTop();
-                });
+                this.$nextTick(() => this.updateTimelineViewportHeight());
             } catch (error) {
                 const protocolHint = window.location.protocol === 'file:'
                     ? ' Open this project through a local web server (not via file://) so JSON fetch works.'
@@ -247,6 +283,7 @@ const TripSampleView = {
             }
         },
         setStop(index) {
+            if (!this.hasSelectedTrip) return;
             const next = Number(index);
             if (!Number.isFinite(next)) return;
             const maxIndex = Math.max(this.activeStops.length - 1, 0);
@@ -257,13 +294,29 @@ const TripSampleView = {
             });
         },
         setTimelineItemRef(el, index) {
+            if (!this.hasSelectedTrip) return;
             if (el) {
                 this.timelineItemRefs[index] = el;
             } else {
                 delete this.timelineItemRefs[index];
             }
         },
+        onTripChange() {
+            if (!this.hasSelectedTrip) {
+                this.activeStopIndex = 0;
+                this.timelineItemRefs = {};
+                this.$nextTick(() => this.updateTimelineViewportHeight());
+                return;
+            }
+            this.timelineItemRefs = {};
+            this.activeStopIndex = 0;
+            this.$nextTick(() => {
+                this.updateTimelineViewportHeight();
+                this.scrollActiveStopToTop();
+            });
+        },
         scrollActiveStopToTop() {
+            if (!this.hasSelectedTrip) return;
             const container = this.$refs.timelineScroll;
             const activeItem = this.timelineItemRefs[this.activeStopIndex];
             if (!container || !activeItem) return;
@@ -285,6 +338,21 @@ const TripSampleView = {
         },
         handleTimelineResize() {
             this.$nextTick(() => this.updateTimelineViewportHeight());
+        },
+        handleTripImageClick(event) {
+            const img = event?.target?.closest?.('img.trip-stop-image');
+            if (!img) return;
+
+            this.tripLightboxImage = img.getAttribute('src') || '';
+            this.tripLightboxTitle = img.getAttribute('alt') || 'Image';
+            this.tripLightboxCaption = img.getAttribute('data-caption') || '';
+
+            this.$nextTick(() => {
+                const modalEl = this.$refs.tripLightboxModal;
+                if (!modalEl || !window.bootstrap) return;
+                this._tripLightboxModalInstance = window.bootstrap.Modal.getOrCreateInstance(modalEl);
+                this._tripLightboxModalInstance.show();
+            });
         },
         prevStop() {
             this.setStop(this.activeStopIndex - 1);
