@@ -162,6 +162,7 @@
                     <camera-equipment-view v-else-if="currentHash === 'camera-equipment'"></camera-equipment-view>
                     <blog-view v-else-if="currentHash === 'blog'"></blog-view>
                     <x-thread-viewer-view v-else-if="currentHash === 'x-thread-viewer'"></x-thread-viewer-view>
+                    <data-analytics-view v-else-if="currentHash === 'data-analytics'"></data-analytics-view>
                     <imprint-view v-else-if="currentHash === 'imprint'"></imprint-view>
                     <privacy-policy-view
                         v-else-if="currentHash === 'privacy-policy' || currentHash === 'privacy-policy-main' || currentHash === 'privacy-policy-cloud'">
@@ -196,6 +197,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="assets/js/widget_spotify.js"></script>
     <script src="assets/js/page_home.js"></script>
     <script src="assets/js/page_qr.js"></script>
@@ -206,6 +208,7 @@
     <script src="assets/js/page_departures.js"></script>
     <script src="assets/js/page_camera_equipment.js"></script>
     <script src="assets/js/page_x_thread_viewer.js"></script>
+    <script src="assets/js/page_data_analytics.js"></script>
     <script src="assets/js/page_legal.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script>
@@ -223,6 +226,7 @@
                 'nav.section.otherStuff': 'Sonstiges',
                 'nav.blog': 'Blog',
                 'nav.xThreadViewer': 'X Thread Viewer',
+                'nav.dataAnalytics': 'Datenanalyse',
                 'nav.imprint': 'Impressum',
                 'nav.privacyPolicy': 'Datenschutz'
             },
@@ -238,6 +242,7 @@
                 'nav.section.otherStuff': 'Other Stuff',
                 'nav.blog': 'Blog',
                 'nav.xThreadViewer': 'X Thread Viewer',
+                'nav.dataAnalytics': 'Data Analytics',
                 'nav.imprint': 'Imprint',
                 'nav.privacyPolicy': 'Privacy Policy'
             }
@@ -254,6 +259,7 @@
                 'camera-equipment-view': CameraEquipmentView,
                 'blog-view': BlogView,
                 'x-thread-viewer-view': XThreadViewerView,
+                'data-analytics-view': DataAnalyticsView,
                 'imprint-view': ImprintView,
                 'privacy-policy-view': PrivacyPolicyView
             },
@@ -317,7 +323,8 @@
                         {
                             titleKey: 'nav.section.otherStuff', items: [
                                 { id: 'blog', labelKey: 'nav.blog', icon: 'book-open-text.svg' },
-                                { id: 'x-thread-viewer', labelKey: 'nav.xThreadViewer', icon: 'twitter.svg' }
+                                { id: 'x-thread-viewer', labelKey: 'nav.xThreadViewer', icon: 'twitter.svg' },
+                                { id: 'data-analytics', labelKey: 'nav.dataAnalytics', icon: 'bar-chart.svg' }
                             ]
                         }
                     ],

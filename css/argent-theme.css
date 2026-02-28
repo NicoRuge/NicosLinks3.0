@@ -13,14 +13,14 @@
  */
 
 /* ── Google Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
 
 /* ─────────────────────────────────────
    DESIGN TOKENS
    ───────────────────────────────────── */
 :root {
   /* Fonts */
-  --font-display: 'Cormorant Garamond', serif;
+  --font-display: 'Lexend', sans-serif;
   --font-mono:    'Courier Prime', monospace;
 
   /* Film — Warm Neutrals (faded paper tones) */
@@ -290,14 +290,14 @@
    GLOBAL STYLES
    ───────────────────────────────────── */
 body {
-  font-family: var(--font-mono);
+  font-family: 'Lexend', sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  font-weight: 300;
+  font-weight: 700;
   letter-spacing: -0.01em;
 }
 
@@ -488,7 +488,7 @@ code, pre {
 }
 .modal-title {
   font-family: var(--font-display);
-  font-weight: 300;
+  font-weight: 700;
 }
 .btn-close {
   filter: invert(0.7);
@@ -501,7 +501,7 @@ code, pre {
 }
 .offcanvas-title {
   font-family: var(--font-display);
-  font-weight: 300;
+  font-weight: 700;
 }
 
 /* Tooltips */

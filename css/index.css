@@ -1535,13 +1535,8 @@ body {
 }
 
 .map-controls {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 10;
-    width: 280px;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 0.5rem;
 }
 
@@ -2116,5 +2111,27 @@ body {
         box-shadow: none !important;
         break-inside: avoid;
         page-break-inside: avoid;
+    }
+}
+
+/* ── Data Analytics ──────────────────────────────────────── */
+.analytics-chart-card {
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+}
+
+.analytics-chart-wrapper {
+    height: 400px;
+    transition: opacity 0.17s ease, transform 0.17s ease;
+}
+
+.analytics-chart-wrapper.analytics-chart-fade-out {
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+@media (max-width: 767.98px) {
+    .analytics-chart-wrapper {
+        height: 300px;
     }
 }

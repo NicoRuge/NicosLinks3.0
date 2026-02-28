@@ -6,20 +6,85 @@ const TravellingView = {
 		            <div class="row justify-content-center">
 		                <div class="col-12 hero-page-shell">
 		                    <section v-if="!isMapFullscreen" class="portfolio-hero rounded-4 p-4 p-lg-5 mb-4">
-		                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
+		                        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
 		                            <div>
 		                                <h1 class="hero-title mb-2">Travel Map</h1>
 		                                <p class="mb-0 hero-subtitle">Explore mapped rides, transport types, and sights from one interactive view.</p>
 		                            </div>
 		                            <button
-		                                class="btn btn-sm"
-		                                :class="isMapFullscreen ? 'btn-light text-dark' : 'btn-outline-light'"
+		                                class="btn btn-sm btn-outline-light"
 		                                type="button"
 		                                @click="toggleMapFullscreen"
 		                            >
-		                                <i class="bi" :class="isMapFullscreen ? 'bi-fullscreen-exit' : 'bi-arrows-fullscreen'"></i>
-		                                {{ isMapFullscreen ? 'Close Map' : 'Expand Map' }}
+		                                <i class="bi bi-arrows-fullscreen"></i>
+		                                Expand Map
 		                            </button>
+		                        </div>
+		                        <div class="map-controls">
+		                            <!-- Train Rides -->
+		                            <div class="dropdown">
+		                                <button class="btn btn-sm btn-outline-light dropdown-toggle d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+		                                    Train Rides
+		                                </button>
+		                                <ul class="dropdown-menu shadow" id="group-trains">
+		                                    <li>
+		                                        <div class="dropdown-item">
+		                                            <div class="form-check">
+		                                                <input class="form-check-input group-toggle" type="checkbox" data-group="trains" checked id="toggle-trains">
+		                                                <label class="form-check-label fw-bold" for="toggle-trains">Select All</label>
+		                                            </div>
+		                                        </div>
+		                                    </li>
+		                                    <li><hr class="dropdown-divider"></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="nationalExpress" checked id="cb-ne"><label class="form-check-label d-flex align-items-center" for="cb-ne"><span class="legend-color" style="background:#ff0000"></span> National Express</label></div></div></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="regional" checked id="cb-re"><label class="form-check-label d-flex align-items-center" for="cb-re"><span class="legend-color" style="background:#ff8c00"></span> Regional Express</label></div></div></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="suburban" checked id="cb-s"><label class="form-check-label d-flex align-items-center" for="cb-s"><span class="legend-color" style="background:#ffff00"></span> Suburban</label></div></div></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="subway" id="cb-u"><label class="form-check-label d-flex align-items-center" for="cb-u"><span class="legend-color" style="background:#1eff00"></span> Subway</label></div></div></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="tram" id="cb-t"><label class="form-check-label d-flex align-items-center" for="cb-t"><span class="legend-color" style="background:#1100ff"></span> Tram</label></div></div></li>
+		                                </ul>
+		                            </div>
+
+		                            <!-- Other Transport -->
+		                            <div class="dropdown">
+		                                <button class="btn btn-sm btn-outline-light dropdown-toggle d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+		                                    Other Transport
+		                                </button>
+		                                <ul class="dropdown-menu shadow" id="group-other">
+		                                    <li>
+		                                        <div class="dropdown-item">
+		                                            <div class="form-check">
+		                                                <input class="form-check-input group-toggle" type="checkbox" data-group="other" checked id="toggle-other">
+		                                                <label class="form-check-label fw-bold" for="toggle-other">Select All</label>
+		                                            </div>
+		                                        </div>
+		                                    </li>
+		                                    <li><hr class="dropdown-divider"></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="bus" checked id="cb-bus"><label class="form-check-label d-flex align-items-center" for="cb-bus"><span class="legend-color" style="background:#ff00fb"></span> Bus</label></div></div></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="ferry" id="cb-ferry"><label class="form-check-label d-flex align-items-center" for="cb-ferry"><span class="legend-color" style="background:#9500ff"></span> Ferry</label></div></div></li>
+		                                </ul>
+		                            </div>
+
+		                            <!-- Sights -->
+		                            <div class="dropdown">
+		                                <button class="btn btn-sm btn-outline-light dropdown-toggle d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+		                                    Sights
+		                                </button>
+		                                <ul class="dropdown-menu shadow" id="group-sights">
+		                                    <li>
+		                                        <div class="dropdown-item">
+		                                            <div class="form-check">
+		                                                <input class="form-check-input group-toggle" type="checkbox" data-group="sights" checked id="toggle-sights">
+		                                                <label class="form-check-label fw-bold" for="toggle-sights">Select All</label>
+		                                            </div>
+		                                        </div>
+		                                    </li>
+		                                    <li><hr class="dropdown-divider"></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Monument" checked id="cb-mon"><label class="form-check-label d-flex align-items-center" for="cb-mon"><span class="legend-icon">⭐</span> Monument</label></div></div></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Airport" checked id="cb-air"><label class="form-check-label d-flex align-items-center" for="cb-air"><span class="legend-icon">✈️</span> Airport</label></div></div></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Station" checked id="cb-stat"><label class="form-check-label d-flex align-items-center" for="cb-stat"><span class="legend-icon">🚆</span> Station</label></div></div></li>
+		                                    <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Other" checked id="cb-oth"><label class="form-check-label d-flex align-items-center" for="cb-oth"><span class="legend-icon">📍</span> Others</label></div></div></li>
+		                                </ul>
+		                            </div>
 		                        </div>
 		                    </section>
 
@@ -40,72 +105,6 @@ const TravellingView = {
 		                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
 	                    </div>
 	                    <div ref="sightToastBody" class="toast-body"></div>
-	                </div>
-	            </div>
-	            <div class="map-controls">
-	                <!-- Train Rides -->
-	                <div class="dropdown">
-	                    <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-	                        Train Rides
-                    </button>
-                    <ul class="dropdown-menu shadow" id="group-trains">
-                        <li>
-                            <div class="dropdown-item">
-                                <div class="form-check">
-                                    <input class="form-check-input group-toggle" type="checkbox" data-group="trains" checked id="toggle-trains">
-                                    <label class="form-check-label fw-bold" for="toggle-trains">Select All</label>
-                                </div>
-                            </div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="nationalExpress" checked id="cb-ne"><label class="form-check-label d-flex align-items-center" for="cb-ne"><span class="legend-color" style="background:#ff0000"></span> National Express</label></div></div></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="regional" checked id="cb-re"><label class="form-check-label d-flex align-items-center" for="cb-re"><span class="legend-color" style="background:#ff8c00"></span> Regional Express</label></div></div></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="suburban" checked id="cb-s"><label class="form-check-label d-flex align-items-center" for="cb-s"><span class="legend-color" style="background:#ffff00"></span> Suburban</label></div></div></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="subway" id="cb-u"><label class="form-check-label d-flex align-items-center" for="cb-u"><span class="legend-color" style="background:#1eff00"></span> Subway</label></div></div></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="tram" id="cb-t"><label class="form-check-label d-flex align-items-center" for="cb-t"><span class="legend-color" style="background:#1100ff"></span> Tram</label></div></div></li>
-                    </ul>
-                </div>
-
-                <!-- Other Transport -->
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                        Other Transport
-                    </button>
-                    <ul class="dropdown-menu shadow" id="group-other">
-                        <li>
-                            <div class="dropdown-item">
-                                <div class="form-check">
-                                    <input class="form-check-input group-toggle" type="checkbox" data-group="other" checked id="toggle-other">
-                                    <label class="form-check-label fw-bold" for="toggle-other">Select All</label>
-                                </div>
-                            </div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="bus" checked id="cb-bus"><label class="form-check-label d-flex align-items-center" for="cb-bus"><span class="legend-color" style="background:#ff00fb"></span> Bus</label></div></div></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input filter-cb" type="checkbox" value="ferry" id="cb-ferry"><label class="form-check-label d-flex align-items-center" for="cb-ferry"><span class="legend-color" style="background:#9500ff"></span> Ferry</label></div></div></li>
-                    </ul>
-                </div>
-
-                <!-- Sights -->
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                        Sights
-                    </button>
-                    <ul class="dropdown-menu shadow" id="group-sights">
-                        <li>
-                            <div class="dropdown-item">
-                                <div class="form-check">
-                                    <input class="form-check-input group-toggle" type="checkbox" data-group="sights" checked id="toggle-sights">
-                                    <label class="form-check-label fw-bold" for="toggle-sights">Select All</label>
-                                </div>
-                            </div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Monument" checked id="cb-mon"><label class="form-check-label d-flex align-items-center" for="cb-mon"><span class="legend-icon">⭐</span> Monument</label></div></div></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Airport" checked id="cb-air"><label class="form-check-label d-flex align-items-center" for="cb-air"><span class="legend-icon">✈️</span> Airport</label></div></div></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Station" checked id="cb-stat"><label class="form-check-label d-flex align-items-center" for="cb-stat"><span class="legend-icon">🚆</span> Station</label></div></div></li>
-                        <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input sight-filter-cb" type="checkbox" value="Other" checked id="cb-oth"><label class="form-check-label d-flex align-items-center" for="cb-oth"><span class="legend-icon">📍</span> Others</label></div></div></li>
-	                    </ul>
 	                </div>
 	            </div>
 	        </div>
