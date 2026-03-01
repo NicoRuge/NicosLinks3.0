@@ -124,14 +124,32 @@
                         </ul>
                     </div>
                 </div>
-                <div id="spotify-sidebar-widget" class="sidebar-now-playing-widget">
-                    <div class="skeleton-box" style="width: 70%; height: 12px; margin-bottom: 10px;"></div>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="skeleton-box" style="width: 34px; height: 34px; border-radius: 8px;"></div>
-                        <div class="flex-grow-1">
-                            <div class="skeleton-box" style="width: 80%; height: 12px; margin-bottom: 7px;"></div>
-                            <div class="skeleton-box" style="width: 58%; height: 10px;"></div>
+                <div class="sidebar-widget-carousel">
+                    <div class="sidebar-widget-track" id="sidebar-widget-track">
+                        <div id="spotify-sidebar-widget" class="sidebar-now-playing-widget sidebar-widget-slide">
+                            <div class="skeleton-box" style="width: 70%; height: 12px; margin-bottom: 10px;"></div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="skeleton-box" style="width: 34px; height: 34px; border-radius: 8px;"></div>
+                                <div class="flex-grow-1">
+                                    <div class="skeleton-box" style="width: 80%; height: 12px; margin-bottom: 7px;"></div>
+                                    <div class="skeleton-box" style="width: 58%; height: 10px;"></div>
+                                </div>
+                            </div>
                         </div>
+                        <div id="steam-sidebar-widget" class="sidebar-now-playing-widget sidebar-widget-slide">
+                            <div class="skeleton-box" style="width: 50%; height: 12px; margin-bottom: 10px;"></div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="skeleton-box" style="width: 34px; height: 34px; border-radius: 8px;"></div>
+                                <div class="flex-grow-1">
+                                    <div class="skeleton-box" style="width: 75%; height: 12px; margin-bottom: 7px;"></div>
+                                    <div class="skeleton-box" style="width: 45%; height: 10px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sidebar-widget-dots">
+                        <span class="sidebar-widget-dot active" data-index="0"></span>
+                        <span class="sidebar-widget-dot" data-index="1"></span>
                     </div>
                 </div>
             </div>
@@ -200,6 +218,7 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="assets/js/widget_spotify.js"></script>
+    <script src="assets/js/widget_steam_sidebar.js"></script>
     <script src="assets/js/page_home.js"></script>
     <script src="assets/js/page_qr.js"></script>
     <script src="assets/js/page_photography.js"></script>

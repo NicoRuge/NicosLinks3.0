@@ -384,6 +384,79 @@ body {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+/* Widget carousel (Spotify / Steam slide) */
+.sidebar-widget-carousel {
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-widget-track {
+    display: flex;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-widget-slide {
+    min-width: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.sidebar-widget-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.sidebar-widget-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-text) 22%, transparent);
+    transition: background 0.3s ease, width 0.3s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.sidebar-widget-dot.active {
+    width: 14px;
+    background: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+/* Steam sidebar widget specifics */
+.sidebar-steam-game-cover {
+    width: 30px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.sidebar-steam-state {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.sidebar-steam-state::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: color-mix(in srgb, var(--color-text) 35%, transparent);
+}
+
+.sidebar-steam-state.is-online::before {
+    background: #57cbde;
+}
+
+.sidebar-steam-state.is-offline::before {
+    background: color-mix(in srgb, var(--color-text) 28%, transparent);
+}
+
 .sidebar-legal-link {
     font-size: 0.9rem;
     margin-bottom: 0;
