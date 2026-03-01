@@ -1041,6 +1041,7 @@ body {
 .sidebar-main-shell {
     flex: 1;
     min-height: 0;
+    overflow: visible;
 }
 
 .content-scroll-shell {
@@ -1094,35 +1095,40 @@ body {
 
 .scroll-hint-target {
     position: relative;
-    --scroll-hint-color: color-mix(in srgb, var(--bs-body-color) 46%, transparent);
-    --scroll-hint-fade: color-mix(in srgb, var(--bs-body-bg) 95%, transparent);
-    --scroll-hint-dot-bg: color-mix(in srgb, var(--bs-body-bg) 75%, var(--bs-body-color) 25%);
+    --scroll-hint-color: color-mix(in srgb, var(--bs-body-color) 60%, transparent);
+    --scroll-hint-fade-color: var(--bs-body-bg);
 }
 
+/* Bottom gradient fade */
 .scroll-hint-target::before {
-    content: none;
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5rem;
+    background: linear-gradient(to bottom, transparent, var(--scroll-hint-fade-color));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
 }
 
+/* Chevron arrow */
 .scroll-hint-target::after {
-    content: "\2193";
+    content: '';
     position: absolute;
     left: 50%;
-    bottom: 0.3rem;
-    transform: translateX(-50%);
-    color: var(--scroll-hint-color);
-    font-size: 0.68rem;
-    line-height: 1;
-    width: 1.05rem;
-    height: 1.05rem;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
-    background: var(--scroll-hint-dot-bg);
+    bottom: 0.7rem;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-right: 2px solid var(--scroll-hint-color);
+    border-bottom: 2px solid var(--scroll-hint-color);
+    transform: translateX(-50%) rotate(45deg);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.3s ease;
     z-index: 3;
-    padding: 0;
 }
 
 .scroll-hint-target.show-scroll-hint::before,
@@ -1131,25 +1137,25 @@ body {
 }
 
 .scroll-hint-target.show-scroll-hint::after {
-    animation: scrollHintBounce 1.8s ease-in-out infinite;
+    animation: scrollChevronPulse 2s ease-in-out infinite;
 }
 
 .sidebar-main-shell.scroll-hint-target {
-    --scroll-hint-color: color-mix(in srgb, var(--color-text) 85%, transparent);
-    --scroll-hint-fade: color-mix(in srgb, var(--color-bg) 96%, transparent);
-    --scroll-hint-dot-bg: color-mix(in srgb, var(--color-text) 16%, transparent);
+    --scroll-hint-color: color-mix(in srgb, var(--color-text) 55%, transparent);
+    --scroll-hint-fade-color: var(--color-bg);
 }
 
-@keyframes scrollHintBounce {
+.sidebar-main-shell.scroll-hint-target::before {
+    content: none;
+}
 
-    0%,
-    100% {
-        transform: translateX(-50%) translateY(0);
-    }
+.sidebar-main-shell.scroll-hint-target::after {
+    bottom: -0.2rem;
+}
 
-    50% {
-        transform: translateX(-50%) translateY(2px);
-    }
+@keyframes scrollChevronPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
 }
 
 @media (prefers-reduced-motion: reduce) {
