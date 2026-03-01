@@ -3,8 +3,8 @@ const TweetViewerView = {
         <div class="container-fluid px-4 tweet-viewer-page">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
                 <div>
-                    <h1 class="h3 mb-1">Tweet Viewer</h1>
-                    <p class="text-secondary mb-0">Paste a tweet URL to generate a shareable card.</p>
+                    <h1 class="h3 mb-1">Post Viewer</h1>
+                    <p class="text-secondary mb-0">Paste a tweet or Bluesky post URL to generate a shareable card.</p>
                 </div>
             </div>
 
@@ -14,13 +14,13 @@ const TweetViewerView = {
                     <div class="card shadow-sm">
                         <div class="card-header bg-body-tertiary fw-semibold">Input</div>
                         <div class="card-body">
-                            <label for="tweet-url-input" class="form-label fw-semibold mb-2">Tweet URL</label>
+                            <label for="tweet-url-input" class="form-label fw-semibold mb-2">Post URL</label>
                             <div class="input-group">
                                 <input
                                     id="tweet-url-input"
                                     type="url"
                                     class="form-control font-monospace"
-                                    placeholder="https://x.com/user/status/..."
+                                    placeholder="https://x.com/user/status/... or bsky.app/..."
                                     v-model.trim="tweetUrl"
                                     @keydown.enter="fetchTweet"
                                     :disabled="loading"
@@ -36,11 +36,11 @@ const TweetViewerView = {
                                     Load
                                 </button>
                             </div>
-                            <div class="form-text mt-2">Supports x.com and twitter.com URLs.</div>
+                            <div class="form-text mt-2">Supports x.com, twitter.com and bsky.app URLs.</div>
 
                             <div v-if="error" class="alert alert-danger mt-3 mb-0 d-flex align-items-start justify-content-between gap-3" role="alert">
                                 <div>
-                                    <div class="fw-semibold mb-1">Couldn't load tweet</div>
+                                    <div class="fw-semibold mb-1">Couldn't load post</div>
                                     <div class="small">{{ error }}</div>
                                 </div>
                                 <button type="button" class="btn-close" aria-label="Close" @click="error = ''"></button>
@@ -129,7 +129,10 @@ const TweetViewerView = {
                                     <div class="tweet-card__handle">@{{ tweet.handle }}</div>
                                 </div>
                                 <div class="tweet-card__x-logo ms-auto">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <!-- Bluesky logo -->
+                                    <img v-if="tweet.platform === 'bluesky'" src="assets/icons/bluesky.svg" class="tweet-card__bluesky-logo" aria-hidden="true" />
+                                    <!-- Twitter bird -->
+                                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
                                     </svg>
                                 </div>
@@ -174,14 +177,14 @@ const TweetViewerView = {
                                     </div>
                                 </div>
                                 <a :href="tweet.url" target="_blank" rel="noopener noreferrer" class="tweet-card__link">
-                                    View on X &#x2192;
+                                    {{ tweet.platform === 'bluesky' ? 'View on Bluesky' : 'View on X' }} &#x2192;
                                 </a>
                             </div>
                         </div>
 
                         <div class="text-secondary small mt-2 text-center">
-                            Data via <a href="https://fxtwitter.com" target="_blank" rel="noopener noreferrer" class="text-secondary">fxtwitter.com</a>.
-                            Some fields may be unavailable due to X API restrictions.
+                            <span v-if="tweet.platform === 'bluesky'">Data via Bluesky public API.</span>
+                            <span v-else>Data via <a href="https://fxtwitter.com" target="_blank" rel="noopener noreferrer" class="text-secondary">fxtwitter.com</a>. Some fields may be unavailable due to X API restrictions.</span>
                         </div>
                     </div>
                 </div>
@@ -279,13 +282,91 @@ const TweetViewerView = {
             e.target.style.display = 'none';
         },
 
+        isBlueskyUrl(raw) {
+            try {
+                const url = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw);
+                const host = url.hostname.toLowerCase();
+                return host === 'bsky.app' || host.endsWith('.bsky.app');
+            } catch { return false; }
+        },
+
+        parseBlueskyUrl(raw) {
+            try {
+                const url = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw);
+                // Format: /profile/<handle>/post/<rkey>
+                const m = url.pathname.match(/^\/profile\/([^/]+)\/post\/([^/]+)/i);
+                if (!m) return null;
+                return { handle: m[1], rkey: m[2] };
+            } catch { return null; }
+        },
+
+        async fetchBluesky(parsed) {
+            // Resolve DID from handle
+            const resolveRes = await fetch(`https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(parsed.handle)}`);
+            if (!resolveRes.ok) throw new Error(`Could not resolve handle @${parsed.handle}`);
+            const { did } = await resolveRes.json();
+
+            const atUri = `at://${did}/app.bsky.feed.post/${parsed.rkey}`;
+            const threadRes = await fetch(`https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread?uri=${encodeURIComponent(atUri)}&depth=0`);
+            if (!threadRes.ok) throw new Error(`Bluesky API error ${threadRes.status}`);
+            const data = await threadRes.json();
+
+            const post = data?.thread?.post;
+            if (!post) throw new Error('Post not found');
+
+            const record = post.record || {};
+            const author = post.author || {};
+            const createdAt = record.createdAt ? new Date(record.createdAt) : null;
+
+            // Extract media (images)
+            let mediaUrl = null;
+            const images = record?.embed?.images || record?.embed?.media?.images || [];
+            if (images.length > 0) mediaUrl = images[0].image?.ref?.$link
+                ? `https://cdn.bsky.app/img/feed_thumbnail/plain/${did}/${images[0].image.ref.$link}@jpeg`
+                : null;
+
+            this.tweet = {
+                platform: 'bluesky',
+                displayName: author.displayName || author.handle || parsed.handle,
+                handle: author.handle || parsed.handle,
+                avatarUrl: author.avatar || null,
+                verified: false,
+                text: record.text || '',
+                formattedDate: this.formatDateTime(createdAt),
+                likes: post.likeCount ?? null,
+                retweets: post.repostCount ?? null,
+                replies: post.replyCount ?? null,
+                views: null,
+                bookmarks: null,
+                mediaUrl,
+                url: `https://bsky.app/profile/${parsed.handle}/post/${parsed.rkey}`
+            };
+        },
+
         async fetchTweet() {
             this.error = '';
             this.tweet = null;
 
+            if (this.isBlueskyUrl(this.tweetUrl)) {
+                const parsed = this.parseBlueskyUrl(this.tweetUrl);
+                if (!parsed) {
+                    this.error = 'Please enter a valid bsky.app post URL (e.g. https://bsky.app/profile/user.bsky.social/post/...)';
+                    return;
+                }
+                this.loading = true;
+                try {
+                    await this.fetchBluesky(parsed);
+                } catch (e) {
+                    this.error = `Could not fetch Bluesky post: ${e.message}`;
+                } finally {
+                    this.loading = false;
+                }
+                return;
+            }
+
             const parsed = this.normalizeTweetUrl(this.tweetUrl);
             if (!parsed) {
-                this.error = 'Please enter a valid x.com or twitter.com tweet URL.';
+                this.error = 'Please enter a valid x.com, twitter.com or bsky.app URL.';
                 return;
             }
 
@@ -316,6 +397,7 @@ const TweetViewerView = {
                 }
 
                 this.tweet = {
+                    platform: 'twitter',
                     displayName: author.name || parsed.username,
                     handle: author.screen_name || parsed.username,
                     avatarUrl: author.avatar_url || `https://unavatar.io/twitter/${encodeURIComponent(parsed.username)}?fallback=false`,
@@ -370,6 +452,7 @@ const TweetViewerView = {
             const createdAt = this.tweetIdToDate(parsed.tweetId);
 
             this.tweet = {
+                platform: 'twitter',
                 displayName: json.author_name || handle,
                 handle,
                 avatarUrl: `https://unavatar.io/twitter/${encodeURIComponent(handle)}?fallback=false`,

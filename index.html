@@ -228,7 +228,7 @@
                 'nav.section.otherStuff': 'Sonstiges',
                 'nav.blog': 'Blog',
                 'nav.xThreadViewer': 'X Thread Viewer',
-                'nav.tweetViewer': 'Tweet Viewer',
+                'nav.tweetViewer': 'Post Viewer',
                 'nav.dataAnalytics': 'Datenanalyse',
                 'nav.imprint': 'Impressum',
                 'nav.privacyPolicy': 'Datenschutz'
@@ -245,7 +245,7 @@
                 'nav.section.otherStuff': 'Other Stuff',
                 'nav.blog': 'Blog',
                 'nav.xThreadViewer': 'X Thread Viewer',
-                'nav.tweetViewer': 'Tweet Viewer',
+                'nav.tweetViewer': 'Post Viewer',
                 'nav.dataAnalytics': 'Data Analytics',
                 'nav.imprint': 'Imprint',
                 'nav.privacyPolicy': 'Privacy Policy'
@@ -684,13 +684,21 @@
             text-overflow: ellipsis;
         }
 
-        /* X logo */
+        /* X / Bluesky logo */
         .tweet-card__x-logo {
             flex-shrink: 0;
         }
         .tweet-card__x-logo svg {
             width: 22px;
             height: 22px;
+        }
+        .tweet-card__bluesky-logo {
+            width: 22px;
+            height: 22px;
+        }
+        .tweet-card--dark .tweet-card__bluesky-logo,
+        .tweet-card--dim .tweet-card__bluesky-logo {
+            filter: invert(1);
         }
 
         /* Tweet text */
@@ -770,6 +778,31 @@
         }
         .tweet-card__link:hover { opacity: 1; text-decoration: underline; }
         .tweet-card--capturing .tweet-card__link { display: none; }
+
+        /* Mobile tweaks */
+        @media (max-width: 575px) {
+            .tweet-card {
+                padding: 24px 24px 20px;
+                border-radius: 16px;
+            }
+            .tweet-card__text {
+                font-size: 15px;
+            }
+            .tweet-card__stats-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .tweet-card__stats {
+                gap: 14px;
+            }
+            .tweet-card__stat-value {
+                font-size: 14px;
+            }
+            .tweet-card__link {
+                align-self: flex-end;
+            }
+        }
     </style>
 </body>
 
