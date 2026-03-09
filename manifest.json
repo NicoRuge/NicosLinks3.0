@@ -1,0 +1,18 @@
+{
+  "name": "Nico's Links",
+  "short_name": "NicosLinks",
+  "description": "Nico Ruge's personal portfolio and links",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a12",
+  "theme_color": "#e09a20",
+  "icons": [
+    {
+      "src": "assets/icons/Logo_White.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
