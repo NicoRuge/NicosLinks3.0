@@ -51,11 +51,14 @@
 <body class="bg-body">
 
     <div id="app" v-cloak>
-        <!-- Mobile Menu Toggle -->
-        <button v-if="currentHash !== 'qr'" class="btn btn-secondary d-lg-none mobile-menu-toggle" @click="toggleSidebar"
-            aria-label="Toggle navigation">
-            <i class="bi bi-list fs-5"></i>
-        </button>
+        <!-- Mobile Top Bar -->
+        <div v-if="currentHash !== 'qr'" class="mobile-topbar d-lg-none"
+            :class="{ 'topbar-scroll-hidden': menuScrollHidden && !sidebarOpen }">
+            <button class="btn mobile-menu-toggle"
+                @click="toggleSidebar" aria-label="Toggle navigation">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+        </div>
 
         <!-- Sidebar Overlay -->
         <div v-if="currentHash !== 'qr'" class="sidebar-overlay" :class="{ show: sidebarOpen }" @click="closeSidebar"></div>
@@ -130,38 +133,26 @@
                         </ul>
                     </div>
                 </div>
-                <div v-if="deferredInstallPrompt && !pwaInstalled" class="sidebar-install-wrap">
-                    <button @click="installPWA" class="btn sidebar-utility-btn w-100 d-flex align-items-center justify-content-center sidebar-install-btn">
-                        <i class="bi bi-download me-2"></i>{{ t('pwa.installTitle') }}
-                    </button>
-                </div>
-
-                <div class="sidebar-widget-carousel">
-                    <div class="sidebar-widget-track" id="sidebar-widget-track">
-                        <div id="spotify-sidebar-widget" class="sidebar-now-playing-widget sidebar-widget-slide">
-                            <div class="skeleton-box" style="width: 70%; height: 12px; margin-bottom: 10px;"></div>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="skeleton-box" style="width: 34px; height: 34px; border-radius: 8px;"></div>
-                                <div class="flex-grow-1">
-                                    <div class="skeleton-box" style="width: 80%; height: 12px; margin-bottom: 7px;"></div>
-                                    <div class="skeleton-box" style="width: 58%; height: 10px;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="steam-sidebar-widget" class="sidebar-now-playing-widget sidebar-widget-slide">
-                            <div class="skeleton-box" style="width: 50%; height: 12px; margin-bottom: 10px;"></div>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="skeleton-box" style="width: 34px; height: 34px; border-radius: 8px;"></div>
-                                <div class="flex-grow-1">
-                                    <div class="skeleton-box" style="width: 75%; height: 12px; margin-bottom: 7px;"></div>
-                                    <div class="skeleton-box" style="width: 45%; height: 10px;"></div>
-                                </div>
+                <div class="sidebar-widgets-stack">
+                    <div id="spotify-sidebar-widget" class="sidebar-now-playing-widget">
+                        <div class="skeleton-box" style="width: 70%; height: 12px; margin-bottom: 10px;"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="skeleton-box" style="width: 34px; height: 34px; border-radius: 8px;"></div>
+                            <div class="flex-grow-1">
+                                <div class="skeleton-box" style="width: 80%; height: 12px; margin-bottom: 7px;"></div>
+                                <div class="skeleton-box" style="width: 58%; height: 10px;"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="sidebar-widget-dots">
-                        <span class="sidebar-widget-dot active" data-index="0"></span>
-                        <span class="sidebar-widget-dot" data-index="1"></span>
+                    <div id="steam-sidebar-widget" class="sidebar-now-playing-widget">
+                        <div class="skeleton-box" style="width: 50%; height: 12px; margin-bottom: 10px;"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="skeleton-box" style="width: 34px; height: 34px; border-radius: 8px;"></div>
+                            <div class="flex-grow-1">
+                                <div class="skeleton-box" style="width: 75%; height: 12px; margin-bottom: 7px;"></div>
+                                <div class="skeleton-box" style="width: 45%; height: 10px;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,7 +171,7 @@
         </nav>
 
         <!-- Main content -->
-        <main class="main-content" :class="{ 'qr-page-mode': currentHash === 'qr' }">
+        <main class="main-content" :class="{ 'qr-page-mode': currentHash === 'qr', 'home-page-mode': currentHash === 'home', 'topbar-hidden': menuScrollHidden && !sidebarOpen }">
             <div class="scroll-hint-shell content-scroll-shell">
                 <div id="content-container" class="page-content" :class="currentHash === 'qr' || currentHash === 'home' ? 'py-0' : 'py-4'">
                     <home-view v-if="currentHash === 'home'"></home-view>
@@ -224,25 +215,6 @@
                 </div>
             </footer>
         </main>
-        <!-- PWA Install Banner -->
-        <transition name="pwa-banner">
-            <div v-if="showInstallBanner" class="pwa-install-banner" role="banner">
-                <div class="pwa-install-banner-inner">
-                    <img :src="activeTheme === 'light' ? 'assets/icons/Logo_Black.svg' : 'assets/icons/Logo_White.svg'"
-                        alt="App icon" class="pwa-install-icon">
-                    <div class="pwa-install-text">
-                        <span class="pwa-install-title">{{ t('pwa.installTitle') }}</span>
-                        <span class="pwa-install-sub">{{ t('pwa.installSubtitle') }}</span>
-                    </div>
-                    <button @click="installPWA" class="btn btn-primary btn-sm pwa-install-btn">
-                        <i class="bi bi-download me-1"></i>{{ t('pwa.install') }}
-                    </button>
-                    <button @click="dismissInstallBanner" class="btn-close pwa-install-close"
-                        :class="activeTheme === 'dark' ? 'btn-close-white' : ''"
-                        :aria-label="t('pwa.dismiss')"></button>
-                </div>
-            </div>
-        </transition>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -281,11 +253,7 @@
                 'nav.tweetViewer': 'Post Viewer',
                 'nav.dataAnalytics': 'Datenanalyse',
                 'nav.imprint': 'Impressum',
-                'nav.privacyPolicy': 'Datenschutz',
-                'pwa.install': 'Installieren',
-                'pwa.installTitle': 'Als App installieren',
-                'pwa.installSubtitle': 'Zum Startbildschirm hinzufügen',
-                'pwa.dismiss': 'Schließen'
+                'nav.privacyPolicy': 'Datenschutz'
             },
             en: {
                 'nav.home': 'Home',
@@ -302,11 +270,7 @@
                 'nav.tweetViewer': 'Post Viewer',
                 'nav.dataAnalytics': 'Data Analytics',
                 'nav.imprint': 'Imprint',
-                'nav.privacyPolicy': 'Privacy Policy',
-                'pwa.install': 'Install',
-                'pwa.installTitle': 'Install as App',
-                'pwa.installSubtitle': 'Add to home screen',
-                'pwa.dismiss': 'Dismiss'
+                'nav.privacyPolicy': 'Privacy Policy'
             }
         }
 
@@ -334,9 +298,7 @@
                     lang: localStorage.getItem('lang') || 'de',
                     activeTheme: 'light',
                     sidebarOpen: false,
-                    deferredInstallPrompt: null,
-                    showInstallBanner: false,
-                    pwaInstalled: false,
+                    menuScrollHidden: false,
                     scrollHintUpdate: null,
                     scrollHintTeardown: null,
                     activeToastMessage: '',
@@ -462,8 +424,11 @@
                         return
                     }
                     this.currentHash = hash === 'privacy-policy' ? 'privacy-policy-main' : hash
+                    this.menuScrollHidden = false
                     this.loadPageContent(this.currentHash)
                     this.syncRobotsMeta()
+                    const contentContainer = document.getElementById('content-container')
+                    if (contentContainer) contentContainer.scrollTop = 0
                     this.$nextTick(() => this.refreshScrollHints())
                 },
                 setTheme(theme) {
@@ -547,29 +512,6 @@
                     if (typeof this.scrollHintUpdate === 'function') {
                         this.scrollHintUpdate()
                     }
-                },
-                handleInstallPrompt(e) {
-                    e.preventDefault()
-                    this.deferredInstallPrompt = e
-                    const dismissed = localStorage.getItem('pwa-banner-dismissed')
-                    const cooldown = 7 * 24 * 60 * 60 * 1000
-                    if (!dismissed || Date.now() - parseInt(dismissed) > cooldown) {
-                        setTimeout(() => { this.showInstallBanner = true }, 2500)
-                    }
-                },
-                async installPWA() {
-                    if (!this.deferredInstallPrompt) return
-                    this.deferredInstallPrompt.prompt()
-                    const { outcome } = await this.deferredInstallPrompt.userChoice
-                    if (outcome === 'accepted') {
-                        this.pwaInstalled = true
-                        this.showInstallBanner = false
-                    }
-                    this.deferredInstallPrompt = null
-                },
-                dismissInstallBanner() {
-                    this.showInstallBanner = false
-                    localStorage.setItem('pwa-banner-dismissed', Date.now().toString())
                 }
             },
             mounted() {
@@ -582,15 +524,26 @@
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                     if (this.storedTheme === 'auto') this.applyTheme()
                 })
-                window.addEventListener('beforeinstallprompt', (e) => this.handleInstallPrompt(e))
-                window.addEventListener('appinstalled', () => {
-                    this.pwaInstalled = true
-                    this.showInstallBanner = false
-                    this.deferredInstallPrompt = null
-                })
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.register('/sw.js').catch(() => {})
                 }
+                this.$nextTick(() => {
+                    const contentContainer = document.getElementById('content-container')
+                    if (contentContainer) {
+                        let lastScrollTop = 0
+                        contentContainer.addEventListener('scroll', () => {
+                            const scrollTop = contentContainer.scrollTop
+                            if (scrollTop < 50) {
+                                this.menuScrollHidden = false
+                            } else if (scrollTop > lastScrollTop + 5) {
+                                this.menuScrollHidden = true
+                            } else if (scrollTop < lastScrollTop - 5) {
+                                this.menuScrollHidden = false
+                            }
+                            lastScrollTop = scrollTop
+                        }, { passive: true })
+                    }
+                })
             },
             beforeUnmount() {
                 if (typeof this.scrollHintTeardown === 'function') {
@@ -602,103 +555,6 @@
     <style>
         [v-cloak] {
             display: none;
-        }
-
-        /* ── PWA Install Banner ───────────────────────────────────────── */
-        .pwa-install-banner {
-            position: fixed;
-            bottom: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1100;
-            width: calc(100% - 2rem);
-            max-width: 480px;
-            background: var(--color-surface-raised, #222233);
-            border: 1px solid color-mix(in srgb, var(--color-text, #f2f1ec) 14%, transparent);
-            border-radius: 1rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.36), 0 2px 8px rgba(0,0,0,0.18);
-            backdrop-filter: blur(12px);
-        }
-
-        .pwa-install-banner-inner {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.85rem 1rem;
-        }
-
-        .pwa-install-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            flex-shrink: 0;
-            padding: 6px;
-            background: var(--color-primary-subtle, rgba(224,154,32,0.12));
-        }
-
-        .pwa-install-text {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .pwa-install-title {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--color-text, #f2f1ec);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .pwa-install-sub {
-            font-size: 0.72rem;
-            color: color-mix(in srgb, var(--color-text, #f2f1ec) 60%, transparent);
-        }
-
-        .pwa-install-btn {
-            flex-shrink: 0;
-            font-size: 0.78rem;
-            padding: 0.3rem 0.75rem;
-        }
-
-        .pwa-install-close {
-            flex-shrink: 0;
-            opacity: 0.6;
-        }
-
-        .pwa-install-close:hover { opacity: 1; }
-
-        /* Vue transition for the banner */
-        .pwa-banner-enter-active,
-        .pwa-banner-leave-active {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .pwa-banner-enter-from,
-        .pwa-banner-leave-to {
-            opacity: 0;
-            transform: translateX(-50%) translateY(1rem);
-        }
-
-        /* ── Sidebar Install Button ───────────────────────────────────── */
-        .sidebar-install-wrap {
-            margin-bottom: 0.6rem;
-            padding: 0.25rem;
-            border-radius: 999px;
-            border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
-            background: color-mix(in srgb, var(--color-bg) 74%, var(--color-text) 26%);
-        }
-
-        .sidebar-install-btn {
-            border-radius: 999px;
-            font-size: 0.72rem;
-        }
-
-        [data-bs-theme="light"] .pwa-install-banner {
-            background: var(--film-50, #fafaf7);
-            border-color: color-mix(in srgb, var(--film-400) 40%, transparent);
         }
 
         .page-content {

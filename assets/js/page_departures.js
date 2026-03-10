@@ -176,7 +176,6 @@ const DeparturesView = {
                     </div>
                 </div>
             </div>
-        </div>
     `,
 	data() {
 		return {

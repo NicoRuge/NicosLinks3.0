@@ -129,46 +129,10 @@
     renderError();
   }
 
-  // ── Carousel cycling ────────────────────────────────────────────────────────
-  function initCarousel() {
-    const track = document.getElementById("sidebar-widget-track");
-    const dots = document.querySelectorAll(".sidebar-widget-dot");
-    if (!track || !dots.length) return;
-
-    let currentSlide = 0;
-    let autoTimer = null;
-
-    function goToSlide(index) {
-      currentSlide = index;
-      track.style.transform = `translateX(-${index * 100}%)`;
-      dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
-    }
-
-    function scheduleNext() {
-      clearInterval(autoTimer);
-      autoTimer = setInterval(() => {
-        goToSlide((currentSlide + 1) % dots.length);
-      }, 5000);
-    }
-
-    dots.forEach((dot, i) => {
-      dot.addEventListener("click", () => {
-        goToSlide(i);
-        scheduleNext();
-      });
-    });
-
-    scheduleNext();
-  }
-
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      fetchStatus();
-      initCarousel();
-    });
+    document.addEventListener("DOMContentLoaded", fetchStatus);
   } else {
     fetchStatus();
-    initCarousel();
   }
 
   setInterval(fetchStatus, CONFIG.fetchIntervalMs);

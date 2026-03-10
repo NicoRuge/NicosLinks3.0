@@ -1,35 +1,6 @@
 const HomeView = {
     template: `
         <div class="home-page">
-            <div class="home-masonry-bg" aria-hidden="true">
-                <div class="home-masonry-grid">
-                    <div
-                        v-for="(column, columnIndex) in backgroundColumns"
-                        :key="'bg-col-' + columnIndex"
-                        class="home-masonry-col"
-                        :class="{ 'is-reverse': columnIndex % 2 === 1 }"
-                        :style="{ '--masonry-duration': (64 + (columnIndex * 10)) + 's' }"
-                    >
-                        <div class="home-masonry-track">
-                            <div
-                                v-for="(tile, tileIndex) in column"
-                                :key="'bg-tile-' + columnIndex + '-' + tileIndex + '-' + tile.internalId"
-                                class="home-masonry-tile"
-                                :class="'is-shape-' + ((tileIndex % 5) + 1)"
-                            >
-                                <img
-                                    :src="getUnsplashBackgroundUrl(tile.internalId)"
-                                    :alt="'Unsplash background image ' + (tileIndex + 1)"
-                                    loading="lazy"
-                                    decoding="async"
-                                >
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="home-masonry-veil"></div>
-            </div>
-
             <div class="container-fluid py-4 home-content-layer">
                 <div class="row justify-content-center">
                     <div class="col-12 hero-page-shell">
@@ -83,44 +54,5 @@ const HomeView = {
                 </div>
             </div>
         </div>
-    `,
-    data() {
-        return {
-            backgroundInternalIds: [
-                '1709192525551-2147fccfaf12',
-                '1768213021718-9f738eabb363',
-                '1752312304247-b920759fc551',
-                '1723816254296-6b8bf36e1cc9',
-                '1708753662011-7db4eed9d054',
-                '1768160308364-2ecc0d70f364',
-                '1680681590567-ff13632428e7',
-                '1672430455100-c4d2b27612a3',
-                '1652546129961-bba64fc0920f',
-                '1768165085210-6832ccd35ff0',
-                '1672855415934-d9bb7f4d8b19',
-                '1704662370387-b9328e6a7089',
-                '1752312303988-f2663ed2dbfa',
-                '1752312304011-5c34edeb20cb',
-                '1653211072239-aa054221e1ec'
-            ]
-        }
-    },
-    computed: {
-        backgroundColumns() {
-            const columnCount = 4
-            const columns = Array.from({ length: columnCount }, () => [])
-
-            this.backgroundInternalIds.forEach((internalId, index) => {
-                columns[index % columnCount].push({ internalId })
-            })
-
-            return columns.map((column) => column.concat(column))
-        }
-    },
-    methods: {
-        getUnsplashBackgroundUrl(internalId) {
-            if (!internalId) return ''
-            return `https://images.unsplash.com/photo-${internalId}?q=80&w=1080&auto=format&fit=crop`
-        }
-    }
+    `
 };
