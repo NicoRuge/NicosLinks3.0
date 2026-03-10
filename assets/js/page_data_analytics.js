@@ -10,6 +10,7 @@ const DataAnalyticsView = {
                         </div>
                     </section>
 
+                    <!-- X / Twitter Chart -->
                     <div class="analytics-chart-card rounded-4 p-3 p-lg-4">
                         <div class="mb-3">
                             <h2 class="h5 fw-semibold mb-1">X / Twitter Stats</h2>
@@ -37,6 +38,47 @@ const DataAnalyticsView = {
                             <canvas ref="chartCanvas"></canvas>
                         </div>
                     </div>
+
+                    <!-- Spotify Listening Minutes Chart -->
+                    <div class="analytics-chart-card rounded-4 p-3 p-lg-4 mt-4">
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#1DB954" class="flex-shrink-0"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                                <h2 class="h5 fw-semibold mb-0">Spotify Listening Minutes</h2>
+                            </div>
+                            <p class="text-body-secondary small mb-0 mt-1">My Spotify listening minutes by month.</p>
+                        </div>
+                        <hr class="my-3">
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <template v-for="view in spotifyViews" :key="view.id">
+                                <input
+                                    class="btn-check"
+                                    type="radio"
+                                    name="spotify-view"
+                                    :id="'sv-' + view.id"
+                                    :value="view.id"
+                                    v-model="spotifyCurrentView"
+                                    @change="onSpotifyViewChange(view.id)"
+                                    autocomplete="off"
+                                >
+                                <label class="btn btn-sm btn-outline-secondary" :for="'sv-' + view.id">
+                                    <i :class="'bi ' + view.icon + ' me-1'"></i>{{ view.label }}
+                                </label>
+                            </template>
+                        </div>
+                        <div ref="spotifyChartWrapper" class="analytics-chart-wrapper">
+                            <div v-if="spotifyLoading" class="d-flex align-items-center justify-content-center h-100 text-body-secondary">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Loading…
+                            </div>
+                            <div v-else-if="!spotifyHasData" class="d-flex flex-column align-items-center justify-content-center h-100 text-body-secondary gap-2">
+                                <i class="bi bi-music-note-list fs-2 opacity-50"></i>
+                                <span class="small">No Spotify data available yet.</span>
+                            </div>
+                            <canvas v-else ref="spotifyChartCanvas"></canvas>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -44,6 +86,7 @@ const DataAnalyticsView = {
 
     data() {
         return {
+            // Twitter chart
             chart: null,
             currentView: 'reach',
             _mo: null,
@@ -71,15 +114,58 @@ const DataAnalyticsView = {
                 avgTweetsDay:    [17,27.2,34.9,31.1,33.4,30.4,21.4,21.1,17.7,20.6,17.4,21.5,26,22.3,27.7,null],
                 avgLikesTweet:   [15.9,11.8,12.1,14.8,11.3,20.2,16.4,14.7,14,16.5,20.8,15.7,18.6,21.7,19.1,null],
                 engagementRate:  [4.37,4.34,4.15,4.72,4.89,4.29,4.25,6.16,3.53,4.38,4.71,4.71,4.52,4.78,4.88,4.49]
-            }
+            },
+
+            // Spotify chart
+            spotifyChart: null,
+            spotifyCurrentView: 'all',
+            spotifyRawData: null,
+            spotifyLoading: true,
         };
+    },
+
+    computed: {
+        spotifyYears() {
+            if (!this.spotifyRawData || !this.spotifyRawData.Year) return [];
+            return Object.keys(this.spotifyRawData.Year).sort();
+        },
+        spotifyHasData() {
+            return this.spotifyYears.length > 0;
+        },
+        spotifyViews() {
+            const YEAR_ICONS = ['bi-calendar3', 'bi-calendar2', 'bi-calendar', 'bi-calendar4', 'bi-calendar-week'];
+            return [
+                { id: 'all', label: 'All Time', icon: 'bi-calendar-range' },
+                ...this.spotifyYears.map((y, i) => ({
+                    id: y,
+                    label: y,
+                    icon: YEAR_ICONS[i % YEAR_ICONS.length]
+                }))
+            ];
+        }
     },
 
     mounted() {
         this.$nextTick(() => this.buildChart(this.currentView));
 
+        // Fetch Spotify data
+        fetch('assets/data/spotify_stats.json')
+            .then(r => r.json())
+            .then(data => {
+                this.spotifyRawData = data;
+                this.spotifyLoading = false;
+                if (this.spotifyHasData) {
+                    this.$nextTick(() => this.buildSpotifyChart(this.spotifyCurrentView));
+                }
+            })
+            .catch(() => {
+                this.spotifyRawData = { title: 'Spotify Streaming Minutes', Year: {} };
+                this.spotifyLoading = false;
+            });
+
         this._mo = new MutationObserver(() => {
             if (this.chart) this.buildChart(this.currentView);
+            if (this.spotifyChart) this.buildSpotifyChart(this.spotifyCurrentView);
         });
         this._mo.observe(document.documentElement, {
             attributes: true,
@@ -89,6 +175,7 @@ const DataAnalyticsView = {
 
     beforeUnmount() {
         if (this.chart) { this.chart.destroy(); this.chart = null; }
+        if (this.spotifyChart) { this.spotifyChart.destroy(); this.spotifyChart = null; }
         if (this._mo) this._mo.disconnect();
     },
 
@@ -111,6 +198,18 @@ const DataAnalyticsView = {
         grad(colorKey, a1 = '0.32', a2 = '0.02') {
             const c = this.palette()[colorKey];
             const canvas = this.$refs.chartCanvas;
+            if (!canvas) return c + '0.2)';
+            const ctx = canvas.getContext('2d');
+            const h = canvas.offsetHeight || 360;
+            const g = ctx.createLinearGradient(0, 0, 0, h);
+            g.addColorStop(0, c + a1 + ')');
+            g.addColorStop(1, c + a2 + ')');
+            return g;
+        },
+
+        gradSpotify(colorKey, a1 = '0.32', a2 = '0.02') {
+            const c = this.palette()[colorKey];
+            const canvas = this.$refs.spotifyChartCanvas;
             if (!canvas) return c + '0.2)';
             const ctx = canvas.getContext('2d');
             const h = canvas.offsetHeight || 360;
@@ -147,6 +246,27 @@ const DataAnalyticsView = {
                 tension: 0.42,
                 fill: fill ? 'origin' : false,
                 backgroundColor: fill ? this.grad(colorKey) : 'transparent',
+                spanGaps: false,
+                _suffix: suffix
+            };
+        },
+
+        ldsSpotify(label, data, colorKey, { fill = true, yAxisID = 'y', suffix = '' } = {}) {
+            const c = this.palette()[colorKey];
+            return {
+                type: 'line',
+                label,
+                data,
+                yAxisID,
+                borderColor: c + '1)',
+                pointBackgroundColor: c + '1)',
+                pointBorderColor: 'transparent',
+                pointRadius: 3.5,
+                pointHoverRadius: 6,
+                borderWidth: 2.5,
+                tension: 0.42,
+                fill: fill ? 'origin' : false,
+                backgroundColor: fill ? this.gradSpotify(colorKey) : 'transparent',
                 spanGaps: false,
                 _suffix: suffix
             };
@@ -252,6 +372,69 @@ const DataAnalyticsView = {
             return configs[viewId] || configs.reach;
         },
 
+        getSpotifyViewConfig(viewId) {
+            const MONTHS_FULL  = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            // Pairs: [bar color for minutes, line color for streams]
+            const YEAR_COLOR_PAIRS = [
+                ['green',  'blue'],
+                ['blue',   'purple'],
+                ['purple', 'orange'],
+                ['orange', 'teal'],
+                ['teal',   'red'],
+                ['red',    'green'],
+            ];
+            const kFmt  = v => v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + 'K' : String(v);
+
+            const yearData = this.spotifyRawData?.Year || {};
+            const years    = Object.keys(yearData).sort();
+
+            if (viewId === 'all') {
+                const labels       = [];
+                const minutesData  = [];
+                const streamsData  = [];
+                years.forEach(year => {
+                    MONTHS_SHORT.forEach((short, i) => {
+                        const monthObj = yearData[year]?.[MONTHS_FULL[i]];
+                        labels.push(`${short} '${year.slice(2)}`);
+                        minutesData.push(monthObj?.minutes ?? null);
+                        streamsData.push(monthObj?.streams ?? null);
+                    });
+                });
+                return {
+                    labels,
+                    datasets: [
+                        this.ldsSpotify('Minutes', minutesData, 'green', { fill: true,  yAxisID: 'y',  suffix: ' min' }),
+                        this.bds(       'Streams', streamsData, 'blue',  { yAxisID: 'y2', suffix: '' })
+                    ],
+                    scales: {
+                        x:  this.scale(),
+                        y:  this.scale({ pos: 'left',  title: 'Listening Minutes', fmt: kFmt }),
+                        y2: this.scale({ pos: 'right', title: 'Streams', grid: false, fmt: kFmt })
+                    }
+                };
+            }
+
+            // Per-year view
+            const colorPairIdx = years.indexOf(viewId) % YEAR_COLOR_PAIRS.length;
+            const [minColor, strColor] = YEAR_COLOR_PAIRS[colorPairIdx];
+            const minutesData = MONTHS_FULL.map(m => yearData[viewId]?.[m]?.minutes ?? null);
+            const streamsData = MONTHS_FULL.map(m => yearData[viewId]?.[m]?.streams ?? null);
+
+            return {
+                labels: MONTHS_SHORT,
+                datasets: [
+                    this.bds(        'Minutes', minutesData, minColor, { yAxisID: 'y',  suffix: ' min' }),
+                    this.ldsSpotify( 'Streams', streamsData, strColor, { fill: false, yAxisID: 'y2', suffix: '' })
+                ],
+                scales: {
+                    x:  this.scale(),
+                    y:  this.scale({ pos: 'left',  title: 'Listening Minutes', fmt: kFmt }),
+                    y2: this.scale({ pos: 'right', title: 'Streams', grid: false, fmt: kFmt })
+                }
+            };
+        },
+
         buildChart(viewId) {
             if (typeof Chart === 'undefined') {
                 setTimeout(() => this.buildChart(viewId), 200);
@@ -272,10 +455,7 @@ const DataAnalyticsView = {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
-                        duration: 650,
-                        easing: 'easeInOutQuart'
-                    },
+                    animation: false,
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: {
@@ -317,15 +497,90 @@ const DataAnalyticsView = {
             });
         },
 
+        buildSpotifyChart(viewId) {
+            if (typeof Chart === 'undefined') {
+                setTimeout(() => this.buildSpotifyChart(viewId), 200);
+                return;
+            }
+
+            if (this.spotifyChart) { this.spotifyChart.destroy(); this.spotifyChart = null; }
+
+            const canvas = this.$refs.spotifyChartCanvas;
+            if (!canvas) return;
+
+            const s   = this.style();
+            const cfg = this.getSpotifyViewConfig(viewId);
+
+            this.spotifyChart = new Chart(canvas, {
+                type: 'bar',
+                data: { labels: cfg.labels, datasets: cfg.datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'start',
+                            labels: {
+                                color: s.text,
+                                padding: 18,
+                                boxWidth: 12,
+                                boxHeight: 12,
+                                borderRadius: 3,
+                                useBorderRadius: true,
+                                font: { size: 12, weight: '500' }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: s.tooltipBg,
+                            titleColor: s.tooltipColor,
+                            bodyColor: s.tooltipColor,
+                            borderColor: s.tooltipBorder,
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: (ctx) => {
+                                    if (ctx.raw == null) return null;
+                                    const suf = ctx.dataset._suffix || '';
+                                    return `  ${ctx.dataset.label}: ${ctx.raw.toLocaleString()}${suf}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: cfg.scales
+                }
+            });
+        },
+
         async onViewChange(viewId) {
+            const token = (this._twitterToken = (this._twitterToken || 0) + 1);
             const wrapper = this.$refs.chartWrapper;
             if (wrapper) {
                 wrapper.classList.add('analytics-chart-fade-out');
                 await new Promise(r => setTimeout(r, 170));
             }
+            if (token !== this._twitterToken) return;
             this.buildChart(viewId);
             await this.$nextTick();
+            if (token === this._twitterToken && wrapper) {
+                wrapper.classList.remove('analytics-chart-fade-out');
+            }
+        },
+
+        async onSpotifyViewChange(viewId) {
+            const token = (this._spotifyToken = (this._spotifyToken || 0) + 1);
+            const wrapper = this.$refs.spotifyChartWrapper;
             if (wrapper) {
+                wrapper.classList.add('analytics-chart-fade-out');
+                await new Promise(r => setTimeout(r, 170));
+            }
+            if (token !== this._spotifyToken) return;
+            this.buildSpotifyChart(viewId);
+            await this.$nextTick();
+            if (token === this._spotifyToken && wrapper) {
                 wrapper.classList.remove('analytics-chart-fade-out');
             }
         }

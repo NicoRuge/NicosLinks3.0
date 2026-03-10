@@ -1,0 +1,155 @@
+{
+    "title": "Spotify Streaming Minutes",
+    "Year": {
+        "2018": {
+            "January": {
+                "minutes": 90,
+                "streams": 34
+            },
+            "February": {
+                "minutes": 471,
+                "streams": 177
+            },
+            "March": {
+                "minutes": 166,
+                "streams": 61
+            },
+            "April": {
+                "minutes": 315,
+                "streams": 110
+            },
+            "May": {
+                "minutes": 14,
+                "streams": 5
+            },
+            "June": {
+                "minutes": 69,
+                "streams": 25
+            },
+            "July": {
+                "minutes": 827,
+                "streams": 326
+            },
+            "August": {
+                "minutes": 688,
+                "streams": 276
+            },
+            "September": {
+                "minutes": 487,
+                "streams": 193
+            },
+            "October": {
+                "minutes": 833,
+                "streams": 337
+            },
+            "November": {
+                "minutes": 1273,
+                "streams": 424
+            },
+            "December": {
+                "minutes": 2011,
+                "streams": 672
+            }
+        },
+        "2019": {
+            "January": {
+                "minutes": 1411,
+                "streams": 451
+            },
+            "February": {
+                "minutes": 1725,
+                "streams": 550
+            },
+            "March": {
+                "minutes": 1558,
+                "streams": 483
+            },
+            "April": {
+                "minutes": 1311,
+                "streams": 435
+            },
+            "May": {
+                "minutes": 1355,
+                "streams": 440
+            },
+            "June": {
+                "minutes": 1435,
+                "streams": 495
+            },
+            "July": {
+                "minutes": 1425,
+                "streams": 505
+            },
+            "August": {
+                "minutes": 1747,
+                "streams": 560
+            },
+            "September": {
+                "minutes": 1212,
+                "streams": 413
+            },
+            "October": {
+                "minutes": 2659,
+                "streams": 850
+            },
+            "November": {
+                "minutes": 476,
+                "streams": 155
+            },
+            "December": {
+                "minutes": 1820,
+                "streams": 604
+            }
+        },
+        "2020": {
+            "January": {
+                "minutes": 2156,
+                "streams": 734
+            },
+            "February": {
+                "minutes": 1980,
+                "streams": 660
+            },
+            "March": {
+                "minutes": 3575,
+                "streams": 1278
+            },
+            "April": {
+                "minutes": 2438,
+                "streams": 769
+            },
+            "May": {
+                "minutes": 1075,
+                "streams": 362
+            },
+            "June": {
+                "minutes": 1071,
+                "streams": 328
+            },
+            "July": {
+                "minutes": 1134,
+                "streams": 308
+            },
+            "August": {
+                "minutes": 743,
+                "streams": 203
+            },
+            "September": {
+                "minutes": 162,
+                "streams": 53
+            },
+            "October": {
+                "minutes": 448,
+                "streams": 147
+            },
+            "November": {
+                "minutes": 2519,
+                "streams": 763
+            },
+            "December": {
+                "minutes": 2833,
+                "streams": 834
+            }
+        }
+    }
+}
