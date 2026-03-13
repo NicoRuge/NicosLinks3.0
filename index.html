@@ -185,6 +185,7 @@
                     <x-thread-viewer-view v-else-if="currentHash === 'x-thread-viewer'"></x-thread-viewer-view>
                     <tweet-viewer-view v-else-if="currentHash === 'tweet-viewer'"></tweet-viewer-view>
                     <data-analytics-view v-else-if="currentHash === 'data-analytics'"></data-analytics-view>
+                    <external-projects-view v-else-if="currentHash === 'external-projects'"></external-projects-view>
                     <imprint-view v-else-if="currentHash === 'imprint'"></imprint-view>
                     <privacy-policy-view
                         v-else-if="currentHash === 'privacy-policy' || currentHash === 'privacy-policy-main' || currentHash === 'privacy-policy-cloud'">
@@ -233,6 +234,7 @@
     <script src="assets/js/page_x_thread_viewer.js"></script>
     <script src="assets/js/page_tweet_viewer.js"></script>
     <script src="assets/js/page_data_analytics.js"></script>
+    <script src="assets/js/page_external_projects.js"></script>
     <script src="assets/js/page_legal.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script>
@@ -252,6 +254,7 @@
                 'nav.xThreadViewer': 'X Thread Viewer',
                 'nav.tweetViewer': 'Post Viewer',
                 'nav.dataAnalytics': 'Datenanalyse',
+                'nav.externalProjects': 'Externe Projekte',
                 'nav.imprint': 'Impressum',
                 'nav.privacyPolicy': 'Datenschutz'
             },
@@ -269,6 +272,7 @@
                 'nav.xThreadViewer': 'X Thread Viewer',
                 'nav.tweetViewer': 'Post Viewer',
                 'nav.dataAnalytics': 'Data Analytics',
+                'nav.externalProjects': 'External Projects',
                 'nav.imprint': 'Imprint',
                 'nav.privacyPolicy': 'Privacy Policy'
             }
@@ -287,6 +291,7 @@
                 'x-thread-viewer-view': XThreadViewerView,
                 'tweet-viewer-view': TweetViewerView,
                 'data-analytics-view': DataAnalyticsView,
+                'external-projects-view': ExternalProjectsView,
                 'imprint-view': ImprintView,
                 'privacy-policy-view': PrivacyPolicyView
             },
@@ -353,7 +358,8 @@
                                 { id: 'blog', labelKey: 'nav.blog', icon: 'book-open-text.svg' },
                                 { id: 'x-thread-viewer', labelKey: 'nav.xThreadViewer', icon: 'twitter.svg' },
                                 { id: 'tweet-viewer', labelKey: 'nav.tweetViewer', icon: 'twitter.svg' },
-                                { id: 'data-analytics', labelKey: 'nav.dataAnalytics', icon: 'bar-chart.svg' }
+                                { id: 'data-analytics', labelKey: 'nav.dataAnalytics', icon: 'bar-chart.svg' },
+                                { id: 'external-projects', labelKey: 'nav.externalProjects', icon: 'git-branch.svg' }
                             ]
                         }
                     ],
