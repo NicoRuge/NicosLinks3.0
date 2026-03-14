@@ -242,6 +242,7 @@ body {
     bottom: 0;
     width: 250px;
     background-color: var(--color-surface);
+    transition: transform 0.3s ease;
     padding: 1rem;
     overflow: hidden;
     z-index: 1000;
@@ -881,6 +882,16 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    transition: margin-left 0.3s ease;
+}
+
+/* Clicker focus mode: slide sidebar off-screen */
+body.clicker-focus .sidebar {
+    transform: translateX(-250px);
+}
+
+body.clicker-focus .main-content {
+    margin-left: 0;
 }
 
 .main-content.qr-page-mode {
@@ -2142,4 +2153,238 @@ body {
     color: var(--bs-secondary-color);
     font-weight: 500;
     font-size: 0.7rem;
+}
+
+/* ===== Code Clicker Page ===== */
+
+.clicker-focus-btn {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 1100;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--bs-border-color);
+    background: var(--color-surface, var(--bs-secondary-bg));
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: var(--bs-secondary-color);
+    font-size: 1rem;
+    transition: background 0.15s, color 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.clicker-focus-btn:hover {
+    background: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+}
+
+.clicker-loc-display {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.clicker-loc-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--bs-secondary-color);
+    margin-top: 0.3rem;
+}
+
+.clicker-stats-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+}
+
+.clicker-stat-item {
+    font-size: 0.8rem;
+    color: var(--bs-secondary-color);
+}
+
+.clicker-stat-value {
+    font-weight: 600;
+    color: var(--bs-body-color);
+    margin-right: 0.2rem;
+}
+
+.clicker-stat-unit {
+    font-size: 0.72rem;
+}
+
+.clicker-stat-full {
+    flex-basis: 100%;
+}
+
+/* --- Big click button --- */
+.clicker-btn-outer {
+    width: 170px;
+    height: 170px;
+    position: relative;
+}
+
+.clicker-btn {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 3px solid var(--color-primary);
+    background: var(--color-surface, var(--bs-secondary-bg));
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 24px rgba(224, 154, 32, 0.2);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.clicker-btn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 36px rgba(224, 154, 32, 0.4);
+}
+
+.clicker-btn:active {
+    transform: scale(0.92);
+    box-shadow: 0 0 10px rgba(224, 154, 32, 0.15);
+}
+
+.clicker-btn-icon {
+    font-size: 3.6rem;
+    color: var(--color-primary);
+    pointer-events: none;
+}
+
+/* --- Floating text --- */
+.float-texts-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.float-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(calc(-50% + var(--fx, 0px)));
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1.05rem;
+    white-space: nowrap;
+    pointer-events: none;
+    animation: clicker-float-up 1.15s ease-out forwards;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+}
+
+@keyframes clicker-float-up {
+    0%   { opacity: 1; transform: translateX(calc(-50% + var(--fx, 0px))) translateY(0); }
+    70%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(calc(-50% + var(--fx, 0px))) translateY(-90px); }
+}
+
+/* --- Milestones --- */
+.clicker-milestone {
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.clicker-milestone:last-child {
+    border-bottom: none;
+}
+
+/* --- Upgrade cards --- */
+.clicker-upgrade-card {
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.7rem;
+    border: 1px solid var(--bs-border-color);
+    background: var(--bs-body-bg);
+    transition: border-color 0.18s, background 0.18s, opacity 0.18s;
+    cursor: pointer;
+}
+
+.clicker-upgrade-card.upgrade-can-buy {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+.clicker-upgrade-card.upgrade-can-buy:hover {
+    background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+
+.clicker-upgrade-card.upgrade-cant-buy {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.clicker-upg-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--bs-secondary-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* --- Building rows --- */
+.clicker-building-row {
+    border: 1px solid var(--bs-border-color-translucent);
+    background: var(--bs-body-bg);
+    transition: border-color 0.18s, background 0.18s;
+}
+
+.clicker-building-row.building-can-buy {
+    border-color: color-mix(in srgb, var(--bs-primary) 40%, transparent);
+}
+
+.clicker-building-row.building-owned {
+    background: var(--bs-secondary-bg-subtle);
+}
+
+.clicker-building-row:hover {
+    background: var(--bs-secondary-bg);
+}
+
+.clicker-bld-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--bs-secondary-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+}
+
+.clicker-count-badge {
+    min-width: 26px;
+    font-variant-numeric: tabular-nums;
+}
+
+.clicker-buy-btn {
+    font-size: 0.72rem;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Misc helpers --- */
+.clicker-tiny {
+    font-size: 0.7rem;
+}
+
+.clicker-tiny2 {
+    font-size: 0.8rem;
+}
+
+.min-w-0 {
+    min-width: 0;
 }
