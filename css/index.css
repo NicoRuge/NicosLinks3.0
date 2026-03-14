@@ -2076,6 +2076,10 @@ body {
     transition: opacity 0.17s ease, transform 0.17s ease;
 }
 
+.analytics-chart-wrapper--tall {
+    height: 580px;
+}
+
 .analytics-chart-wrapper.analytics-chart-fade-out {
     opacity: 0;
     transform: translateY(6px);

@@ -79,6 +79,131 @@ const DataAnalyticsView = {
                         </div>
                     </div>
 
+                    <!-- Spotify Platform Chart -->
+                    <div class="analytics-chart-card rounded-4 p-3 p-lg-4 mt-4">
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#1DB954" class="flex-shrink-0"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                                <h2 class="h5 fw-semibold mb-0">Streams by Platform</h2>
+                            </div>
+                            <p class="text-body-secondary small mb-0 mt-1">Where I listened to Spotify – streams counted per platform / device.</p>
+                        </div>
+                        <hr class="my-3">
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <template v-for="view in platformViews" :key="view.id">
+                                <input
+                                    class="btn-check"
+                                    type="radio"
+                                    name="platform-view"
+                                    :id="'pv-' + view.id"
+                                    :value="view.id"
+                                    v-model="platformCurrentView"
+                                    @change="onPlatformViewChange(view.id)"
+                                    autocomplete="off"
+                                >
+                                <label class="btn btn-sm btn-outline-secondary" :for="'pv-' + view.id">
+                                    <i :class="'bi ' + view.icon + ' me-1'"></i>{{ view.label }}
+                                </label>
+                            </template>
+                        </div>
+                        <div ref="platformChartWrapper" class="analytics-chart-wrapper analytics-chart-wrapper--tall">
+                            <div v-if="platformLoading" class="d-flex align-items-center justify-content-center h-100 text-body-secondary">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Loading…
+                            </div>
+                            <div v-else-if="!platformHasData" class="d-flex flex-column align-items-center justify-content-center h-100 text-body-secondary gap-2">
+                                <i class="bi bi-laptop fs-2 opacity-50"></i>
+                                <span class="small">No platform data available.</span>
+                            </div>
+                            <canvas v-else ref="platformChartCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Spotify Reason End Chart -->
+                    <div class="analytics-chart-card rounded-4 p-3 p-lg-4 mt-4">
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#1DB954" class="flex-shrink-0"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                                <h2 class="h5 fw-semibold mb-0">Streams by Skip Reason</h2>
+                            </div>
+                            <p class="text-body-secondary small mb-0 mt-1">How my streams ended – why did a track stop playing?</p>
+                        </div>
+                        <hr class="my-3">
+                        <div ref="reasonChartWrapper" class="analytics-chart-wrapper">
+                            <div v-if="reasonLoading" class="d-flex align-items-center justify-content-center h-100 text-body-secondary">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Loading…
+                            </div>
+                            <div v-else-if="!reasonHasData" class="d-flex flex-column align-items-center justify-content-center h-100 text-body-secondary gap-2">
+                                <i class="bi bi-skip-end fs-2 opacity-50"></i>
+                                <span class="small">No reason_end data available.</span>
+                            </div>
+                            <canvas v-else ref="reasonChartCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Listening Patterns (Clock) -->
+                    <div class="analytics-chart-card rounded-4 p-3 p-lg-4 mt-4">
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#1DB954" class="flex-shrink-0"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                                <h2 class="h5 fw-semibold mb-0">Listening Patterns</h2>
+                            </div>
+                            <p class="text-body-secondary small mb-0 mt-1">When do I listen? By hour of day and day of week (UTC+1).</p>
+                        </div>
+                        <hr class="my-3">
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <template v-for="view in clockViews" :key="view.id">
+                                <input class="btn-check" type="radio" name="clock-view" :id="'cv-' + view.id" :value="view.id" v-model="clockCurrentView" @change="onClockViewChange(view.id)" autocomplete="off">
+                                <label class="btn btn-sm btn-outline-secondary" :for="'cv-' + view.id">
+                                    <i :class="'bi ' + view.icon + ' me-1'"></i>{{ view.label }}
+                                </label>
+                            </template>
+                        </div>
+                        <div ref="clockChartWrapper" class="analytics-chart-wrapper">
+                            <div v-if="clockLoading" class="d-flex align-items-center justify-content-center h-100 text-body-secondary">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Loading…
+                            </div>
+                            <div v-else-if="!clockHasData" class="d-flex flex-column align-items-center justify-content-center h-100 text-body-secondary gap-2">
+                                <i class="bi bi-clock fs-2 opacity-50"></i>
+                                <span class="small">No listening pattern data available.</span>
+                            </div>
+                            <canvas v-else ref="clockChartCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Top Artists & Tracks -->
+                    <div class="analytics-chart-card rounded-4 p-3 p-lg-4 mt-4">
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#1DB954" class="flex-shrink-0"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                                <h2 class="h5 fw-semibold mb-0">Top Artists & Tracks</h2>
+                            </div>
+                            <p class="text-body-secondary small mb-0 mt-1">My most-played artists and tracks (≥ 30 s plays, Top 25).</p>
+                        </div>
+                        <hr class="my-3">
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <template v-for="view in topViews" :key="view.id">
+                                <input class="btn-check" type="radio" name="top-view" :id="'tv-' + view.id" :value="view.id" v-model="topCurrentView" @change="onTopViewChange(view.id)" autocomplete="off">
+                                <label class="btn btn-sm btn-outline-secondary" :for="'tv-' + view.id">
+                                    <i :class="'bi ' + view.icon + ' me-1'"></i>{{ view.label }}
+                                </label>
+                            </template>
+                        </div>
+                        <div ref="topChartWrapper" class="analytics-chart-wrapper analytics-chart-wrapper--tall">
+                            <div v-if="topLoading" class="d-flex align-items-center justify-content-center h-100 text-body-secondary">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Loading…
+                            </div>
+                            <div v-else-if="!topHasData" class="d-flex flex-column align-items-center justify-content-center h-100 text-body-secondary gap-2">
+                                <i class="bi bi-music-note-list fs-2 opacity-50"></i>
+                                <span class="small">No artist/track data available.</span>
+                            </div>
+                            <canvas v-else ref="topChartCanvas"></canvas>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -121,6 +246,29 @@ const DataAnalyticsView = {
             spotifyCurrentView: 'all',
             spotifyRawData: null,
             spotifyLoading: true,
+
+            // Platform chart
+            platformChart: null,
+            platformCurrentView: 'top10',
+            platformRawData: null,
+            platformLoading: true,
+
+            // Reason End chart
+            reasonChart: null,
+            reasonRawData: null,
+            reasonLoading: true,
+
+            // Listening Clock chart
+            clockChart: null,
+            clockCurrentView: 'hour-streams',
+            clockRawData: null,
+            clockLoading: true,
+
+            // Top Artists & Tracks chart
+            topChart: null,
+            topCurrentView: 'artists-streams',
+            topRawData: null,
+            topLoading: true,
         };
     },
 
@@ -142,13 +290,52 @@ const DataAnalyticsView = {
                     icon: YEAR_ICONS[i % YEAR_ICONS.length]
                 }))
             ];
-        }
+        },
+
+        platformHasData() {
+            return this.platformRawData && Object.keys(this.platformRawData.platforms || {}).length > 0;
+        },
+        platformViews() {
+            return [
+                { id: 'top10', label: 'Top 10', icon: 'bi-bar-chart-steps' },
+                { id: 'top25', label: 'Top 25', icon: 'bi-bar-chart'       },
+            ];
+        },
+
+
+        reasonHasData() {
+            return this.reasonRawData && Object.keys(this.reasonRawData.reason_end || {}).length > 0;
+        },
+
+        clockHasData() {
+            return this.clockRawData && (this.clockRawData.by_hour || []).length > 0;
+        },
+        clockViews() {
+            return [
+                { id: 'hour-streams', label: 'Hour / Streams', icon: 'bi-clock'              },
+                { id: 'hour-minutes', label: 'Hour / Minutes', icon: 'bi-clock-fill'         },
+                { id: 'week-streams', label: 'Weekday / Streams', icon: 'bi-calendar-week'   },
+                { id: 'week-minutes', label: 'Weekday / Minutes', icon: 'bi-calendar-check'  },
+            ];
+        },
+
+        topHasData() {
+            return this.topRawData && (this.topRawData.artists_by_streams || []).length > 0;
+        },
+        topViews() {
+            return [
+                { id: 'artists-streams', label: 'Artists / Streams', icon: 'bi-person-fill'      },
+                { id: 'artists-minutes', label: 'Artists / Minutes', icon: 'bi-person'            },
+                { id: 'tracks-streams',  label: 'Tracks / Streams',  icon: 'bi-music-note'        },
+                { id: 'tracks-minutes',  label: 'Tracks / Minutes',  icon: 'bi-music-note-list'   },
+            ];
+        },
     },
 
     mounted() {
         this.$nextTick(() => this.buildChart(this.currentView));
 
-        // Fetch Spotify data
+        // Fetch Spotify monthly data
         fetch('assets/data/spotify_stats.json')
             .then(r => r.json())
             .then(data => {
@@ -163,20 +350,99 @@ const DataAnalyticsView = {
                 this.spotifyLoading = false;
             });
 
+        // Fetch platform data
+        fetch('assets/data/spotify_platform_stats.json')
+            .then(r => r.json())
+            .then(data => {
+                this.platformRawData = data;
+                this.platformLoading = false;
+                if (this.platformHasData) {
+                    this.$nextTick(() => this.buildPlatformChart(this.platformCurrentView));
+                }
+            })
+            .catch(() => {
+                this.platformRawData = { platforms: {} };
+                this.platformLoading = false;
+            });
+
+        // Fetch reason_end data
+        fetch('assets/data/spotify_reason_end_stats.json')
+            .then(r => r.json())
+            .then(data => {
+                this.reasonRawData = data;
+                this.reasonLoading = false;
+                if (this.reasonHasData) {
+                    this.$nextTick(() => this.buildReasonChart());
+                }
+            })
+            .catch(() => {
+                this.reasonRawData = { reason_end: {} };
+                this.reasonLoading = false;
+            });
+
+        // Fetch listening clock data
+        fetch('assets/data/spotify_listening_clock.json')
+            .then(r => r.json())
+            .then(data => {
+                this.clockRawData = data;
+                this.clockLoading = false;
+                if (this.clockHasData) {
+                    this.$nextTick(() => this.buildClockChart(this.clockCurrentView));
+                }
+            })
+            .catch(() => {
+                this.clockRawData = { by_hour: [], by_weekday: [] };
+                this.clockLoading = false;
+            });
+
+        // Fetch top artists & tracks data
+        fetch('assets/data/spotify_top_artists_tracks.json')
+            .then(r => r.json())
+            .then(data => {
+                this.topRawData = data;
+                this.topLoading = false;
+                if (this.topHasData) {
+                    this.$nextTick(() => this.buildTopChart(this.topCurrentView));
+                }
+            })
+            .catch(() => {
+                this.topRawData = { artists_by_streams: [] };
+                this.topLoading = false;
+            });
+
         this._mo = new MutationObserver(() => {
-            if (this.chart) this.buildChart(this.currentView);
-            if (this.spotifyChart) this.buildSpotifyChart(this.spotifyCurrentView);
+            if (this.chart)         this.buildChart(this.currentView);
+            if (this.spotifyChart)  this.buildSpotifyChart(this.spotifyCurrentView);
+            if (this.platformChart) this.buildPlatformChart(this.platformCurrentView);
+            if (this.reasonChart)   this.buildReasonChart();
+            if (this.clockChart)    this.buildClockChart(this.clockCurrentView);
+            if (this.topChart)      this.buildTopChart(this.topCurrentView);
         });
         this._mo.observe(document.documentElement, {
             attributes: true,
             attributeFilter: ['data-bs-theme']
         });
+
+        // Chrome scrolls the overflow:hidden .content-scroll-shell when a radio button
+        // inside it is focused, moving the actual scroll container out of view.
+        // Reset it immediately whenever the browser scrolls it.
+        const shell = document.querySelector('.content-scroll-shell');
+        if (shell) {
+            this._shellScrollFix = () => { if (shell.scrollTop !== 0) shell.scrollTop = 0; };
+            shell.addEventListener('scroll', this._shellScrollFix, { passive: false });
+        }
     },
 
     beforeUnmount() {
-        if (this.chart) { this.chart.destroy(); this.chart = null; }
-        if (this.spotifyChart) { this.spotifyChart.destroy(); this.spotifyChart = null; }
+        if (this.chart)         { this.chart.destroy();         this.chart = null; }
+        if (this.spotifyChart)  { this.spotifyChart.destroy();  this.spotifyChart = null; }
+        if (this.platformChart) { this.platformChart.destroy(); this.platformChart = null; }
+        if (this.reasonChart)   { this.reasonChart.destroy();   this.reasonChart = null; }
+        if (this.clockChart)    { this.clockChart.destroy();    this.clockChart = null; }
+        if (this.topChart)      { this.topChart.destroy();      this.topChart = null; }
         if (this._mo) this._mo.disconnect();
+        const shell = document.querySelector('.content-scroll-shell');
+        if (shell && this._shellScrollFix) shell.removeEventListener('scroll', this._shellScrollFix);
     },
 
     methods: {
@@ -435,6 +701,111 @@ const DataAnalyticsView = {
             };
         },
 
+        getPlatformViewConfig(viewId) {
+            const platforms = this.platformRawData?.platforms || {};
+            const entries   = Object.entries(platforms); // already sorted by count desc
+            const limit     = viewId === 'top25' ? 25 : 10;
+            const slice     = entries.slice(0, limit);
+
+            const s    = this.style();
+            const c    = this.palette().green;
+            const kFmt = v => v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + 'K' : String(v);
+
+            const labels     = slice.map(([k]) => k.length > 35 ? k.slice(0, 33) + '…' : k);
+            const fullLabels = slice.map(([k]) => k);
+            const data       = slice.map(([, v]) => v);
+
+            return {
+                labels,
+                fullLabels,
+                datasets: [{
+                    label: 'Streams',
+                    data,
+                    backgroundColor: c + '0.6)',
+                    hoverBackgroundColor: c + '0.85)',
+                    borderRadius: 4,
+                }],
+                scales: {
+                    x: {
+                        position: 'bottom',
+                        grid: { color: s.grid, drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: s.text, padding: 6, callback: kFmt }
+                    },
+                    y: {
+                        position: 'left',
+                        grid: { color: 'transparent', drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: s.text, padding: 6 }
+                    }
+                }
+            };
+        },
+
+        getReasonViewConfig() {
+            const reasons = this.reasonRawData?.reason_end || {};
+            const LABEL_MAP = {
+                'trackdone':                    'Track Done',
+                'endplay':                      'End Play',
+                'fwdbtn':                       'Skip →',
+                'logout':                       'Logout',
+                'remote':                       'Remote',
+                'backbtn':                      '← Back',
+                'unexpected-exit-while-paused': 'Exit (Paused)',
+                'unexpected-exit':              'Unexpected Exit',
+                'unknown':                      'Unknown',
+                'trackerror':                   'Track Error',
+                'switched-to-audio':            '→ Audio',
+                'switched-to-video':            '→ Video',
+                'null':                         'No Reason',
+            };
+            const COLORS = [
+                'rgba(16,185,129,',   // green
+                'rgba(59,130,246,',   // blue
+                'rgba(251,146,60,',   // orange
+                'rgba(248,87,104,',   // red
+                'rgba(149,97,255,',   // purple
+                'rgba(34,211,199,',   // teal
+                'rgba(16,185,129,',
+                'rgba(59,130,246,',
+                'rgba(251,146,60,',
+                'rgba(248,87,104,',
+                'rgba(149,97,255,',
+                'rgba(34,211,199,',
+            ];
+
+            const s       = this.style();
+            const entries = Object.entries(reasons);
+            const labels  = entries.map(([k]) => LABEL_MAP[k] || k);
+            const data    = entries.map(([, v]) => v);
+            const bgColors    = entries.map((_, i) => COLORS[i % COLORS.length] + '0.6)');
+            const hoverColors = entries.map((_, i) => COLORS[i % COLORS.length] + '0.85)');
+            const kFmt = v => v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + 'K' : String(v);
+
+            return {
+                labels,
+                datasets: [{
+                    label: 'Streams',
+                    data,
+                    backgroundColor: bgColors,
+                    hoverBackgroundColor: hoverColors,
+                    borderRadius: 5,
+                }],
+                scales: {
+                    x: {
+                        grid: { color: 'transparent', drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: s.text, padding: 6 }
+                    },
+                    y: {
+                        grid: { color: s.grid, drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: s.text, padding: 6, maxTicksLimit: 6, callback: kFmt }
+                    }
+                }
+            };
+        },
+
         buildChart(viewId) {
             if (typeof Chart === 'undefined') {
                 setTimeout(() => this.buildChart(viewId), 200);
@@ -555,6 +926,92 @@ const DataAnalyticsView = {
             });
         },
 
+        buildPlatformChart(viewId) {
+            if (typeof Chart === 'undefined') {
+                setTimeout(() => this.buildPlatformChart(viewId), 200);
+                return;
+            }
+
+            if (this.platformChart) { this.platformChart.destroy(); this.platformChart = null; }
+
+            const canvas = this.$refs.platformChartCanvas;
+            if (!canvas) return;
+
+            const s   = this.style();
+            const cfg = this.getPlatformViewConfig(viewId);
+
+            this.platformChart = new Chart(canvas, {
+                type: 'bar',
+                data: { labels: cfg.labels, datasets: cfg.datasets },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: s.tooltipBg,
+                            titleColor: s.tooltipColor,
+                            bodyColor: s.tooltipColor,
+                            borderColor: s.tooltipBorder,
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 10,
+                            callbacks: {
+                                title: (items) => cfg.fullLabels[items[0].dataIndex],
+                                label: (ctx) => `  Streams: ${ctx.raw.toLocaleString()}`
+                            }
+                        }
+                    },
+                    scales: cfg.scales
+                }
+            });
+        },
+
+        buildReasonChart() {
+            if (typeof Chart === 'undefined') {
+                setTimeout(() => this.buildReasonChart(), 200);
+                return;
+            }
+
+            if (this.reasonChart) { this.reasonChart.destroy(); this.reasonChart = null; }
+
+            const canvas = this.$refs.reasonChartCanvas;
+            if (!canvas) return;
+
+            const s   = this.style();
+            const cfg = this.getReasonViewConfig();
+
+            this.reasonChart = new Chart(canvas, {
+                type: 'bar',
+                data: { labels: cfg.labels, datasets: cfg.datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: s.tooltipBg,
+                            titleColor: s.tooltipColor,
+                            bodyColor: s.tooltipColor,
+                            borderColor: s.tooltipBorder,
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: (ctx) => `  Streams: ${ctx.raw.toLocaleString()}`
+                            }
+                        }
+                    },
+                    scales: cfg.scales
+                }
+            });
+        },
+
         async onViewChange(viewId) {
             const token = (this._twitterToken = (this._twitterToken || 0) + 1);
             const wrapper = this.$refs.chartWrapper;
@@ -583,6 +1040,212 @@ const DataAnalyticsView = {
             if (token === this._spotifyToken && wrapper) {
                 wrapper.classList.remove('analytics-chart-fade-out');
             }
+        },
+
+        async onPlatformViewChange(viewId) {
+            const token = (this._platformToken = (this._platformToken || 0) + 1);
+            const wrapper = this.$refs.platformChartWrapper;
+            if (wrapper) {
+                wrapper.classList.add('analytics-chart-fade-out');
+                await new Promise(r => setTimeout(r, 170));
+            }
+            if (token !== this._platformToken) return;
+            this.buildPlatformChart(viewId);
+            await this.$nextTick();
+            if (token === this._platformToken && wrapper) {
+                wrapper.classList.remove('analytics-chart-fade-out');
+            }
+        },
+
+        // ── Listening Clock ──────────────────────────────────────────
+
+        getClockViewConfig(viewId) {
+            const s      = this.style();
+            const kFmt   = v => v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + 'K' : String(v);
+            const isHour = viewId.startsWith('hour');
+            const isMin  = viewId.endsWith('minutes');
+            const arr    = isHour ? (this.clockRawData?.by_hour || []) : (this.clockRawData?.by_weekday || []);
+            const labels = arr.map(e => e.label);
+            const data   = arr.map(e => isMin ? e.minutes : e.streams);
+            const metric = isMin ? 'Minutes' : 'Streams';
+            const c      = this.palette()[isHour ? 'purple' : 'teal'];
+
+            return {
+                labels,
+                datasets: [{
+                    label: metric,
+                    data,
+                    backgroundColor: c + '0.6)',
+                    hoverBackgroundColor: c + '0.85)',
+                    borderRadius: 5,
+                    _suffix: isMin ? ' min' : '',
+                }],
+                scales: {
+                    x: {
+                        grid: { color: 'transparent', drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: s.text, padding: 6 }
+                    },
+                    y: {
+                        grid: { color: s.grid, drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: s.text, padding: 6, maxTicksLimit: 6, callback: kFmt }
+                    }
+                }
+            };
+        },
+
+        buildClockChart(viewId) {
+            if (typeof Chart === 'undefined') { setTimeout(() => this.buildClockChart(viewId), 200); return; }
+            if (this.clockChart) { this.clockChart.destroy(); this.clockChart = null; }
+            const canvas = this.$refs.clockChartCanvas;
+            if (!canvas) return;
+            const s   = this.style();
+            const cfg = this.getClockViewConfig(viewId);
+            this.clockChart = new Chart(canvas, {
+                type: 'bar',
+                data: { labels: cfg.labels, datasets: cfg.datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: s.tooltipBg,
+                            titleColor: s.tooltipColor,
+                            bodyColor: s.tooltipColor,
+                            borderColor: s.tooltipBorder,
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: (ctx) => {
+                                    const suf = ctx.dataset._suffix || '';
+                                    return `  ${ctx.dataset.label}: ${ctx.raw.toLocaleString()}${suf}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: cfg.scales
+                }
+            });
+        },
+
+        async onClockViewChange(viewId) {
+            const token = (this._clockToken = (this._clockToken || 0) + 1);
+            const wrapper = this.$refs.clockChartWrapper;
+            if (wrapper) {
+                wrapper.classList.add('analytics-chart-fade-out');
+                await new Promise(r => setTimeout(r, 170));
+            }
+            if (token !== this._clockToken) return;
+            this.buildClockChart(viewId);
+            await this.$nextTick();
+            if (token === this._clockToken && wrapper) wrapper.classList.remove('analytics-chart-fade-out');
+        },
+
+        // ── Top Artists & Tracks ─────────────────────────────────────
+
+        getTopViewConfig(viewId) {
+            const s    = this.style();
+            const kFmt = v => v == null ? '' : v >= 1000 ? (v / 1000).toFixed(1) + 'K' : String(v);
+            const TOP  = 25;
+
+            const isArtist = viewId.startsWith('artists');
+            const isMin    = viewId.endsWith('minutes');
+            const key      = isArtist
+                ? (isMin ? 'artists_by_minutes' : 'artists_by_streams')
+                : (isMin ? 'tracks_by_minutes'  : 'tracks_by_streams');
+
+            const raw    = (this.topRawData?.[key] || []).slice(0, TOP);
+            const labels = raw.map(e => {
+                const n = isArtist ? e.name : `${e.name} – ${e.artist}`;
+                return n.length > 40 ? n.slice(0, 38) + '…' : n;
+            });
+            const fullLabels = raw.map(e =>
+                isArtist ? e.name : `${e.name} — ${e.artist}`
+            );
+            const data   = raw.map(e => isMin ? e.minutes : e.streams);
+            const metric = isMin ? 'Minutes' : 'Streams';
+            const c      = this.palette()[isArtist ? 'blue' : 'orange'];
+
+            return {
+                labels,
+                fullLabels,
+                datasets: [{
+                    label: metric,
+                    data,
+                    backgroundColor: c + '0.6)',
+                    hoverBackgroundColor: c + '0.85)',
+                    borderRadius: 4,
+                }],
+                scales: {
+                    x: {
+                        position: 'bottom',
+                        grid: { color: s.grid, drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: s.text, padding: 6, callback: kFmt }
+                    },
+                    y: {
+                        position: 'left',
+                        grid: { color: 'transparent', drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: s.text, padding: 6 }
+                    }
+                }
+            };
+        },
+
+        buildTopChart(viewId) {
+            if (typeof Chart === 'undefined') { setTimeout(() => this.buildTopChart(viewId), 200); return; }
+            if (this.topChart) { this.topChart.destroy(); this.topChart = null; }
+            const canvas = this.$refs.topChartCanvas;
+            if (!canvas) return;
+            const s   = this.style();
+            const cfg = this.getTopViewConfig(viewId);
+            this.topChart = new Chart(canvas, {
+                type: 'bar',
+                data: { labels: cfg.labels, datasets: cfg.datasets },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: s.tooltipBg,
+                            titleColor: s.tooltipColor,
+                            bodyColor: s.tooltipColor,
+                            borderColor: s.tooltipBorder,
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 10,
+                            callbacks: {
+                                title: (items) => cfg.fullLabels[items[0].dataIndex],
+                                label: (ctx) => `  ${ctx.dataset.label}: ${ctx.raw.toLocaleString()}`
+                            }
+                        }
+                    },
+                    scales: cfg.scales
+                }
+            });
+        },
+
+        async onTopViewChange(viewId) {
+            const token = (this._topToken = (this._topToken || 0) + 1);
+            const wrapper = this.$refs.topChartWrapper;
+            if (wrapper) {
+                wrapper.classList.add('analytics-chart-fade-out');
+                await new Promise(r => setTimeout(r, 170));
+            }
+            if (token !== this._topToken) return;
+            this.buildTopChart(viewId);
+            await this.$nextTick();
+            if (token === this._topToken && wrapper) wrapper.classList.remove('analytics-chart-fade-out');
         }
     }
 };

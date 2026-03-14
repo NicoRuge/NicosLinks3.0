@@ -1,14 +1,82 @@
 {
     "title": "Spotify Streaming Minutes",
     "Year": {
+        "2016": {
+            "February": {
+                "minutes": 587,
+                "streams": 234
+            },
+            "March": {
+                "minutes": 142,
+                "streams": 61
+            },
+            "April": {
+                "minutes": 89,
+                "streams": 45
+            },
+            "May": {
+                "minutes": 157,
+                "streams": 64
+            },
+            "June": {
+                "minutes": 8,
+                "streams": 5
+            },
+            "July": {
+                "minutes": 1,
+                "streams": 1
+            },
+            "December": {
+                "minutes": 117,
+                "streams": 43
+            }
+        },
+        "2017": {
+            "January": {
+                "minutes": 30,
+                "streams": 11
+            },
+            "February": {
+                "minutes": 118,
+                "streams": 38
+            },
+            "March": {
+                "minutes": 211,
+                "streams": 61
+            },
+            "April": {
+                "minutes": 99,
+                "streams": 44
+            },
+            "May": {
+                "minutes": 13,
+                "streams": 8
+            },
+            "June": {
+                "minutes": 33,
+                "streams": 16
+            },
+            "July": {
+                "minutes": 11,
+                "streams": 5
+            },
+            "September": {
+                "minutes": 1,
+                "streams": 2
+            },
+            "December": {
+                "minutes": 161,
+                "streams": 53
+            }
+        },
         "2018": {
             "January": {
                 "minutes": 90,
                 "streams": 34
             },
             "February": {
-                "minutes": 471,
-                "streams": 177
+                "minutes": 472,
+                "streams": 178
             },
             "March": {
                 "minutes": 166,
@@ -19,136 +87,392 @@
                 "streams": 110
             },
             "May": {
-                "minutes": 14,
-                "streams": 5
+                "minutes": 15,
+                "streams": 6
             },
             "June": {
                 "minutes": 69,
                 "streams": 25
             },
             "July": {
-                "minutes": 827,
-                "streams": 326
+                "minutes": 849,
+                "streams": 334
             },
             "August": {
-                "minutes": 688,
-                "streams": 276
+                "minutes": 837,
+                "streams": 328
             },
             "September": {
-                "minutes": 487,
-                "streams": 193
+                "minutes": 537,
+                "streams": 214
             },
             "October": {
-                "minutes": 833,
-                "streams": 337
+                "minutes": 933,
+                "streams": 377
             },
             "November": {
-                "minutes": 1273,
-                "streams": 424
+                "minutes": 1354,
+                "streams": 450
             },
             "December": {
-                "minutes": 2011,
-                "streams": 672
+                "minutes": 2273,
+                "streams": 755
             }
         },
         "2019": {
             "January": {
-                "minutes": 1411,
-                "streams": 451
+                "minutes": 1520,
+                "streams": 486
             },
             "February": {
-                "minutes": 1725,
-                "streams": 550
+                "minutes": 1824,
+                "streams": 584
             },
             "March": {
-                "minutes": 1558,
-                "streams": 483
+                "minutes": 1664,
+                "streams": 516
             },
             "April": {
-                "minutes": 1311,
-                "streams": 435
+                "minutes": 1363,
+                "streams": 453
             },
             "May": {
-                "minutes": 1355,
-                "streams": 440
+                "minutes": 1434,
+                "streams": 466
             },
             "June": {
-                "minutes": 1435,
-                "streams": 495
+                "minutes": 1508,
+                "streams": 515
             },
             "July": {
-                "minutes": 1425,
-                "streams": 505
+                "minutes": 1438,
+                "streams": 510
             },
             "August": {
-                "minutes": 1747,
-                "streams": 560
+                "minutes": 1803,
+                "streams": 577
             },
             "September": {
-                "minutes": 1212,
-                "streams": 413
+                "minutes": 1263,
+                "streams": 429
             },
             "October": {
-                "minutes": 2659,
-                "streams": 850
+                "minutes": 2723,
+                "streams": 875
             },
             "November": {
-                "minutes": 476,
-                "streams": 155
+                "minutes": 558,
+                "streams": 179
             },
             "December": {
-                "minutes": 1820,
-                "streams": 604
+                "minutes": 1871,
+                "streams": 622
             }
         },
         "2020": {
             "January": {
-                "minutes": 2156,
-                "streams": 734
+                "minutes": 2166,
+                "streams": 738
             },
             "February": {
-                "minutes": 1980,
-                "streams": 660
+                "minutes": 1994,
+                "streams": 666
             },
             "March": {
-                "minutes": 3575,
-                "streams": 1278
+                "minutes": 3630,
+                "streams": 1297
             },
             "April": {
-                "minutes": 2438,
-                "streams": 769
+                "minutes": 3002,
+                "streams": 940
             },
             "May": {
-                "minutes": 1075,
-                "streams": 362
+                "minutes": 1369,
+                "streams": 458
             },
             "June": {
-                "minutes": 1071,
-                "streams": 328
+                "minutes": 1252,
+                "streams": 373
             },
             "July": {
-                "minutes": 1134,
-                "streams": 308
+                "minutes": 1206,
+                "streams": 326
             },
             "August": {
-                "minutes": 743,
-                "streams": 203
+                "minutes": 841,
+                "streams": 221
             },
             "September": {
-                "minutes": 162,
-                "streams": 53
+                "minutes": 167,
+                "streams": 54
             },
             "October": {
-                "minutes": 448,
-                "streams": 147
+                "minutes": 513,
+                "streams": 165
             },
             "November": {
-                "minutes": 2519,
-                "streams": 763
+                "minutes": 3203,
+                "streams": 971
             },
             "December": {
-                "minutes": 2833,
-                "streams": 834
+                "minutes": 3854,
+                "streams": 1113
+            }
+        },
+        "2021": {
+            "January": {
+                "minutes": 79,
+                "streams": 23
+            },
+            "February": {
+                "minutes": 1,
+                "streams": 1
+            },
+            "March": {
+                "minutes": 90,
+                "streams": 39
+            },
+            "April": {
+                "minutes": 257,
+                "streams": 92
+            },
+            "May": {
+                "minutes": 63,
+                "streams": 29
+            },
+            "June": {
+                "minutes": 342,
+                "streams": 106
+            },
+            "July": {
+                "minutes": 132,
+                "streams": 50
+            },
+            "August": {
+                "minutes": 662,
+                "streams": 209
+            },
+            "September": {
+                "minutes": 1160,
+                "streams": 425
+            },
+            "October": {
+                "minutes": 1860,
+                "streams": 605
+            },
+            "November": {
+                "minutes": 757,
+                "streams": 225
+            },
+            "December": {
+                "minutes": 663,
+                "streams": 212
+            }
+        },
+        "2022": {
+            "January": {
+                "minutes": 1232,
+                "streams": 385
+            },
+            "February": {
+                "minutes": 805,
+                "streams": 253
+            },
+            "March": {
+                "minutes": 254,
+                "streams": 88
+            },
+            "April": {
+                "minutes": 183,
+                "streams": 70
+            },
+            "May": {
+                "minutes": 51,
+                "streams": 17
+            },
+            "June": {
+                "minutes": 10,
+                "streams": 7
+            },
+            "July": {
+                "minutes": 879,
+                "streams": 263
+            },
+            "August": {
+                "minutes": 217,
+                "streams": 71
+            },
+            "September": {
+                "minutes": 24,
+                "streams": 10
+            },
+            "October": {
+                "minutes": 31,
+                "streams": 12
+            },
+            "November": {
+                "minutes": 8,
+                "streams": 3
+            },
+            "December": {
+                "minutes": 5,
+                "streams": 2
+            }
+        },
+        "2023": {
+            "March": {
+                "minutes": 8,
+                "streams": 3
+            },
+            "April": {
+                "minutes": 20,
+                "streams": 8
+            },
+            "May": {
+                "minutes": 26,
+                "streams": 9
+            },
+            "June": {
+                "minutes": 9,
+                "streams": 3
+            },
+            "July": {
+                "minutes": 5,
+                "streams": 3
+            },
+            "August": {
+                "minutes": 2,
+                "streams": 1
+            },
+            "September": {
+                "minutes": 1,
+                "streams": 1
+            },
+            "October": {
+                "minutes": 228,
+                "streams": 75
+            },
+            "November": {
+                "minutes": 432,
+                "streams": 145
+            },
+            "December": {
+                "minutes": 3285,
+                "streams": 1063
+            }
+        },
+        "2024": {
+            "January": {
+                "minutes": 2753,
+                "streams": 822
+            },
+            "February": {
+                "minutes": 3534,
+                "streams": 1083
+            },
+            "March": {
+                "minutes": 4230,
+                "streams": 1325
+            },
+            "April": {
+                "minutes": 2759,
+                "streams": 937
+            },
+            "May": {
+                "minutes": 3295,
+                "streams": 1030
+            },
+            "June": {
+                "minutes": 4093,
+                "streams": 1251
+            },
+            "July": {
+                "minutes": 2775,
+                "streams": 843
+            },
+            "August": {
+                "minutes": 1922,
+                "streams": 607
+            },
+            "September": {
+                "minutes": 2774,
+                "streams": 816
+            },
+            "October": {
+                "minutes": 2430,
+                "streams": 764
+            },
+            "November": {
+                "minutes": 2527,
+                "streams": 772
+            },
+            "December": {
+                "minutes": 5831,
+                "streams": 1540
+            }
+        },
+        "2025": {
+            "January": {
+                "minutes": 5351,
+                "streams": 1511
+            },
+            "February": {
+                "minutes": 3407,
+                "streams": 977
+            },
+            "March": {
+                "minutes": 5657,
+                "streams": 1551
+            },
+            "April": {
+                "minutes": 5479,
+                "streams": 1522
+            },
+            "May": {
+                "minutes": 1950,
+                "streams": 579
+            },
+            "June": {
+                "minutes": 2212,
+                "streams": 684
+            },
+            "July": {
+                "minutes": 4171,
+                "streams": 1223
+            },
+            "August": {
+                "minutes": 2256,
+                "streams": 708
+            },
+            "September": {
+                "minutes": 2258,
+                "streams": 708
+            },
+            "October": {
+                "minutes": 4415,
+                "streams": 1301
+            },
+            "November": {
+                "minutes": 5283,
+                "streams": 1374
+            },
+            "December": {
+                "minutes": 7594,
+                "streams": 2108
+            }
+        },
+        "2026": {
+            "January": {
+                "minutes": 8170,
+                "streams": 2149
+            },
+            "February": {
+                "minutes": 7726,
+                "streams": 2104
+            },
+            "March": {
+                "minutes": 3074,
+                "streams": 861
             }
         }
     }

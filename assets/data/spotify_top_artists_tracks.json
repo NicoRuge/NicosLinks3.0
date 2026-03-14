@@ -1,0 +1,1115 @@
+{
+    "title": "Spotify Top Artists & Tracks",
+    "min_ms": 30000,
+    "total_counted": 52329,
+    "unique_artists": 4463,
+    "unique_tracks": 11462,
+    "artists_by_streams": [
+        {
+            "name": "The Weeknd",
+            "streams": 2038,
+            "minutes": 6826
+        },
+        {
+            "name": "Peter Fox",
+            "streams": 1232,
+            "minutes": 3748
+        },
+        {
+            "name": "Clean Bandit",
+            "streams": 853,
+            "minutes": 2672
+        },
+        {
+            "name": "Dua Lipa",
+            "streams": 768,
+            "minutes": 2336
+        },
+        {
+            "name": "Sam Smith",
+            "streams": 726,
+            "minutes": 2133
+        },
+        {
+            "name": "Lady Gaga",
+            "streams": 572,
+            "minutes": 1940
+        },
+        {
+            "name": "Robin Schulz",
+            "streams": 458,
+            "minutes": 1354
+        },
+        {
+            "name": "Ava Max",
+            "streams": 384,
+            "minutes": 1095
+        },
+        {
+            "name": "Lost Frequencies",
+            "streams": 363,
+            "minutes": 923
+        },
+        {
+            "name": "David Guetta",
+            "streams": 348,
+            "minutes": 1027
+        },
+        {
+            "name": "Purple Disco Machine",
+            "streams": 345,
+            "minutes": 1120
+        },
+        {
+            "name": "Linkin Park",
+            "streams": 337,
+            "minutes": 1058
+        },
+        {
+            "name": "Troye Sivan",
+            "streams": 331,
+            "minutes": 977
+        },
+        {
+            "name": "Rammstein",
+            "streams": 326,
+            "minutes": 1349
+        },
+        {
+            "name": "Sabrina Carpenter",
+            "streams": 319,
+            "minutes": 890
+        },
+        {
+            "name": "Adele",
+            "streams": 318,
+            "minutes": 1216
+        },
+        {
+            "name": "Imagine Dragons",
+            "streams": 316,
+            "minutes": 982
+        },
+        {
+            "name": "Giant Rooks",
+            "streams": 316,
+            "minutes": 1083
+        },
+        {
+            "name": "Alle Farben",
+            "streams": 312,
+            "minutes": 902
+        },
+        {
+            "name": "Seeed",
+            "streams": 309,
+            "minutes": 1033
+        },
+        {
+            "name": "Zimmer90",
+            "streams": 285,
+            "minutes": 779
+        },
+        {
+            "name": "Daft Punk",
+            "streams": 283,
+            "minutes": 1230
+        },
+        {
+            "name": "Nothing But Thieves",
+            "streams": 272,
+            "minutes": 968
+        },
+        {
+            "name": "Charlie Puth",
+            "streams": 262,
+            "minutes": 792
+        },
+        {
+            "name": "Felix Jaehn",
+            "streams": 251,
+            "minutes": 663
+        },
+        {
+            "name": "Falco",
+            "streams": 245,
+            "minutes": 1024
+        },
+        {
+            "name": "Dan Romer",
+            "streams": 245,
+            "minutes": 609
+        },
+        {
+            "name": "Doja Cat",
+            "streams": 245,
+            "minutes": 696
+        },
+        {
+            "name": "Ed Sheeran",
+            "streams": 242,
+            "minutes": 761
+        },
+        {
+            "name": "Kim Petras",
+            "streams": 239,
+            "minutes": 602
+        },
+        {
+            "name": "Twenty One Pilots",
+            "streams": 238,
+            "minutes": 829
+        },
+        {
+            "name": "Kygo",
+            "streams": 226,
+            "minutes": 708
+        },
+        {
+            "name": "Zara Larsson",
+            "streams": 225,
+            "minutes": 687
+        },
+        {
+            "name": "Calvin Harris",
+            "streams": 222,
+            "minutes": 731
+        },
+        {
+            "name": "Alphaville",
+            "streams": 222,
+            "minutes": 866
+        },
+        {
+            "name": "Harry Styles",
+            "streams": 213,
+            "minutes": 618
+        },
+        {
+            "name": "Tame Impala",
+            "streams": 212,
+            "minutes": 831
+        },
+        {
+            "name": "Coldplay",
+            "streams": 207,
+            "minutes": 783
+        },
+        {
+            "name": "Sam Feldt",
+            "streams": 192,
+            "minutes": 533
+        },
+        {
+            "name": "Taylor Swift",
+            "streams": 190,
+            "minutes": 605
+        },
+        {
+            "name": "Tove Lo",
+            "streams": 185,
+            "minutes": 561
+        },
+        {
+            "name": "Alan Walker",
+            "streams": 182,
+            "minutes": 564
+        },
+        {
+            "name": "Regard",
+            "streams": 182,
+            "minutes": 530
+        },
+        {
+            "name": "Maroon 5",
+            "streams": 175,
+            "minutes": 537
+        },
+        {
+            "name": "Foreigner",
+            "streams": 175,
+            "minutes": 729
+        },
+        {
+            "name": "Apache 207",
+            "streams": 174,
+            "minutes": 478
+        },
+        {
+            "name": "OneRepublic",
+            "streams": 172,
+            "minutes": 517
+        },
+        {
+            "name": "Balu Brigada",
+            "streams": 170,
+            "minutes": 613
+        },
+        {
+            "name": "Wolfgang Lohr",
+            "streams": 163,
+            "minutes": 503
+        },
+        {
+            "name": "TOTO",
+            "streams": 162,
+            "minutes": 692
+        }
+    ],
+    "artists_by_minutes": [
+        {
+            "name": "The Weeknd",
+            "streams": 2038,
+            "minutes": 6826
+        },
+        {
+            "name": "Peter Fox",
+            "streams": 1232,
+            "minutes": 3748
+        },
+        {
+            "name": "Clean Bandit",
+            "streams": 853,
+            "minutes": 2672
+        },
+        {
+            "name": "Dua Lipa",
+            "streams": 768,
+            "minutes": 2336
+        },
+        {
+            "name": "Sam Smith",
+            "streams": 726,
+            "minutes": 2133
+        },
+        {
+            "name": "Lady Gaga",
+            "streams": 572,
+            "minutes": 1940
+        },
+        {
+            "name": "Robin Schulz",
+            "streams": 458,
+            "minutes": 1354
+        },
+        {
+            "name": "Rammstein",
+            "streams": 326,
+            "minutes": 1349
+        },
+        {
+            "name": "Daft Punk",
+            "streams": 283,
+            "minutes": 1230
+        },
+        {
+            "name": "Adele",
+            "streams": 318,
+            "minutes": 1216
+        },
+        {
+            "name": "Purple Disco Machine",
+            "streams": 345,
+            "minutes": 1120
+        },
+        {
+            "name": "Ava Max",
+            "streams": 384,
+            "minutes": 1095
+        },
+        {
+            "name": "Giant Rooks",
+            "streams": 316,
+            "minutes": 1083
+        },
+        {
+            "name": "Linkin Park",
+            "streams": 337,
+            "minutes": 1058
+        },
+        {
+            "name": "Seeed",
+            "streams": 309,
+            "minutes": 1033
+        },
+        {
+            "name": "David Guetta",
+            "streams": 348,
+            "minutes": 1027
+        },
+        {
+            "name": "Falco",
+            "streams": 245,
+            "minutes": 1024
+        },
+        {
+            "name": "Imagine Dragons",
+            "streams": 316,
+            "minutes": 982
+        },
+        {
+            "name": "Troye Sivan",
+            "streams": 331,
+            "minutes": 977
+        },
+        {
+            "name": "Nothing But Thieves",
+            "streams": 272,
+            "minutes": 968
+        },
+        {
+            "name": "Lost Frequencies",
+            "streams": 363,
+            "minutes": 923
+        },
+        {
+            "name": "Alle Farben",
+            "streams": 312,
+            "minutes": 902
+        },
+        {
+            "name": "Sabrina Carpenter",
+            "streams": 319,
+            "minutes": 890
+        },
+        {
+            "name": "Alphaville",
+            "streams": 222,
+            "minutes": 866
+        },
+        {
+            "name": "Tame Impala",
+            "streams": 212,
+            "minutes": 831
+        },
+        {
+            "name": "Twenty One Pilots",
+            "streams": 238,
+            "minutes": 829
+        },
+        {
+            "name": "Charlie Puth",
+            "streams": 262,
+            "minutes": 792
+        },
+        {
+            "name": "Coldplay",
+            "streams": 207,
+            "minutes": 783
+        },
+        {
+            "name": "Zimmer90",
+            "streams": 285,
+            "minutes": 779
+        },
+        {
+            "name": "Ed Sheeran",
+            "streams": 242,
+            "minutes": 761
+        },
+        {
+            "name": "Calvin Harris",
+            "streams": 222,
+            "minutes": 731
+        },
+        {
+            "name": "Foreigner",
+            "streams": 175,
+            "minutes": 729
+        },
+        {
+            "name": "Kygo",
+            "streams": 226,
+            "minutes": 708
+        },
+        {
+            "name": "Doja Cat",
+            "streams": 245,
+            "minutes": 696
+        },
+        {
+            "name": "TOTO",
+            "streams": 162,
+            "minutes": 692
+        },
+        {
+            "name": "Zara Larsson",
+            "streams": 225,
+            "minutes": 687
+        },
+        {
+            "name": "Felix Jaehn",
+            "streams": 251,
+            "minutes": 663
+        },
+        {
+            "name": "Berg",
+            "streams": 135,
+            "minutes": 661
+        },
+        {
+            "name": "Astrix",
+            "streams": 102,
+            "minutes": 652
+        },
+        {
+            "name": "Harry Styles",
+            "streams": 213,
+            "minutes": 618
+        },
+        {
+            "name": "Balu Brigada",
+            "streams": 170,
+            "minutes": 613
+        },
+        {
+            "name": "Dan Romer",
+            "streams": 245,
+            "minutes": 609
+        },
+        {
+            "name": "Taylor Swift",
+            "streams": 190,
+            "minutes": 605
+        },
+        {
+            "name": "Kim Petras",
+            "streams": 239,
+            "minutes": 602
+        },
+        {
+            "name": "Alan Walker",
+            "streams": 182,
+            "minutes": 564
+        },
+        {
+            "name": "Tove Lo",
+            "streams": 185,
+            "minutes": 561
+        },
+        {
+            "name": "Desireless",
+            "streams": 140,
+            "minutes": 556
+        },
+        {
+            "name": "Maroon 5",
+            "streams": 175,
+            "minutes": 537
+        },
+        {
+            "name": "Pet Shop Boys",
+            "streams": 149,
+            "minutes": 535
+        },
+        {
+            "name": "Sam Feldt",
+            "streams": 192,
+            "minutes": 533
+        }
+    ],
+    "tracks_by_streams": [
+        {
+            "name": "Symphony (feat. Zara Larsson)",
+            "artist": "Clean Bandit",
+            "streams": 243,
+            "minutes": 766
+        },
+        {
+            "name": "How Do You Sleep?",
+            "artist": "Sam Smith",
+            "streams": 191,
+            "minutes": 615
+        },
+        {
+            "name": "Stay (Don't Go Away) [feat. Raye]",
+            "artist": "David Guetta",
+            "streams": 190,
+            "minutes": 565
+        },
+        {
+            "name": "Gold",
+            "artist": "Sam Feldt",
+            "streams": 177,
+            "minutes": 500
+        },
+        {
+            "name": "Blinding Lights",
+            "artist": "The Weeknd",
+            "streams": 173,
+            "minutes": 534
+        },
+        {
+            "name": "I Feel It Coming",
+            "artist": "The Weeknd",
+            "streams": 161,
+            "minutes": 680
+        },
+        {
+            "name": "Fading",
+            "artist": "Alle Farben",
+            "streams": 160,
+            "minutes": 502
+        },
+        {
+            "name": "Physical",
+            "artist": "Dua Lipa",
+            "streams": 149,
+            "minutes": 457
+        },
+        {
+            "name": "Dancing With A Stranger (with Normani)",
+            "artist": "Sam Smith",
+            "streams": 140,
+            "minutes": 361
+        },
+        {
+            "name": "Voyage voyage",
+            "artist": "Desireless",
+            "streams": 139,
+            "minutes": 553
+        },
+        {
+            "name": "Rather Be (feat. Jess Glynne)",
+            "artist": "Clean Bandit",
+            "streams": 132,
+            "minutes": 464
+        },
+        {
+            "name": "Don't Call Me Up",
+            "artist": "Mabel",
+            "streams": 132,
+            "minutes": 349
+        },
+        {
+            "name": "Can't Tame Her",
+            "artist": "Zara Larsson",
+            "streams": 132,
+            "minutes": 397
+        },
+        {
+            "name": "How Long",
+            "artist": "Tove Lo",
+            "streams": 130,
+            "minutes": 394
+        },
+        {
+            "name": "Dancing with Tears in My Eyes",
+            "artist": "Ultravox",
+            "streams": 125,
+            "minutes": 440
+        },
+        {
+            "name": "Tainted Love",
+            "artist": "Soft Cell",
+            "streams": 122,
+            "minutes": 284
+        },
+        {
+            "name": "Makudonarudo",
+            "artist": "Namewee",
+            "streams": 121,
+            "minutes": 334
+        },
+        {
+            "name": "Your Song",
+            "artist": "Rita Ora",
+            "streams": 120,
+            "minutes": 329
+        },
+        {
+            "name": "Strangers",
+            "artist": "Kenya Grace",
+            "streams": 117,
+            "minutes": 319
+        },
+        {
+            "name": "Toast 🍸",
+            "artist": "Peter Fox",
+            "streams": 117,
+            "minutes": 338
+        },
+        {
+            "name": "Crazy",
+            "artist": "Lost Frequencies",
+            "streams": 116,
+            "minutes": 283
+        },
+        {
+            "name": "Solo (feat. Demi Lovato)",
+            "artist": "Clean Bandit",
+            "streams": 113,
+            "minutes": 362
+        },
+        {
+            "name": "Espresso",
+            "artist": "Sabrina Carpenter",
+            "streams": 113,
+            "minutes": 305
+        },
+        {
+            "name": "Africa",
+            "artist": "TOTO",
+            "streams": 112,
+            "minutes": 499
+        },
+        {
+            "name": "Torn",
+            "artist": "Ava Max",
+            "streams": 110,
+            "minutes": 338
+        },
+        {
+            "name": "Take on Me",
+            "artist": "a-ha",
+            "streams": 109,
+            "minutes": 378
+        },
+        {
+            "name": "Woman",
+            "artist": "Doja Cat",
+            "streams": 109,
+            "minutes": 290
+        },
+        {
+            "name": "Down Under",
+            "artist": "Men At Work",
+            "streams": 106,
+            "minutes": 372
+        },
+        {
+            "name": "Hungry Eyes - From \"Dirty Dancing\" Soundtrack",
+            "artist": "Eric Carmen",
+            "streams": 105,
+            "minutes": 406
+        },
+        {
+            "name": "Calma",
+            "artist": "Pedro Capó",
+            "streams": 104,
+            "minutes": 288
+        },
+        {
+            "name": "Think About Things",
+            "artist": "Daði Freyr",
+            "streams": 104,
+            "minutes": 290
+        },
+        {
+            "name": "In Your Eyes",
+            "artist": "The Weeknd",
+            "streams": 103,
+            "minutes": 377
+        },
+        {
+            "name": "We Don't Talk Anymore (feat. Selena Gomez)",
+            "artist": "Charlie Puth",
+            "streams": 100,
+            "minutes": 325
+        },
+        {
+            "name": "Toscana Fanboys (feat. Adriano Celentano)",
+            "artist": "Peter Fox",
+            "streams": 100,
+            "minutes": 240
+        },
+        {
+            "name": "Die For You",
+            "artist": "The Weeknd",
+            "streams": 99,
+            "minutes": 389
+        },
+        {
+            "name": "Save Your Tears (Remix) (with Ariana Grande) - Bonus Track",
+            "artist": "The Weeknd",
+            "streams": 99,
+            "minutes": 299
+        },
+        {
+            "name": "Feel It Still",
+            "artist": "Portugal. The Man",
+            "streams": 97,
+            "minutes": 252
+        },
+        {
+            "name": "Jennie (feat. R. City, Bori)",
+            "artist": "Felix Jaehn",
+            "streams": 96,
+            "minutes": 268
+        },
+        {
+            "name": "Ich sterb für dich",
+            "artist": "Vanessa Mai",
+            "streams": 95,
+            "minutes": 274
+        },
+        {
+            "name": "As It Was",
+            "artist": "Harry Styles",
+            "streams": 95,
+            "minutes": 232
+        },
+        {
+            "name": "Levitating",
+            "artist": "Dua Lipa",
+            "streams": 94,
+            "minutes": 287
+        },
+        {
+            "name": "We Built This City",
+            "artist": "Starship",
+            "streams": 94,
+            "minutes": 420
+        },
+        {
+            "name": "Say What - Pisk Electro Swing Remix",
+            "artist": "Cut Capers",
+            "streams": 93,
+            "minutes": 276
+        },
+        {
+            "name": "Gimme! Gimme! Gimme!",
+            "artist": "GAMPER & DADONI",
+            "streams": 93,
+            "minutes": 268
+        },
+        {
+            "name": "More Than You Know",
+            "artist": "Axwell /\\ Ingrosso",
+            "streams": 92,
+            "minutes": 290
+        },
+        {
+            "name": "Riverside",
+            "artist": "Agnes Obel",
+            "streams": 91,
+            "minutes": 296
+        },
+        {
+            "name": "Owner of a Lonely Heart",
+            "artist": "Yes",
+            "streams": 91,
+            "minutes": 346
+        },
+        {
+            "name": "...Baby One More Time",
+            "artist": "Britney Spears",
+            "streams": 90,
+            "minutes": 284
+        },
+        {
+            "name": "Alles neu",
+            "artist": "Peter Fox",
+            "streams": 90,
+            "minutes": 344
+        },
+        {
+            "name": "Salt",
+            "artist": "Ava Max",
+            "streams": 89,
+            "minutes": 247
+        }
+    ],
+    "tracks_by_minutes": [
+        {
+            "name": "Symphony (feat. Zara Larsson)",
+            "artist": "Clean Bandit",
+            "streams": 243,
+            "minutes": 766
+        },
+        {
+            "name": "I Feel It Coming",
+            "artist": "The Weeknd",
+            "streams": 161,
+            "minutes": 680
+        },
+        {
+            "name": "How Do You Sleep?",
+            "artist": "Sam Smith",
+            "streams": 191,
+            "minutes": 615
+        },
+        {
+            "name": "Stay (Don't Go Away) [feat. Raye]",
+            "artist": "David Guetta",
+            "streams": 190,
+            "minutes": 565
+        },
+        {
+            "name": "Voyage voyage",
+            "artist": "Desireless",
+            "streams": 139,
+            "minutes": 553
+        },
+        {
+            "name": "Blinding Lights",
+            "artist": "The Weeknd",
+            "streams": 173,
+            "minutes": 534
+        },
+        {
+            "name": "Fading",
+            "artist": "Alle Farben",
+            "streams": 160,
+            "minutes": 502
+        },
+        {
+            "name": "Gold",
+            "artist": "Sam Feldt",
+            "streams": 177,
+            "minutes": 500
+        },
+        {
+            "name": "Africa",
+            "artist": "TOTO",
+            "streams": 112,
+            "minutes": 499
+        },
+        {
+            "name": "Rather Be (feat. Jess Glynne)",
+            "artist": "Clean Bandit",
+            "streams": 132,
+            "minutes": 464
+        },
+        {
+            "name": "Physical",
+            "artist": "Dua Lipa",
+            "streams": 149,
+            "minutes": 457
+        },
+        {
+            "name": "Dancing with Tears in My Eyes",
+            "artist": "Ultravox",
+            "streams": 125,
+            "minutes": 440
+        },
+        {
+            "name": "We Built This City",
+            "artist": "Starship",
+            "streams": 94,
+            "minutes": 420
+        },
+        {
+            "name": "Hungry Eyes - From \"Dirty Dancing\" Soundtrack",
+            "artist": "Eric Carmen",
+            "streams": 105,
+            "minutes": 406
+        },
+        {
+            "name": "Can't Tame Her",
+            "artist": "Zara Larsson",
+            "streams": 132,
+            "minutes": 397
+        },
+        {
+            "name": "How Long",
+            "artist": "Tove Lo",
+            "streams": 130,
+            "minutes": 394
+        },
+        {
+            "name": "Die For You",
+            "artist": "The Weeknd",
+            "streams": 99,
+            "minutes": 389
+        },
+        {
+            "name": "Take on Me",
+            "artist": "a-ha",
+            "streams": 109,
+            "minutes": 378
+        },
+        {
+            "name": "In Your Eyes",
+            "artist": "The Weeknd",
+            "streams": 103,
+            "minutes": 377
+        },
+        {
+            "name": "Beyond",
+            "artist": "Daft Punk",
+            "streams": 88,
+            "minutes": 375
+        },
+        {
+            "name": "Down Under",
+            "artist": "Men At Work",
+            "streams": 106,
+            "minutes": 372
+        },
+        {
+            "name": "Jeanny",
+            "artist": "Falco",
+            "streams": 68,
+            "minutes": 365
+        },
+        {
+            "name": "Solo (feat. Demi Lovato)",
+            "artist": "Clean Bandit",
+            "streams": 113,
+            "minutes": 362
+        },
+        {
+            "name": "Dancing With A Stranger (with Normani)",
+            "artist": "Sam Smith",
+            "streams": 140,
+            "minutes": 361
+        },
+        {
+            "name": "Don't Call Me Up",
+            "artist": "Mabel",
+            "streams": 132,
+            "minutes": 349
+        },
+        {
+            "name": "Owner of a Lonely Heart",
+            "artist": "Yes",
+            "streams": 91,
+            "minutes": 346
+        },
+        {
+            "name": "Alles neu",
+            "artist": "Peter Fox",
+            "streams": 90,
+            "minutes": 344
+        },
+        {
+            "name": "Deutschland",
+            "artist": "Rammstein",
+            "streams": 72,
+            "minutes": 344
+        },
+        {
+            "name": "Torn",
+            "artist": "Ava Max",
+            "streams": 110,
+            "minutes": 338
+        },
+        {
+            "name": "Toast 🍸",
+            "artist": "Peter Fox",
+            "streams": 117,
+            "minutes": 338
+        },
+        {
+            "name": "Makudonarudo",
+            "artist": "Namewee",
+            "streams": 121,
+            "minutes": 334
+        },
+        {
+            "name": "I Drink Wine",
+            "artist": "Adele",
+            "streams": 65,
+            "minutes": 332
+        },
+        {
+            "name": "Your Song",
+            "artist": "Rita Ora",
+            "streams": 120,
+            "minutes": 329
+        },
+        {
+            "name": "Sweet Harmony",
+            "artist": "The Beloved",
+            "streams": 66,
+            "minutes": 329
+        },
+        {
+            "name": "We Don't Talk Anymore (feat. Selena Gomez)",
+            "artist": "Charlie Puth",
+            "streams": 100,
+            "minutes": 325
+        },
+        {
+            "name": "Strangers",
+            "artist": "Kenya Grace",
+            "streams": 117,
+            "minutes": 319
+        },
+        {
+            "name": "Espresso",
+            "artist": "Sabrina Carpenter",
+            "streams": 113,
+            "minutes": 305
+        },
+        {
+            "name": "Save Your Tears (Remix) (with Ariana Grande) - Bonus Track",
+            "artist": "The Weeknd",
+            "streams": 99,
+            "minutes": 299
+        },
+        {
+            "name": "Moth To A Flame (with The Weeknd)",
+            "artist": "Swedish House Mafia",
+            "streams": 85,
+            "minutes": 298
+        },
+        {
+            "name": "Riverside",
+            "artist": "Agnes Obel",
+            "streams": 91,
+            "minutes": 296
+        },
+        {
+            "name": "Rockabye (feat. Sean Paul & Anne-Marie)",
+            "artist": "Clean Bandit",
+            "streams": 78,
+            "minutes": 294
+        },
+        {
+            "name": "Dance To This (feat. Ariana Grande)",
+            "artist": "Troye Sivan",
+            "streams": 84,
+            "minutes": 294
+        },
+        {
+            "name": "Always on My Mind",
+            "artist": "Pet Shop Boys",
+            "streams": 82,
+            "minutes": 291
+        },
+        {
+            "name": "More Than You Know",
+            "artist": "Axwell /\\ Ingrosso",
+            "streams": 92,
+            "minutes": 290
+        },
+        {
+            "name": "Think About Things",
+            "artist": "Daði Freyr",
+            "streams": 104,
+            "minutes": 290
+        },
+        {
+            "name": "Woman",
+            "artist": "Doja Cat",
+            "streams": 109,
+            "minutes": 290
+        },
+        {
+            "name": "The Best",
+            "artist": "Tina Turner",
+            "streams": 59,
+            "minutes": 288
+        },
+        {
+            "name": "Calma",
+            "artist": "Pedro Capó",
+            "streams": 104,
+            "minutes": 288
+        },
+        {
+            "name": "Levitating",
+            "artist": "Dua Lipa",
+            "streams": 94,
+            "minutes": 287
+        },
+        {
+            "name": "...Baby One More Time",
+            "artist": "Britney Spears",
+            "streams": 90,
+            "minutes": 284
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "title": "Spotify Streams by reason_end",
+    "total_streams": 67514,
+    "reason_end": {
+        "trackdone": 42375,
+        "endplay": 11721,
+        "fwdbtn": 5970,
+        "logout": 3683,
+        "remote": 1245,
+        "backbtn": 1010,
+        "unexpected-exit-while-paused": 910,
+        "unexpected-exit": 263,
+        "unknown": 212,
+        "trackerror": 110,
+        "switched-to-audio": 8,
+        "switched-to-video": 7
+    }
+}
