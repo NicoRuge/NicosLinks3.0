@@ -56,6 +56,7 @@
     --silver-600: #5c5c58;
 
     --color-success: #4e7a5a;
+    --color-spotify: #1DB954;
     --color-warning: #c07a08;
     --color-danger: #9a3e38;
     --color-info: #3a5878;
@@ -320,7 +321,7 @@ body {
 }
 
 .sidebar-now-playing-label.is-playing {
-    color: var(--color-success);
+    color: var(--color-spotify);
 }
 
 .sidebar-now-playing-row {
@@ -381,7 +382,7 @@ body {
 
 .sidebar-now-playing-progress-fill {
     height: 100%;
-    background: var(--color-success);
+    background: var(--color-spotify);
     border-radius: inherit;
 }
 
@@ -1171,24 +1172,24 @@ body.clicker-focus .main-content {
 .sp-icon-playing {
     width: 10px;
     height: 10px;
-    background-color: var(--color-success);
+    background-color: var(--color-spotify);
     border-radius: 50%;
     margin-right: 12px;
-    box-shadow: 0 0 0 color-mix(in srgb, var(--color-success) 40%, transparent);
+    box-shadow: 0 0 0 color-mix(in srgb, var(--color-spotify) 40%, transparent);
     animation: sp-pulse 2s infinite;
 }
 
 @keyframes sp-pulse {
     0% {
-        box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-success) 70%, transparent);
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-spotify) 70%, transparent);
     }
 
     70% {
-        box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-success) 0%, transparent);
+        box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-spotify) 0%, transparent);
     }
 
     100% {
-        box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-success) 0%, transparent);
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-spotify) 0%, transparent);
     }
 }
 
@@ -1214,7 +1215,7 @@ body.clicker-focus .main-content {
 }
 
 .sp-source-webhook {
-    color: var(--color-success);
+    color: var(--color-spotify);
 }
 
 .sp-source-api {
