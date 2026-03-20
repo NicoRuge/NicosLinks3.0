@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spotify Stats</title>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #1a1a1a;
+      --surface2: #242424;
+      --border: #2e2e2e;
+      --green: #1db954;
+      --text: #e8e8e8;
+      --text-muted: #888;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+      min-height: 100vh;
+      padding: 28px 16px 64px;
+    }
+
+    header { text-align: center; margin-bottom: 32px; }
+    header h1 { font-size: 1.8rem; font-weight: 700; }
+    header h1 span { color: var(--green); }
+    header p { color: var(--text-muted); margin-top: 6px; font-size: 0.88rem; }
+
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    /* Drop zone */
+    #dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    #dropzone.drag-over { border-color: var(--green); background: rgba(29,185,84,.05); }
+    #dropzone svg { opacity: 0.4; margin-bottom: 10px; }
+    #dropzone strong { display: block; font-size: 1rem; }
+    #dropzone p { color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; }
+    #file-input { display: none; }
+
+    #file-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .chip {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px 10px;
+      font-size: 0.75rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .chip span { color: var(--green); }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      align-items: center; margin-top: 20px;
+    }
+    .toolbar input[type=search] {
+      flex: 1; min-width: 160px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      padding: 8px 12px; font-size: 0.85rem; outline: none;
+    }
+    .toolbar input[type=search]:focus { border-color: var(--green); }
+    .toolbar select {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      padding: 8px 10px; font-size: 0.82rem; outline: none; cursor: pointer;
+    }
+    .btn {
+      padding: 8px 16px; border-radius: 8px; font-size: 0.82rem;
+      font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text); transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--border); }
+    .btn.primary { background: var(--green); color: #000; border-color: var(--green); }
+    .btn.primary:hover { background: #1ed760; }
+
+    /* Progress */
+    #progress { display: none; margin-top: 14px; }
+    .pbar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .pfill { height: 100%; background: var(--green); transition: width 0.15s; }
+    #plabel { font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; text-align: center; }
+
+    /* Stats row */
+    #stats { display: none; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+    .stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 18px;
+      flex: 1; min-width: 110px; text-align: center;
+    }
+    .stat .n { font-size: 1.4rem; font-weight: 700; color: var(--green); }
+    .stat .l { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Table */
+    #table-wrap { margin-top: 20px; overflow-x: auto; }
+    #result-info { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    thead th {
+      text-align: left; padding: 8px 12px;
+      color: var(--text-muted); font-size: 0.73rem; font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    thead th:hover { color: var(--text); }
+    thead th.sorted { color: var(--green); }
+    thead th .arr { margin-left: 3px; opacity: 0.6; }
+    tbody tr:hover td { background: var(--surface2); }
+    td {
+      padding: 9px 12px; border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .track { font-weight: 600; }
+    .artist { color: var(--text-muted); font-size: 0.78rem; margin-top: 2px; }
+    .bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .mini-bar { height: 5px; border-radius: 3px; background: var(--green); min-width: 2px; }
+    .num { font-weight: 600; }
+    .date-cell { color: var(--text-muted); font-size: 0.78rem; white-space: nowrap; }
+    .open-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 50px; font-size: 0.72rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); text-decoration: none;
+      transition: background 0.15s; white-space: nowrap;
+    }
+    .open-link:hover { background: var(--border); }
+
+    /* Pagination */
+    #pagination, #pagination-top { display: flex; justify-content: center; gap: 6px; margin-top: 20px; flex-wrap: wrap; }
+    #pagination-top { margin-top: 20px; margin-bottom: 12px; }
+    .page-btn {
+      padding: 5px 11px; border-radius: 6px; font-size: 0.78rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); cursor: pointer;
+    }
+    .page-btn.active { background: var(--green); color: #000; border-color: var(--green); font-weight: 700; }
+    .page-btn:hover:not(.active) { background: var(--border); }
+
+    /* Empty */
+    #empty { display: none; text-align: center; padding: 48px; color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(16px);
+      background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+      padding: 9px 18px; border-radius: 50px; font-size: 0.8rem;
+      opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 99;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 600px) {
+      th:nth-child(5), td:nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Spotify <span>Stream Stats</span></h1>
+    <p>Upload your Extended Streaming History JSON files to explore your listening data.</p>
+  </header>
+
+  <div id="dropzone">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 16V4m0 0L8 8m4-4l4 4"/><rect x="2" y="16" width="20" height="6" rx="2"/>
+    </svg>
+    <strong>Drop Streaming_History_Audio_*.json files here</strong>
+    <p>or <u style="cursor:pointer" id="browse-link">browse files</u> — multiple files supported</p>
+  </div>
+  <input type="file" id="file-input" accept=".json" multiple />
+  <div id="file-chips"></div>
+
+  <div class="toolbar" id="toolbar" style="display:none">
+    <input type="search" id="search" placeholder="Search track or artist…" />
+    <select id="sort-by">
+      <option value="streams">Sort: Streams ↓</option>
+      <option value="first">Sort: First heard</option>
+      <option value="last">Sort: Last heard</option>
+      <option value="name">Sort: Track A–Z</option>
+      <option value="artist">Sort: Artist A–Z</option>
+      <option value="ms">Sort: Total time</option>
+    </select>
+    <button class="btn" onclick="exportCSV()">Export CSV</button>
+  </div>
+
+  <div id="progress">
+    <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+    <div id="plabel">Processing…</div>
+  </div>
+
+  <div id="stats" style="display:none">
+    <div class="stat"><div class="n" id="s-plays">—</div><div class="l">Total plays</div></div>
+    <div class="stat"><div class="n" id="s-tracks">—</div><div class="l">Unique tracks</div></div>
+    <div class="stat"><div class="n" id="s-artists">—</div><div class="l">Unique artists</div></div>
+    <div class="stat"><div class="n" id="s-hours">—</div><div class="l">Hours listened</div></div>
+    <div class="stat"><div class="n" id="s-span">—</div><div class="l">History span</div></div>
+  </div>
+
+  <div id="pagination-top"></div>
+
+  <div id="table-wrap">
+    <div id="result-info"></div>
+    <div id="empty">No tracks found. Try a different search.</div>
+    <table id="tbl" style="display:none">
+      <thead>
+        <tr>
+          <th style="width:36px">#</th>
+          <th data-col="name">Track <span class="arr"></span></th>
+          <th data-col="streams" class="sorted">Streams <span class="arr">↓</span></th>
+          <th data-col="ms">Total Time <span class="arr"></span></th>
+          <th data-col="first">First Heard <span class="arr"></span></th>
+          <th data-col="last">Last Heard <span class="arr"></span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div id="pagination"></div>
+
+</div>
+<div id="toast"></div>
+
+<script>
+/* ── State ── */
+let allTracks = [];       // full merged dataset
+let filtered = [];        // after search
+let sortCol = 'streams';
+let sortAsc = false;
+let page = 1;
+const PAGE_SIZE = 50;
+
+/* ── Drop zone ── */
+const dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+dz.addEventListener('click', () => document.getElementById('file-input').click());
+document.getElementById('browse-link').addEventListener('click', e => { e.stopPropagation(); document.getElementById('file-input').click(); });
+document.getElementById('file-input').addEventListener('change', e => handleFiles(e.target.files));
+
+/* ── File loading ── */
+async function handleFiles(fileList) {
+  const files = Array.from(fileList).filter(f => f.name.endsWith('.json'));
+  if (!files.length) { toast('No JSON files selected'); return; }
+
+  allTracks = [];
+  document.getElementById('file-chips').innerHTML = '';
+  document.getElementById('toolbar').style.display = 'none';
+  document.getElementById('stats').style.display = 'none';
+  document.getElementById('tbl').style.display = 'none';
+  document.getElementById('empty').style.display = 'none';
+  document.getElementById('pagination').innerHTML = '';
+
+  showProg(5, `Loading ${files.length} file(s)…`);
+
+  const raw = [];
+  for (let i = 0; i < files.length; i++) {
+    showProg(5 + Math.round((i / files.length) * 50), `Reading ${files[i].name}…`);
+    try {
+      const text = await readFile(files[i]);
+      const arr = JSON.parse(text);
+      if (Array.isArray(arr)) raw.push(...arr);
+      addChip(files[i].name, arr.length);
+    } catch { toast(`Could not parse ${files[i].name}`); }
+  }
+
+  showProg(60, 'Aggregating tracks…');
+  await tick();
+  allTracks = aggregate(raw);
+
+  showProg(95, 'Rendering…');
+  await tick();
+
+  renderStats(raw, allTracks);
+  applyFilter();
+
+  showProg(100, 'Done!');
+  setTimeout(hideProg, 500);
+  document.getElementById('toolbar').style.display = 'flex';
+}
+
+function readFile(f) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsText(f);
+  });
+}
+
+function tick() { return new Promise(r => setTimeout(r, 0)); }
+
+function addChip(name, count) {
+  const d = document.createElement('div');
+  d.className = 'chip';
+  d.innerHTML = `${name} <span>${count.toLocaleString()} rows</span>`;
+  document.getElementById('file-chips').appendChild(d);
+}
+
+/* ── Aggregation ── */
+function aggregate(entries) {
+  const map = new Map();
+
+  for (const e of entries) {
+    const uri  = e.spotify_track_uri;
+    const name = e.master_metadata_track_name;
+    const artist = e.master_metadata_album_artist_name;
+    if (!uri || !name || !artist) continue;
+    if (!uri.startsWith('spotify:track:')) continue;
+    if (!e.ts) continue;
+    const ts = new Date(e.ts);
+    if (isNaN(ts)) continue;
+
+    const ms = e.ms_played || 0;
+
+    // Merge key: lowercase "artist|||name" to unify re-uploaded tracks
+    const key = (artist + '|||' + name).toLowerCase();
+
+    if (!map.has(key)) {
+      map.set(key, { uri, name, artist, streams: 0, ms: 0, first: ts, last: ts });
+    }
+    const t = map.get(key);
+    t.streams++;
+    t.ms += ms;
+    if (ts < t.first) t.first = ts;
+    if (ts > t.last)  { t.last = ts; t.uri = uri; }  // keep latest URI
+  }
+
+  return Array.from(map.values());
+}
+
+/* ── Stats ── */
+function renderStats(raw, tracks) {
+  const bar = document.getElementById('stats');
+  bar.style.display = 'flex';
+
+  const artists = new Set(tracks.map(t => t.artist.toLowerCase())).size;
+  const totalMs = tracks.reduce((s, t) => s + t.ms, 0);
+  const dates = raw.filter(e => e.ts).map(e => new Date(e.ts)).filter(d => !isNaN(d));
+  const minY = dates.length ? new Date(Math.min(...dates)).getFullYear() : '?';
+  const maxY = dates.length ? new Date(Math.max(...dates)).getFullYear() : '?';
+
+  document.getElementById('s-plays').textContent  = raw.length.toLocaleString();
+  document.getElementById('s-tracks').textContent = tracks.length.toLocaleString();
+  document.getElementById('s-artists').textContent= artists.toLocaleString();
+  document.getElementById('s-hours').textContent  = Math.round(totalMs / 3600000).toLocaleString();
+  document.getElementById('s-span').textContent   = minY === maxY ? String(minY) : `${minY}–${maxY}`;
+}
+
+/* ── Search & sort ── */
+document.getElementById('search').addEventListener('input', () => { page = 1; applyFilter(); });
+document.getElementById('sort-by').addEventListener('change', function() {
+  sortCol = this.value;
+  sortAsc = ['name','artist','first'].includes(sortCol);
+  updateSortHeaders();
+  page = 1;
+  applyFilter();
+});
+
+document.querySelectorAll('thead th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (sortCol === col) sortAsc = !sortAsc;
+    else { sortCol = col; sortAsc = ['name','artist','first'].includes(col); }
+    document.getElementById('sort-by').value = col;
+    updateSortHeaders();
+    page = 1;
+    applyFilter();
+  });
+});
+
+function updateSortHeaders() {
+  document.querySelectorAll('thead th[data-col]').forEach(th => {
+    const isSorted = th.dataset.col === sortCol;
+    th.classList.toggle('sorted', isSorted);
+    th.querySelector('.arr').textContent = isSorted ? (sortAsc ? '↑' : '↓') : '';
+  });
+}
+
+function applyFilter() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  filtered = q
+    ? allTracks.filter(t => t.name.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q))
+    : [...allTracks];
+
+  // Sort
+  filtered.sort((a, b) => {
+    let va, vb;
+    if (sortCol === 'streams') { va = a.streams; vb = b.streams; }
+    else if (sortCol === 'ms')  { va = a.ms; vb = b.ms; }
+    else if (sortCol === 'first') { va = a.first; vb = b.first; }
+    else if (sortCol === 'last')  { va = a.last;  vb = b.last; }
+    else if (sortCol === 'name')  { va = a.name.toLowerCase(); vb = b.name.toLowerCase(); }
+    else if (sortCol === 'artist'){ va = a.artist.toLowerCase(); vb = b.artist.toLowerCase(); }
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ?  1 : -1;
+    return 0;
+  });
+
+  renderTable();
+  renderPagination();
+}
+
+/* ── Table ── */
+const maxStreams = () => filtered.length ? Math.max(...filtered.map(t => t.streams)) : 1;
+
+function renderTable() {
+  const tbody = document.getElementById('tbody');
+  const tbl = document.getElementById('tbl');
+  const empty = document.getElementById('empty');
+  const info = document.getElementById('result-info');
+
+  if (!filtered.length) {
+    tbl.style.display = 'none';
+    empty.style.display = 'block';
+    info.textContent = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  tbl.style.display = 'table';
+
+  const start = (page - 1) * PAGE_SIZE;
+  const slice = filtered.slice(start, start + PAGE_SIZE);
+  const mx = maxStreams();
+
+  info.textContent = `Showing ${start + 1}–${Math.min(start + PAGE_SIZE, filtered.length)} of ${filtered.length.toLocaleString()} tracks`;
+
+  tbody.innerHTML = '';
+  slice.forEach((t, i) => {
+    const rank = start + i + 1;
+    const barW = Math.max(2, Math.round((t.streams / mx) * 100));
+    const mins = Math.round(t.ms / 60000);
+    const timeStr = mins >= 60
+      ? `${Math.floor(mins/60)}h ${mins % 60}m`
+      : `${mins}m`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--text-muted); font-size:0.75rem">${rank}</td>
+      <td>
+        <div class="track">${esc(t.name)}</div>
+        <div class="artist">${esc(t.artist)}</div>
+      </td>
+      <td>
+        <div class="bar-wrap">
+          <div class="mini-bar" style="width:${barW}px"></div>
+          <span class="num">${t.streams.toLocaleString()}</span>
+        </div>
+      </td>
+      <td class="date-cell">${timeStr}</td>
+      <td class="date-cell">${fmtDate(t.first)}</td>
+      <td class="date-cell">${fmtDate(t.last)}</td>
+      <td>
+        <a class="open-link" href="${t.uri.replace('spotify:track:', 'https://open.spotify.com/track/')}" target="_blank">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="var(--green)"><circle cx="12" cy="12" r="10"/></svg>
+          Open
+        </a>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ── Pagination ── */
+function buildPaginationNodes(total, scrollTop) {
+  const make = (label, p, active) => {
+    const b = document.createElement('button');
+    b.className = 'page-btn' + (active ? ' active' : '');
+    b.textContent = label;
+    b.onclick = () => { page = p; renderTable(); renderPagination(); if (scrollTop) window.scrollTo(0, 0); };
+    return b;
+  };
+  const ellipsis = () => Object.assign(document.createElement('span'), { textContent: '…', style: 'padding:5px 4px;color:var(--text-muted);font-size:0.78rem' });
+
+  const nodes = [];
+  if (page > 1) nodes.push(make('←', page - 1, false));
+  let start = Math.max(1, page - 2);
+  let end   = Math.min(total, page + 2);
+  if (start > 1) { nodes.push(make('1', 1, false)); if (start > 2) nodes.push(ellipsis()); }
+  for (let p = start; p <= end; p++) nodes.push(make(p, p, p === page));
+  if (end < total) { if (end < total - 1) nodes.push(ellipsis()); nodes.push(make(total, total, false)); }
+  if (page < total) nodes.push(make('→', page + 1, false));
+  return nodes;
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const bottom = document.getElementById('pagination');
+  const top    = document.getElementById('pagination-top');
+  bottom.innerHTML = '';
+  top.innerHTML = '';
+  if (total <= 1) return;
+
+  buildPaginationNodes(total, true).forEach(n => bottom.appendChild(n));
+  buildPaginationNodes(total, false).forEach(n => top.appendChild(n));
+}
+
+/* ── Export ── */
+function exportCSV() {
+  if (!filtered.length) { toast('No data to export'); return; }
+  const rows = [['Rank','Track','Artist','Streams','Total Minutes','First Heard','Last Heard','Spotify URI']];
+  filtered.forEach((t, i) => rows.push([
+    i + 1,
+    `"${t.name.replace(/"/g,'""')}"`,
+    `"${t.artist.replace(/"/g,'""')}"`,
+    t.streams,
+    Math.round(t.ms / 60000),
+    fmtDate(t.first),
+    fmtDate(t.last),
+    t.uri,
+  ]));
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'spotify-stats.csv';
+  a.click();
+  toast('Exported!');
+}
+
+/* ── Helpers ── */
+function fmtDate(d) {
+  if (!d) return '—';
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function showProg(pct, label) {
+  document.getElementById('progress').style.display = 'block';
+  document.getElementById('pfill').style.width = pct + '%';
+  document.getElementById('plabel').textContent = label;
+}
+function hideProg() { document.getElementById('progress').style.display = 'none'; }
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+</script>
+</body>
+</html>
