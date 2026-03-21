@@ -63,7 +63,7 @@ const ToolsHubView = {
                     tags: ['Charts', 'Stats']
                 },
                 {
-                    id: 'spotify-stats',
+                    id: 'SpotifyStats',
                     name: 'Spotify Stats',
                     description: 'Explore your Spotify listening history and top tracks.',
                     icon: 'bi-music-note-list',
