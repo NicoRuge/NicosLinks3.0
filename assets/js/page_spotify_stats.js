@@ -13,6 +13,12 @@ async function _pkceChallenge(v) {
     return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 }
 
+// If this is a Spotify OAuth callback, set the hash so SpotifyStatsView mounts and handles it
+;(function() {
+    const p = new URLSearchParams(window.location.search)
+    if (p.has('code') && p.has('state')) window.location.hash = '#SpotifyStats'
+})()
+
 const SpotifyStatsView = {
     template: `
         <div class="container-fluid py-4">
