@@ -1,48 +1,73 @@
 const QrView = {
     methods: {
-        async copyToClipboard(value) {
-            try {
-                await navigator.clipboard.writeText(value);
-            } catch (_) {
-                // No-op fallback for browsers that block clipboard access.
-            }
+        downloadVcard() {
+            const lines = [
+                'BEGIN:VCARD',
+                'VERSION:3.0',
+                'FN:Nico Ruge',
+                'N:Ruge;Nico;;;',
+                'EMAIL;TYPE=INTERNET:mail@nico-ruge.de',
+                'URL:https://nico-ruge.de',
+                'X-SOCIALPROFILE;type=linkedin:https://www.linkedin.com/in/nico-ruge/',
+                'X-SOCIALPROFILE;type=instagram:https://www.instagram.com/nico_ruge',
+                'END:VCARD'
+            ];
+            const blob = new Blob([lines.join('\r\n')], { type: 'text/vcard;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'NicoRuge.vcf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
     },
     template: `
-        <div class="container-fluid qr-page py-4 py-md-5">
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-10 col-lg-7 col-xl-6">
-                    <section class="portfolio-hero rounded-4 p-4 p-lg-5 qr-hero-card">
-                        <p class="qr-kicker mb-2">Contact</p>
-                        <h1 class="hero-title mb-2">Nico Ruge</h1>
-                        <p class="hero-subtitle mb-4">Photographer & Data Analyst based in Germany.</p>
-
-                        <div class="vstack gap-2">
-                            <a class="btn btn-light text-dark d-flex align-items-center justify-content-between qr-contact-btn" href="mailto:mail@nico-ruge.de">
-                                <span><i class="bi bi-envelope-fill me-2"></i>mail@nico-ruge.de</span>
-                                <i class="bi bi-arrow-right"></i>
+        <div class="biz-page">
+            <div class="biz-wrapper">
+                <div class="biz-card">
+                    <div class="biz-card-left">
+                        <div>
+                            <p class="biz-kicker">Contact</p>
+                            <h1 class="biz-name">Nico Ruge</h1>
+                            <p class="biz-title">Photographer &amp; Data Analyst</p>
+                        </div>
+                        <div class="biz-divider"></div>
+                        <div class="biz-contacts">
+                            <a class="biz-link" href="mailto:mail@nico-ruge.de">
+                                <i class="bi bi-envelope"></i>
+                                <span>mail@nico-ruge.de</span>
                             </a>
-                            <a class="btn btn-outline-light d-flex align-items-center justify-content-between qr-contact-btn" href="https://www.linkedin.com/in/nico-ruge/" target="_blank" rel="noopener noreferrer">
-                                <span><i class="bi bi-linkedin me-2"></i>LinkedIn</span>
-                                <i class="bi bi-box-arrow-up-right"></i>
+                            <a class="biz-link" href="https://nico-ruge.de" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-globe2"></i>
+                                <span>nico-ruge.de</span>
                             </a>
-                            <a class="btn btn-outline-light d-flex align-items-center justify-content-between qr-contact-btn" href="https://bsky.app/profile/nico-ruge.de" target="_blank" rel="noopener noreferrer">
-                                <span><i class="bi bi-cloud me-2"></i>Bluesky</span>
-                                <i class="bi bi-box-arrow-up-right"></i>
+                            <a class="biz-link" href="https://www.linkedin.com/in/nico-ruge/" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-linkedin"></i>
+                                <span>LinkedIn</span>
                             </a>
-                            <a class="btn btn-outline-light d-flex align-items-center justify-content-between qr-contact-btn" href="https://nico-ruge.de" target="_blank" rel="noopener noreferrer">
-                                <span><i class="bi bi-globe2 me-2"></i>nico-ruge.de</span>
-                                <i class="bi bi-box-arrow-up-right"></i>
+                            <a class="biz-link" href="https://www.instagram.com/nico_ruge" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-instagram"></i>
+                                <span>Instagram</span>
                             </a>
                         </div>
-
-                        <div class="d-flex justify-content-center mt-4">
-                            <button class="btn btn-sm btn-outline-light" type="button" @click="copyToClipboard('https://nico-ruge.de/#qr')">
-                                <i class="bi bi-copy me-1"></i>Copy QR Link
-                            </button>
+                    </div>
+                    <div class="biz-card-right">
+                        <div class="biz-qr-wrap">
+                            <img
+                                class="biz-qr-img"
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https%3A%2F%2Fnico-ruge.de%2F%23qr&margin=2"
+                                alt="QR Code — nico-ruge.de/#qr"
+                                width="160"
+                                height="160"
+                            >
                         </div>
-                    </section>
+                    </div>
                 </div>
+                <button class="biz-vcard-btn" @click="downloadVcard">
+                    <i class="bi bi-person-vcard me-1"></i>Download .vcard
+                </button>
             </div>
         </div>
     `

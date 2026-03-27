@@ -671,6 +671,307 @@ body {
     margin: 0;
 }
 
+/* ── Weather Widget ─────────────────────────────────────────────────────── */
+
+.weather-widget-wrap {
+    width: 100%;
+}
+
+.weather-widget {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.2rem;
+    border-radius: 1rem;
+    border: 1px solid color-mix(in srgb, var(--bs-body-color) 16%, transparent);
+    background: color-mix(in srgb, var(--color-surface, #2C2E37) 92%, var(--amber-500, #e09a20) 8%);
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    position: relative;
+}
+
+.weather-widget--loading,
+.weather-widget--muted {
+    opacity: 0.7;
+}
+
+.weather-widget--data {
+    align-items: flex-start;
+}
+
+/* Icon */
+.weather-widget__icon {
+    font-size: 1.4rem;
+    color: var(--amber-400, #e09a20);
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.weather-widget__icon--large {
+    font-size: 2.6rem;
+}
+
+@keyframes weather-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
+.weather-widget__icon--pulse {
+    animation: weather-pulse 1.6s ease-in-out infinite;
+}
+
+.weather-widget__status-text {
+    color: var(--bs-body-color);
+    opacity: 0.8;
+}
+
+.weather-widget__retry-btn {
+    margin-left: 0.5rem;
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--bs-body-color) 30%, transparent);
+    color: var(--bs-body-color);
+    border-radius: 0.4rem;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.weather-widget__retry-btn:hover {
+    background: color-mix(in srgb, var(--bs-body-color) 12%, transparent);
+}
+
+/* Main temp block */
+.weather-widget__main {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+
+.weather-widget__temp {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--bs-body-color);
+}
+
+.weather-widget__unit {
+    font-size: 1.1rem;
+    font-weight: 400;
+    opacity: 0.65;
+}
+
+/* Detail block */
+.weather-widget__details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.weather-widget__condition {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--bs-body-color);
+}
+
+.weather-widget__location {
+    font-size: 0.82rem;
+    opacity: 0.65;
+}
+
+.weather-widget__meta {
+    display: flex;
+    gap: 0.9rem;
+    font-size: 0.82rem;
+    opacity: 0.7;
+    margin-top: 0.15rem;
+}
+
+.weather-widget__meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Privacy note */
+.weather-widget__privacy {
+    width: 100%;
+    font-size: 0.72rem;
+    opacity: 0.45;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid color-mix(in srgb, var(--bs-body-color) 10%, transparent);
+    margin-top: 0.1rem;
+}
+
+/* Light theme adjustments */
+[data-bs-theme="light"] .weather-widget {
+    background: color-mix(in srgb, #ffffff 80%, var(--amber-100, #fdf3dc) 20%);
+}
+
+/* Idle button */
+.weather-widget__cta-btn {
+    margin-left: auto;
+    background: var(--color-primary, #e09a20);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: filter 0.2s, transform 0.15s;
+    flex-shrink: 0;
+}
+.weather-widget__cta-btn:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+/* ── Weather Privacy Modal ───────────────────────────────────────────────── */
+
+.ww-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 1rem;
+}
+
+.ww-modal {
+    background: var(--color-surface, #1e2029);
+    border: 1px solid color-mix(in srgb, var(--bs-body-color) 18%, transparent);
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+[data-bs-theme="light"] .ww-modal {
+    background: #ffffff;
+}
+
+.ww-modal__header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.2rem 1.4rem 0.75rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--bs-body-color) 10%, transparent);
+}
+
+.ww-modal__shield {
+    font-size: 1.3rem;
+    color: var(--color-primary, #e09a20);
+}
+
+.ww-modal__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.ww-modal__body {
+    padding: 1rem 1.4rem;
+    font-size: 0.88rem;
+    color: var(--bs-body-color);
+    opacity: 0.9;
+}
+
+.ww-modal__body p {
+    margin-bottom: 0.75rem;
+}
+
+.ww-modal__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.ww-modal__list li {
+    display: grid;
+    grid-template-columns: 1rem 1fr;
+    gap: 0.5rem;
+    line-height: 1.5;
+}
+
+.ww-modal__list li i {
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+    font-size: 0.9rem;
+}
+
+.ww-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding: 0.9rem 1.4rem 1.2rem;
+    border-top: 1px solid color-mix(in srgb, var(--bs-body-color) 10%, transparent);
+}
+
+.ww-modal__btn {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.45rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.15s;
+}
+.ww-modal__btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.ww-modal__btn--cancel {
+    background: color-mix(in srgb, var(--bs-body-color) 12%, transparent);
+    color: var(--bs-body-color);
+}
+
+.ww-modal__btn--confirm {
+    background: var(--color-primary, #e09a20);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* Modal transition */
+.ww-modal-enter-active,
+.ww-modal-leave-active {
+    transition: opacity 0.2s ease;
+}
+.ww-modal-enter-active .ww-modal,
+.ww-modal-leave-active .ww-modal {
+    transition: transform 0.22s ease, opacity 0.2s ease;
+}
+.ww-modal-enter-from,
+.ww-modal-leave-to {
+    opacity: 0;
+}
+.ww-modal-enter-from .ww-modal,
+.ww-modal-leave-to .ww-modal {
+    transform: translateY(12px) scale(0.97);
+    opacity: 0;
+}
+
+/* ── End Weather Widget ──────────────────────────────────────────────────── */
+
 .business-card {
     background: #2C2E37;
     border: 1px solid color-mix(in srgb, var(--bs-body-color) 18%, transparent);
@@ -933,26 +1234,155 @@ body.clicker-focus .main-content {
     margin-right: auto;
 }
 
-.qr-page {
+/* ── Business Card (QR page) ───────────────────────────── */
+.biz-page {
     min-height: 100vh;
-    display: grid;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
 }
 
-.qr-hero-card {
-    background: linear-gradient(135deg, #2C2E37 0%, #5D6488 100%);
+.biz-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
 }
 
-.qr-kicker {
-    color: color-mix(in srgb, var(--film-100) 76%, transparent);
-    letter-spacing: 0.08em;
+.biz-card {
+    width: min(520px, 100%);
+    background: linear-gradient(145deg, #191b22 0%, #23263080 55%, #2c2e3a 100%);
+    border-radius: 14px;
+    padding: clamp(22px, 5.5%, 32px) clamp(24px, 6%, 36px);
+    display: flex;
+    align-items: stretch;
+    gap: clamp(16px, 4%, 28px);
+    box-shadow:
+        0 28px 80px rgba(0, 0, 0, 0.6),
+        0 8px 24px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    position: relative;
+    overflow: hidden;
+}
+
+.biz-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 5%, rgba(210, 185, 120, 0.45) 50%, transparent 95%);
+}
+
+.biz-card-left {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.biz-kicker {
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0 0 6px;
 }
 
-.qr-contact-btn {
-    min-height: 2.9rem;
-    border-width: 1px;
+.biz-name {
+    font-size: clamp(1.15rem, 4vw, 1.55rem);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin: 0 0 5px;
+}
+
+.biz-title {
+    font-size: clamp(0.6rem, 1.7vw, 0.7rem);
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.06em;
+    margin: 0;
+}
+
+.biz-divider {
+    width: 26px;
+    height: 1px;
+    background: rgba(210, 185, 120, 0.35);
+    margin: 14px 0;
+}
+
+.biz-contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: auto;
+}
+
+.biz-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: clamp(0.62rem, 1.8vw, 0.72rem);
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: color 0.15s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.biz-link:hover {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.biz-link i {
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+
+.biz-card-right {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.biz-qr-wrap {
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px;
+    width: clamp(72px, 22%, 96px);
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.biz-qr-img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    image-rendering: pixelated;
+}
+
+.biz-vcard-btn {
+    background: none;
+    border: none;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    color: rgba(var(--bs-body-color-rgb), 0.38);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.15s ease;
+    letter-spacing: 0.02em;
+}
+
+.biz-vcard-btn:hover {
+    color: rgba(var(--bs-body-color-rgb), 0.75);
 }
 
 #content-container::-webkit-scrollbar {
